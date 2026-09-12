@@ -11,10 +11,9 @@ class AuthService {
   final ApiService _api;
   final FlutterSecureStorage _storage;
 
-  Future<Student> register(Map<String, dynamic> payload) async {
+  Future<void> register(Map<String, dynamic> payload) async {
     final response = await _api.request('POST', '/auth/register', body: payload);
-    await _saveToken(response);
-    return Student.fromJson(response['data']['student'] as Map<String, dynamic>);
+    if (response['data'] == null) throw const ApiException('Registration did not complete');
   }
 
   Future<Student> login(String email, String password) async {
@@ -25,6 +24,10 @@ class AuthService {
     );
     await _saveToken(response);
     return Student.fromJson(response['data']['student'] as Map<String, dynamic>);
+  }
+
+  Future<void> verifyEmail(String email, String otp) async {
+    await _api.request('POST', '/auth/verify-email', body: {'email': email, 'otp': otp});
   }
 
   Future<String?> token() => _storage.read(key: 'career_iq_token');

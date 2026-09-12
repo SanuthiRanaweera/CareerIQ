@@ -1,7 +1,9 @@
 const bcrypt = require('bcrypt');
+const crypto = require('node:crypto');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Student = require('../models/Student');
+const { sendVerificationEmail } = require('./emailService');
 
 function createToken(user) {
 	const secret = process.env.JWT_SECRET;
@@ -10,7 +12,7 @@ function createToken(user) {
 }
 
 function publicUser(user) {
-	return { id: user._id, fullName: user.fullName, email: user.email, role: user.role };
+	return { id: user._id, fullName: user.fullName, email: user.email, role: user.role, isEmailVerified: user.isEmailVerified };
 }
 
 async function register({ fullName, email, password, dateOfBirth, school, district, alYear }) {
@@ -20,9 +22,15 @@ async function register({ fullName, email, password, dateOfBirth, school, distri
 		error.statusCode = 409;
 		throw error;
 	}
-	const user = await User.create({ fullName, email: normalizedEmail, password: await bcrypt.hash(password, 12) });
+	const verificationOtp = String(crypto.randomInt(100000, 1000000));
+	const user = await User.create({
+		fullName, email: normalizedEmail, password: await bcrypt.hash(password, 12),
+		emailVerificationOtpHash: crypto.createHash('sha256').update(verificationOtp).digest('hex'),
+		emailVerificationOtpExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
+	});
 	const student = await Student.create({ userId: user._id, fullName, email: normalizedEmail, dateOfBirth, school, district, alYear });
-	return { token: createToken(user), user: publicUser(user), student };
+	await sendVerificationEmail({ email: normalizedEmail, fullName, otp: verificationOtp });
+	return { user: publicUser(user), student };
 }
 
 async function login({ email, password }) {
@@ -32,8 +40,28 @@ async function login({ email, password }) {
 		error.statusCode = 401;
 		throw error;
 	}
+	if (!user.isEmailVerified) {
+		const error = new Error('Please verify your email before logging in');
+		error.statusCode = 403;
+		throw error;
+	}
 	const student = await Student.findOne({ userId: user._id });
 	return { token: createToken(user), user: publicUser(user), student };
 }
 
-module.exports = { register, login };
+async function verifyEmail(email, otp) {
+	const otpHash = crypto.createHash('sha256').update(String(otp)).digest('hex');
+	const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+emailVerificationOtpHash +emailVerificationOtpExpiresAt');
+	if (!user || user.emailVerificationOtpHash !== otpHash || !user.emailVerificationOtpExpiresAt || user.emailVerificationOtpExpiresAt < new Date()) {
+		const error = new Error('Invalid or expired verification code');
+		error.statusCode = 400;
+		throw error;
+	}
+	user.isEmailVerified = true;
+	user.emailVerificationOtpHash = undefined;
+	user.emailVerificationOtpExpiresAt = undefined;
+	await user.save();
+	return user;
+}
+
+module.exports = { register, login, verifyEmail };

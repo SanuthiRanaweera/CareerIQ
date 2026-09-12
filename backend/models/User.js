@@ -6,6 +6,9 @@ const userSchema = new mongoose.Schema(
 		email: { type: String, required: true, unique: true, lowercase: true, trim: true },
 		password: { type: String, required: true, minlength: 6, select: false },
 		role: { type: String, enum: ['student'], default: 'student' },
+		isEmailVerified: { type: Boolean, default: false },
+		emailVerificationOtpHash: { type: String, select: false },
+		emailVerificationOtpExpiresAt: { type: Date, select: false },
 	},
 	{ timestamps: true },
 );

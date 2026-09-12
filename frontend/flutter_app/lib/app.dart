@@ -62,11 +62,9 @@ class _AuthGateState extends State<AuthGate> {
     if (mounted) setState(() {});
   }
 
-  Future<void> _register(Map<String, dynamic> payload) async {
-    _student = await _auth.register(payload);
-    _token = await _auth.token();
-    if (mounted) setState(() {});
-  }
+  Future<void> _register(Map<String, dynamic> payload) async => _auth.register(payload);
+
+  Future<void> _verifyEmail(String email, String otp) async => _auth.verifyEmail(email, otp);
 
   Future<void> _logout() async {
     await _auth.logout();
@@ -98,7 +96,7 @@ class _AuthGateState extends State<AuthGate> {
         },
       );
     }
-    if (_registering) return RegisterPage(onRegister: _register, onLogin: () => setState(() => _registering = false));
+    if (_registering) return RegisterPage(onRegister: _register, onVerify: _verifyEmail, onLogin: () => setState(() => _registering = false));
     return LoginPage(onLogin: _login, onRegister: () => setState(() => _registering = true));
   }
 }

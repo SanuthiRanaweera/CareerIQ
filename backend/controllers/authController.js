@@ -17,4 +17,12 @@ async function login(req, res, next) {
 	catch (error) { next(error); }
 }
 
-module.exports = { register, login };
+async function verifyEmail(req, res, next) {
+	try {
+		if (!req.body.email || !/^\d{6}$/.test(req.body.otp)) throw Object.assign(new Error('Email and six-digit OTP are required'), { statusCode: 400 });
+		await authService.verifyEmail(req.body.email, req.body.otp);
+		res.json({ success: true, message: 'Email verified successfully' });
+	} catch (error) { next(error); }
+}
+
+module.exports = { register, login, verifyEmail };

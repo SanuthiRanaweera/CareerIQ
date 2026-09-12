@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key, required this.onRegister, required this.onLogin});
+  const RegisterPage({super.key, required this.onRegister, required this.onVerify, required this.onLogin});
   final Future<void> Function(Map<String, dynamic> payload) onRegister;
+  final Future<void> Function(String email, String otp) onVerify;
   final VoidCallback onLogin;
 
   @override
@@ -17,11 +18,13 @@ class _RegisterPageState extends State<RegisterPage> {
   final _school = TextEditingController();
   final _district = TextEditingController();
   final _year = TextEditingController();
+  final _otp = TextEditingController();
   bool _loading = false;
+  bool _submitted = false;
   String? _error;
 
   @override
-  void dispose() { for (final controller in [_name, _email, _password, _confirm, _school, _district, _year]) { controller.dispose(); } super.dispose(); }
+  void dispose() { for (final controller in [_name, _email, _password, _confirm, _school, _district, _year, _otp]) { controller.dispose(); } super.dispose(); }
 
   Future<void> _submit() async {
     if (_name.text.trim().isEmpty || _email.text.trim().isEmpty || _password.text.length < 6 || _password.text != _confirm.text) {
@@ -31,15 +34,29 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() { _loading = true; _error = null; });
     try {
       await widget.onRegister({'fullName': _name.text.trim(), 'email': _email.text.trim(), 'password': _password.text, 'confirmPassword': _confirm.text, 'school': _school.text.trim(), 'district': _district.text.trim(), 'alYear': int.tryParse(_year.text.trim())});
+      if (mounted) setState(() => _submitted = true);
     } catch (error) {
       if (mounted) setState(() => _error = error.toString());
     } finally { if (mounted) setState(() => _loading = false); }
   }
 
+  Future<void> _verify() async {
+    if (!RegExp(r'^\d{6}$').hasMatch(_otp.text.trim())) {
+      setState(() => _error = 'Enter the six-digit code from Gmail.');
+      return;
+    }
+    setState(() { _loading = true; _error = null; });
+    try { await widget.onVerify(_email.text.trim(), _otp.text.trim()); if (mounted) widget.onLogin(); }
+    catch (error) { if (mounted) setState(() => _error = error.toString()); }
+    finally { if (mounted) setState(() => _loading = false); }
+  }
+
   @override
-  Widget build(BuildContext context) => Scaffold(
+    Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: const Text('Create account')),
-        body: SafeArea(child: SingleChildScrollView(padding: const EdgeInsets.all(24), child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 520), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      body: _submitted
+      ? Center(child: Padding(padding: const EdgeInsets.all(28), child: Column(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.mark_email_read_outlined, size: 64, color: Color(0xFF0B6E69)), const SizedBox(height: 20), Text('Check your Gmail', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)), const SizedBox(height: 10), Text('Enter the six-digit code sent to ${_email.text}.', textAlign: TextAlign.center), const SizedBox(height: 20), TextField(controller: _otp, keyboardType: TextInputType.number, maxLength: 6, decoration: const InputDecoration(labelText: 'Email verification code')), if (_error != null) ...[const SizedBox(height: 8), Text(_error!, style: const TextStyle(color: Colors.red), textAlign: TextAlign.center)], const SizedBox(height: 16), FilledButton(onPressed: _loading ? null : _verify, child: _loading ? const CircularProgressIndicator() : const Text('Verify email')), const SizedBox(height: 8), TextButton(onPressed: widget.onLogin, child: const Text('Back to login'))])))
+        : SafeArea(child: SingleChildScrollView(padding: const EdgeInsets.all(24), child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 520), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           Text('Start your journey', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 8), const Text('Your profile will be saved securely to CareerIQ.'), const SizedBox(height: 24),
           TextField(controller: _name, decoration: const InputDecoration(labelText: 'Full name')), const SizedBox(height: 12),
