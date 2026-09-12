@@ -1,7 +1,6 @@
 const dns = require('node:dns');
 const mongoose = require('mongoose');
 
-// Atlas SRV records need a DNS resolver that supports public SRV lookups.
 dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 async function connectDatabase() {
@@ -13,6 +12,9 @@ async function connectDatabase() {
 
 	await mongoose.connect(mongoUri, {
 		serverSelectionTimeoutMS: 10000,
+		connectTimeoutMS: 10000,
+		family: 4,
+		dbName: 'career_iq',
 	});
 
 	console.log('Connected to MongoDB');
