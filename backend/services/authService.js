@@ -17,10 +17,16 @@ function publicUser(user) {
 
 async function register({ fullName, email, password, dateOfBirth, school, district, alYear }) {
 	const normalizedEmail = email.toLowerCase().trim();
-	if (await User.exists({ email: normalizedEmail })) {
+	const existingUser = await User.findOne({ email: normalizedEmail });
+	if (existingUser?.isEmailVerified) {
 		const error = new Error('An account with this email already exists');
 		error.statusCode = 409;
 		throw error;
+	}
+	if (existingUser) {
+		const student = await Student.findOne({ userId: existingUser._id });
+		await resendVerificationEmail(normalizedEmail);
+		return { user: publicUser(existingUser), student };
 	}
 	const verificationOtp = String(crypto.randomInt(100000, 1000000));
 	const user = await User.create({
@@ -28,9 +34,44 @@ async function register({ fullName, email, password, dateOfBirth, school, distri
 		emailVerificationOtpHash: crypto.createHash('sha256').update(verificationOtp).digest('hex'),
 		emailVerificationOtpExpiresAt: new Date(Date.now() + 10 * 60 * 1000),
 	});
-	const student = await Student.create({ userId: user._id, fullName, email: normalizedEmail, dateOfBirth, school, district, alYear });
-	await sendVerificationEmail({ email: normalizedEmail, fullName, otp: verificationOtp });
+	let student;
+	try {
+		student = await Student.create({ userId: user._id, fullName, email: normalizedEmail, dateOfBirth, school, district, alYear });
+		await sendVerificationEmail({ email: normalizedEmail, fullName, otp: verificationOtp });
+	} catch (error) {
+		await Student.deleteOne({ userId: user._id });
+		await User.deleteOne({ _id: user._id });
+		const emailError = new Error(`Account was not created because the verification email could not be sent: ${error.message}`);
+		emailError.statusCode = 503;
+		throw emailError;
+	}
 	return { user: publicUser(user), student };
+}
+
+async function resendVerificationEmail(email) {
+	const normalizedEmail = email.toLowerCase().trim();
+	const user = await User.findOne({ email: normalizedEmail }).select('+emailVerificationOtpHash +emailVerificationOtpExpiresAt');
+	if (!user) {
+		const error = new Error('No account was found for this email');
+		error.statusCode = 404;
+		throw error;
+	}
+	if (user.isEmailVerified) {
+		const error = new Error('This email is already verified. You can log in.');
+		error.statusCode = 409;
+		throw error;
+	}
+	const verificationOtp = String(crypto.randomInt(100000, 1000000));
+	user.emailVerificationOtpHash = crypto.createHash('sha256').update(verificationOtp).digest('hex');
+	user.emailVerificationOtpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
+	await user.save();
+	try {
+		await sendVerificationEmail({ email: normalizedEmail, fullName: user.fullName, otp: verificationOtp });
+	} catch (error) {
+		const emailError = new Error(`The verification email could not be sent: ${error.message}`);
+		emailError.statusCode = 503;
+		throw emailError;
+	}
 }
 
 async function login({ email, password }) {
@@ -64,4 +105,4 @@ async function verifyEmail(email, otp) {
 	return user;
 }
 
-module.exports = { register, login, verifyEmail };
+module.exports = { register, login, verifyEmail, resendVerificationEmail };

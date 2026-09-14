@@ -13,15 +13,18 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'CareerIQ',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0B6E69)),
-          useMaterial3: true,
-          inputDecorationTheme: const InputDecorationTheme(border: OutlineInputBorder(), filled: true),
-        ),
-        home: const AuthGate(),
-      );
+    title: 'CareerIQ',
+    debugShowCheckedModeBanner: false,
+    theme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0B6E69)),
+      useMaterial3: true,
+      inputDecorationTheme: const InputDecorationTheme(
+        border: OutlineInputBorder(),
+        filled: true,
+      ),
+    ),
+    home: const AuthGate(),
+  );
 }
 
 class AuthGate extends StatefulWidget {
@@ -62,13 +65,22 @@ class _AuthGateState extends State<AuthGate> {
     if (mounted) setState(() {});
   }
 
-  Future<void> _register(Map<String, dynamic> payload) async => _auth.register(payload);
+  Future<void> _register(Map<String, dynamic> payload) async =>
+      _auth.register(payload);
 
-  Future<void> _verifyEmail(String email, String otp) async => _auth.verifyEmail(email, otp);
+  Future<void> _verifyEmail(String email, String otp) async =>
+      _auth.verifyEmail(email, otp);
+
+  Future<void> _resendVerificationEmail(String email) async =>
+      _auth.resendVerificationEmail(email);
 
   Future<void> _logout() async {
     await _auth.logout();
-    if (mounted) setState(() { _student = null; _token = null; });
+    if (mounted)
+      setState(() {
+        _student = null;
+        _token = null;
+      });
   }
 
   Future<void> _refreshStudent() async {
@@ -85,18 +97,34 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (_loading)
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     if (_student != null && _token != null) {
       return DashboardPage(
         student: _student!,
         onLogout: _logout,
         onProfile: () async {
-          await Navigator.push(context, MaterialPageRoute(builder: (_) => ProfilePage(student: _student!, onSave: _saveStudent)));
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  ProfilePage(student: _student!, onSave: _saveStudent),
+            ),
+          );
           await _refreshStudent();
         },
       );
     }
-    if (_registering) return RegisterPage(onRegister: _register, onVerify: _verifyEmail, onLogin: () => setState(() => _registering = false));
-    return LoginPage(onLogin: _login, onRegister: () => setState(() => _registering = true));
+    if (_registering)
+      return RegisterPage(
+        onRegister: _register,
+        onVerify: _verifyEmail,
+        onResend: _resendVerificationEmail,
+        onLogin: () => setState(() => _registering = false),
+      );
+    return LoginPage(
+      onLogin: _login,
+      onRegister: () => setState(() => _registering = true),
+    );
   }
 }

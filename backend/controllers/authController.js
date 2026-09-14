@@ -25,4 +25,12 @@ async function verifyEmail(req, res, next) {
 	} catch (error) { next(error); }
 }
 
-module.exports = { register, login, verifyEmail };
+async function resendVerificationEmail(req, res, next) {
+	try {
+		if (!req.body.email || !/^\S+@\S+\.\S+$/.test(req.body.email)) throw Object.assign(new Error('A valid email is required'), { statusCode: 400 });
+		await authService.resendVerificationEmail(req.body.email);
+		res.json({ success: true, message: 'A new verification code has been sent' });
+	} catch (error) { next(error); }
+}
+
+module.exports = { register, login, verifyEmail, resendVerificationEmail };

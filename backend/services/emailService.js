@@ -20,15 +20,20 @@ function readResponse(socket) {
 async function command(socket, value, expected = [250]) {
 	socket.write(`${value}\r\n`);
 	const response = await readResponse(socket);
-	if (!expected.includes(response.code)) throw new Error(`Gmail SMTP error ${response.code}: ${response.text}`);
+	if (!expected.includes(response.code)) {
+		if (response.code === 535) {
+			throw new Error('Gmail rejected GMAIL_USER or GMAIL_APP_PASSWORD. Generate a new Gmail App Password and update backend/.env.');
+		}
+		throw new Error(`Gmail SMTP error ${response.code}: ${response.text}`);
+	}
 }
 
 async function sendVerificationEmail({ email, fullName, otp }) {
 	const username = process.env.GMAIL_USER;
 	const password = process.env.GMAIL_APP_PASSWORD;
-	if (!username || !password) throw new Error('GMAIL_USER and GMAIL_APP_PASSWORD are required to send verification emails');
+	if (!username || !password) throw new Error('GMAIL_USER and GMAIL_APP_PASSWORD are required in backend/.env');
 
-	const socket = tls.connect({ host: 'smtp.gmail.com', port: 465, servername: 'smtp.gmail.com' });
+	const socket = tls.connect({ host: 'smtp.gmail.com', port: 465, servername: 'smtp.gmail.com', timeout: 15000 });
 	try {
 		await readResponse(socket);
 		await command(socket, 'EHLO careeriq.local');
@@ -43,6 +48,7 @@ async function sendVerificationEmail({ email, fullName, otp }) {
 		if (sent.code !== 250) throw new Error(`Gmail SMTP error ${sent.code}: ${sent.text}`);
 		await command(socket, 'QUIT', [221]);
 	} finally {
+		socket.setTimeout(0);
 		socket.end();
 	}
 }
