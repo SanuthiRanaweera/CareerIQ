@@ -65,6 +65,12 @@ class _AuthGateState extends State<AuthGate> {
     if (mounted) setState(() {});
   }
 
+  Future<void> _googleLogin() async {
+    _student = await _auth.googleLogin();
+    _token = await _auth.token();
+    if (mounted) setState(() {});
+  }
+
   Future<void> _register(Map<String, dynamic> payload) async =>
       _auth.register(payload);
 
@@ -124,6 +130,7 @@ class _AuthGateState extends State<AuthGate> {
       );
     return LoginPage(
       onLogin: _login,
+      onGoogleLogin: _googleLogin,
       onRegister: () => setState(() => _registering = true),
     );
   }

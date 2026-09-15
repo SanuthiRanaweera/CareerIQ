@@ -17,6 +17,13 @@ async function login(req, res, next) {
 	catch (error) { next(error); }
 }
 
+async function googleLogin(req, res, next) {
+	try {
+		if (!req.body.idToken || typeof req.body.idToken !== 'string') throw Object.assign(new Error('Google sign-in token is required'), { statusCode: 400 });
+		res.json({ success: true, message: 'Google login successful', data: await authService.googleLogin(req.body.idToken) });
+	} catch (error) { next(error); }
+}
+
 async function verifyEmail(req, res, next) {
 	try {
 		if (!req.body.email || !/^\d{6}$/.test(req.body.otp)) throw Object.assign(new Error('Email and six-digit OTP are required'), { statusCode: 400 });
@@ -33,4 +40,4 @@ async function resendVerificationEmail(req, res, next) {
 	} catch (error) { next(error); }
 }
 
-module.exports = { register, login, verifyEmail, resendVerificationEmail };
+module.exports = { register, login, googleLogin, verifyEmail, resendVerificationEmail };

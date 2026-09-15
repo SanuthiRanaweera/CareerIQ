@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const crypto = require('node:crypto');
 const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
 const Student = require('../models/Student');
 const { sendVerificationEmail } = require('./emailService');
@@ -13,6 +14,30 @@ function createToken(user) {
 
 function publicUser(user) {
 	return { id: user._id, fullName: user.fullName, email: user.email, role: user.role, isEmailVerified: user.isEmailVerified };
+}
+
+async function googleLogin(idToken) {
+	const clientId = process.env.GOOGLE_CLIENT_ID;
+	if (!clientId) throw Object.assign(new Error('GOOGLE_CLIENT_ID is not configured in backend/.env'), { statusCode: 503 });
+	const ticket = await new OAuth2Client().verifyIdToken({ idToken, audience: clientId });
+	const payload = ticket.getPayload();
+	if (!payload?.sub || !payload.email || payload.email_verified !== true) {
+		throw Object.assign(new Error('Google account email could not be verified'), { statusCode: 401 });
+	}
+	const email = payload.email.toLowerCase().trim();
+	let user = await User.findOne({ $or: [{ googleId: payload.sub }, { email }] }).select('+googleId');
+	if (user?.googleId && user.googleId !== payload.sub) throw Object.assign(new Error('This email is linked to a different Google account'), { statusCode: 409 });
+	if (!user) {
+		user = await User.create({ fullName: payload.name || email.split('@')[0], email, googleId: payload.sub, authProvider: 'google', isEmailVerified: true });
+		await Student.create({ userId: user._id, fullName: user.fullName, email });
+	} else if (!user.googleId) {
+		user.googleId = payload.sub;
+		user.authProvider = 'google';
+		user.isEmailVerified = true;
+		await user.save();
+	}
+	const student = await Student.findOne({ userId: user._id });
+	return { token: createToken(user), user: publicUser(user), student };
 }
 
 async function register({ fullName, email, password, dateOfBirth, school, district, alYear }) {
@@ -76,7 +101,7 @@ async function resendVerificationEmail(email) {
 
 async function login({ email, password }) {
 	const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
-	if (!user || !(await bcrypt.compare(password, user.password))) {
+	if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
 		const error = new Error('Invalid email or password');
 		error.statusCode = 401;
 		throw error;
@@ -105,4 +130,4 @@ async function verifyEmail(email, otp) {
 	return user;
 }
 
-module.exports = { register, login, verifyEmail, resendVerificationEmail };
+module.exports = { register, login, googleLogin, verifyEmail, resendVerificationEmail };
