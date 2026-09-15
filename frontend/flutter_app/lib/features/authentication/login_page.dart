@@ -71,15 +71,6 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'CAREERIQ',
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    letterSpacing: 2.4,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF087F78),
-                  ),
-                ),
-                const SizedBox(height: 18),
                 Image.asset(
                   'Assets/logo.jpeg',
                   width: 112,
