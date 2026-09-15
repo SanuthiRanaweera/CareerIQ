@@ -189,6 +189,28 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(14),
+                          child: Image.asset(
+                            'Assets/logo.jpeg',
+                            width: 72,
+                            height: 72,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 22),
+                      Text(
+                        'CREATE YOUR PROFILE',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.w800,
+                          color: const Color(0xFF087F78),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       Text(
                         'Start your journey',
                         style: Theme.of(context).textTheme.headlineMedium

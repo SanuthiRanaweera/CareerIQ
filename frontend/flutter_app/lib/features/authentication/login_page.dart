@@ -71,6 +71,15 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                Text(
+                  'CAREERIQ',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    letterSpacing: 2.4,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF087F78),
+                  ),
+                ),
+                const SizedBox(height: 18),
                 Image.asset(
                   'Assets/logo.jpeg',
                   width: 112,
@@ -90,6 +99,15 @@ class _LoginPageState extends State<LoginPage> {
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 32),
+                Text(
+                  'SIGN IN',
+                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.w800,
+                    color: const Color(0xFF087F78),
+                  ),
+                ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _email,
                   keyboardType: TextInputType.emailAddress,
@@ -125,6 +143,20 @@ class _LoginPageState extends State<LoginPage> {
                   label: const Text('Continue with Google'),
                 ),
                 const SizedBox(height: 12),
+                Row(
+                  children: [
+                    const Expanded(child: Divider()),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Text(
+                        'new here?',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                    const Expanded(child: Divider()),
+                  ],
+                ),
+                const SizedBox(height: 4),
                 TextButton(
                   onPressed: widget.onRegister,
                   child: const Text('Create a student account'),

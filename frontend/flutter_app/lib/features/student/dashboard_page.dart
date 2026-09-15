@@ -45,49 +45,94 @@ class DashboardPage extends StatelessWidget {
       body: RefreshIndicator(
         onRefresh: () async => onProfile(),
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
           children: [
+            const SizedBox(height: 8),
+            Text('Good morning,', style: Theme.of(context).textTheme.bodyLarge),
+            const SizedBox(height: 4),
             Text(
               'Hello, $firstName',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
-            const Text('Continue your career journey'),
-            const SizedBox(height: 24),
+            const SizedBox(height: 6),
+            Text(
+              'Continue shaping a career that fits you.',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            const SizedBox(height: 28),
+            Text(
+              'YOUR PROGRESS',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF087F78),
+              ),
+            ),
+            const SizedBox(height: 10),
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(22),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          'Profile completion',
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Profile completion',
+                                style: Theme.of(context).textTheme.titleLarge,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                student.profileCompletion == 100
+                                    ? 'You are all set'
+                                    : 'A few details make recommendations sharper',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
                         ),
-                        Text('${student.profileCompletion}%'),
+                        Text(
+                          '${student.profileCompletion}%',
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(color: const Color(0xFF087F78)),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 18),
                     LinearProgressIndicator(
                       value: student.profileCompletion / 100,
-                      minHeight: 9,
+                      minHeight: 10,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 18),
                     OutlinedButton.icon(
                       onPressed: onProfile,
                       icon: const Icon(Icons.edit_outlined),
-                      label: const Text('Complete profile'),
+                      label: Text(
+                        student.profileCompletion == 100
+                            ? 'Review profile'
+                            : 'Complete profile',
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 16),
+            Text(
+              'YOUR CAREER HUB',
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF087F78),
+              ),
+            ),
+            const SizedBox(height: 10),
             _InfoCard(
               icon: Icons.school_outlined,
               title: 'Your A/L results',
@@ -131,15 +176,25 @@ class _InfoCard extends StatelessWidget {
   Widget build(BuildContext context) => Card(
     margin: const EdgeInsets.only(bottom: 12),
     child: ListTile(
-      contentPadding: const EdgeInsets.all(16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       leading: CircleAvatar(
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        child: Icon(icon),
+        radius: 24,
+        backgroundColor: const Color(0xFFCCF3EF),
+        foregroundColor: const Color(0xFF087F78),
+        child: Icon(icon, size: 24),
       ),
-      title: Text(title),
-      subtitle: Text('$value\n$subtitle'),
+      title: Text(title, style: Theme.of(context).textTheme.titleLarge),
+      subtitle: Padding(
+        padding: const EdgeInsets.only(top: 5),
+        child: Text(
+          '$value\n$subtitle',
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ),
       isThreeLine: true,
-      trailing: onTap == null ? null : const Icon(Icons.chevron_right),
+      trailing: onTap == null
+          ? const Icon(Icons.lock_outline, size: 20)
+          : const Icon(Icons.arrow_forward_rounded),
       onTap: onTap,
     ),
   );
