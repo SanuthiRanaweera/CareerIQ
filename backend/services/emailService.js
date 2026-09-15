@@ -1,4 +1,6 @@
 const tls = require('node:tls');
+const fs = require('node:fs');
+const path = require('node:path');
 
 function readResponse(socket) {
 	return new Promise((resolve, reject) => {
@@ -43,7 +45,32 @@ async function sendVerificationEmail({ email, fullName, otp }) {
 		await command(socket, `MAIL FROM:<${username}>`);
 		await command(socket, `RCPT TO:<${email}>`);
 		await command(socket, 'DATA', [354]);
-		socket.write(`From: CareerIQ <${username}>\r\nTo: ${email}\r\nSubject: Your CareerIQ verification code\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n<h2>Welcome to CareerIQ, ${fullName}</h2><p>Your email verification code is:</p><h1 style="letter-spacing: 8px">${otp}</h1><p>This code expires in 10 minutes.</p>\r\n.\r\n`);
+		const logoPath = path.resolve(__dirname, '../../frontend/flutter_app/Assets/logo.jpeg');
+		const logo = fs.readFileSync(logoPath).toString('base64');
+		const boundary = `CareerIQ_${Date.now()}`;
+		const message = [
+			`From: CareerIQ <${username}>`,
+			`To: ${email}`,
+			'Subject: Your CareerIQ verification code',
+			'MIME-Version: 1.0',
+			`Content-Type: multipart/related; boundary="${boundary}"`,
+			'',
+			`--${boundary}`,
+			'Content-Type: text/html; charset=UTF-8',
+			'',
+			`<div style="font-family:Arial,sans-serif;max-width:520px;padding:24px;color:#172323"><img src="cid:careeriq-logo" alt="CareerIQ" style="width:180px;height:auto"><h2>Welcome to CareerIQ, ${fullName}</h2><p>Your email verification code is:</p><h1 style="letter-spacing:8px;color:#0B6E69">${otp}</h1><p>This code expires in 10 minutes.</p></div>`,
+			'',
+			`--${boundary}`,
+			'Content-Type: image/jpeg; name="careeriq-logo.jpeg"',
+			'Content-Transfer-Encoding: base64',
+			'Content-ID: <careeriq-logo>',
+			'Content-Disposition: inline; filename="careeriq-logo.jpeg"',
+			'',
+			logo.match(/.{1,76}/g).join('\r\n'),
+			`--${boundary}--`,
+			'',
+		].join('\r\n');
+		socket.write(`${message}\r\n.\r\n`);
 		const sent = await readResponse(socket);
 		if (sent.code !== 250) throw new Error(`Gmail SMTP error ${sent.code}: ${sent.text}`);
 		await command(socket, 'QUIT', [221]);
