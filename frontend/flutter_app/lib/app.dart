@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'features/chatbot/screens/chatbot_screen.dart';
 import 'features/authentication/login_page.dart';
 import 'features/authentication/register_page.dart';
 import 'features/student/dashboard_page.dart';
+import 'features/student/personality/personality_test_page.dart';
 import 'features/student/profile_page.dart';
 import 'models/student.dart';
 import 'services/auth_service.dart';
@@ -17,12 +19,12 @@ class MyApp extends StatelessWidget {
     debugShowCheckedModeBanner: false,
     theme: ThemeData(
       colorScheme: ColorScheme.fromSeed(
-        seedColor: const Color(0xFF087F78),
+        seedColor: const Color(0xFF3B82F6),
         brightness: Brightness.light,
-        surface: const Color(0xFFF4FAF8),
+        surface: const Color(0xFFF8FAFC),
       ),
       useMaterial3: true,
-      scaffoldBackgroundColor: const Color(0xFFF4FAF8),
+      scaffoldBackgroundColor: const Color(0xFFF8FAFC),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
@@ -33,11 +35,11 @@ class MyApp extends StatelessWidget {
         color: Colors.white,
         surfaceTintColor: Colors.transparent,
         elevation: 1,
-        shadowColor: Color(0x220D3734),
+        shadowColor: Color(0x1A1F2937),
         margin: EdgeInsets.zero,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(20)),
-          side: BorderSide(color: Color(0x0F0D3734)),
+          side: BorderSide(color: Color(0x12E2E8F0)),
         ),
       ),
       filledButtonTheme: FilledButtonThemeData(
@@ -51,28 +53,28 @@ class MyApp extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           minimumSize: const Size.fromHeight(52),
           shape: const StadiumBorder(),
-          side: const BorderSide(color: Color(0xFF52706D)),
+          side: const BorderSide(color: Color(0xFF64748B)),
           textStyle: const TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
       inputDecorationTheme: const InputDecorationTheme(
         filled: true,
-        fillColor: Color(0xFFE9F1EF),
+        fillColor: Color(0xFFF8FAFC),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
-          borderSide: BorderSide(color: Color(0x2452706D)),
+          borderSide: BorderSide(color: Color(0xFF94A3B8)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(16)),
-          borderSide: BorderSide(color: Color(0xFF087F78), width: 2),
+          borderSide: BorderSide(color: Color(0xFF3B82F6), width: 2),
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         floatingLabelStyle: TextStyle(
-          color: Color(0xFF087F78),
+          color: Color(0xFF3B82F6),
           fontWeight: FontWeight.w700,
         ),
       ),
@@ -81,23 +83,23 @@ class MyApp extends StatelessWidget {
           fontSize: 32,
           height: 1.1,
           fontWeight: FontWeight.w800,
-          color: Color(0xFF142322),
+          color: Color(0xFF1F2937),
         ),
         headlineSmall: TextStyle(
           fontSize: 24,
           height: 1.15,
           fontWeight: FontWeight.w800,
-          color: Color(0xFF142322),
+          color: Color(0xFF1F2937),
         ),
         titleLarge: TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: Color(0xFF142322),
+          color: Color(0xFF1F2937),
         ),
         bodyLarge: TextStyle(
           fontSize: 17,
           height: 1.35,
-          color: Color(0xFF405451),
+          color: Color(0xFF64748B),
         ),
       ),
     ),
@@ -196,6 +198,30 @@ class _AuthGateState extends State<AuthGate> {
             ),
           );
           await _refreshStudent();
+        },
+        onPersonalityTest: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => PersonalityTestPage(
+                token: _token!,
+                studentId: _student!.id,
+                onCompleted: _refreshStudent,
+              ),
+            ),
+          );
+          await _refreshStudent();
+        },
+        onChatbot: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ChatbotScreen(
+                token: _token!,
+                studentName: _student!.fullName,
+              ),
+            ),
+          );
         },
       );
     }

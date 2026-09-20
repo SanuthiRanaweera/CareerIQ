@@ -8,10 +8,14 @@ class DashboardPage extends StatelessWidget {
     required this.student,
     required this.onProfile,
     required this.onLogout,
+    required this.onPersonalityTest,
+    required this.onChatbot,
   });
   final Student student;
   final VoidCallback onProfile;
   final VoidCallback onLogout;
+  final VoidCallback onPersonalityTest;
+  final VoidCallback onChatbot;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +46,15 @@ class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: onChatbot,
+        backgroundColor: const Color(0xFF3B82F6),
+        foregroundColor: Colors.white,
+        elevation: 5,
+        icon: const Icon(Icons.auto_awesome_rounded),
+        label: const Text('Ask CareerIQ'),
+      ),
       body: RefreshIndicator(
         onRefresh: () async => onProfile(),
         child: ListView(
@@ -65,7 +78,7 @@ class DashboardPage extends StatelessWidget {
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF087F78),
+                color: const Color(0xFF3B82F6),
               ),
             ),
             const SizedBox(height: 10),
@@ -99,7 +112,7 @@ class DashboardPage extends StatelessWidget {
                         Text(
                           '${student.profileCompletion}%',
                           style: Theme.of(context).textTheme.headlineSmall
-                              ?.copyWith(color: const Color(0xFF087F78)),
+                              ?.copyWith(color: const Color(0xFF3B82F6)),
                         ),
                       ],
                     ),
@@ -129,7 +142,7 @@ class DashboardPage extends StatelessWidget {
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
                 letterSpacing: 1.2,
                 fontWeight: FontWeight.w800,
-                color: const Color(0xFF087F78),
+                color: const Color(0xFF3B82F6),
               ),
             ),
             const SizedBox(height: 10),
@@ -139,6 +152,15 @@ class DashboardPage extends StatelessWidget {
               value: student.stream ?? 'Add your stream',
               subtitle: '${student.alResults.length} subjects added',
               onTap: onProfile,
+            ),
+            _InfoCard(
+              icon: Icons.psychology_outlined,
+              title: 'Personality & Interest Test',
+              value: student.personalityCategory ?? 'Not started',
+              subtitle: student.personalityCategory == null
+                  ? 'Discover your career personality'
+                  : 'Tap to view your result',
+              onTap: onPersonalityTest,
             ),
             _InfoCard(
               icon: Icons.auto_awesome_outlined,
@@ -151,6 +173,13 @@ class DashboardPage extends StatelessWidget {
               title: 'Course recommendations',
               value: 'Coming soon',
               subtitle: 'Explore courses that fit your goals',
+            ),
+            _InfoCard(
+              icon: Icons.auto_awesome_outlined,
+              title: 'CareerIQ AI Assistant',
+              value: 'Ask your career mentor',
+              subtitle: 'Get personalized guidance on demand',
+              onTap: onChatbot,
             ),
           ],
         ),
@@ -179,8 +208,8 @@ class _InfoCard extends StatelessWidget {
       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
       leading: CircleAvatar(
         radius: 24,
-        backgroundColor: const Color(0xFFCCF3EF),
-        foregroundColor: const Color(0xFF087F78),
+        backgroundColor: const Color(0xFFDBEAFE),
+        foregroundColor: const Color(0xFF3B82F6),
         child: Icon(icon, size: 24),
       ),
       title: Text(title, style: Theme.of(context).textTheme.titleLarge),

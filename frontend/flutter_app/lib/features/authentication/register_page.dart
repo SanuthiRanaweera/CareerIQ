@@ -130,7 +130,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   const Icon(
                     Icons.mark_email_read_outlined,
                     size: 64,
-                    color: Color(0xFF0B6E69),
+                    color: Color(0xFF3B82F6),
                   ),
                   const SizedBox(height: 20),
                   Text(
@@ -157,7 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(height: 8),
                     Text(
                       _error!,
-                      style: const TextStyle(color: Colors.red),
+                      style: const TextStyle(color: Color(0xFFEF4444)),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -207,7 +207,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           letterSpacing: 1.2,
                           fontWeight: FontWeight.w800,
-                          color: const Color(0xFF087F78),
+                          color: const Color(0xFF3B82F6),
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -273,7 +273,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 12),
                         Text(
                           _error!,
-                          style: const TextStyle(color: Colors.red),
+                          style: const TextStyle(color: Color(0xFFEF4444)),
                         ),
                       ],
                       const SizedBox(height: 22),

@@ -24,6 +24,14 @@ const studentSchema = new mongoose.Schema(
 		personalityResult: {
 			category: { type: String, trim: true },
 			strengths: [{ type: String, trim: true }],
+			scores: {
+				analytical: { type: Number, min: 0, max: 100 },
+				creative: { type: Number, min: 0, max: 100 },
+				social: { type: Number, min: 0, max: 100 },
+				leadership: { type: Number, min: 0, max: 100 },
+				practical: { type: Number, min: 0, max: 100 },
+				organized: { type: Number, min: 0, max: 100 },
+			},
 			completedAt: { type: Date },
 		},
 		favoriteCareers: [{ type: mongoose.Schema.Types.ObjectId }],

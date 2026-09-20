@@ -6,15 +6,18 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/material.dart';
 
 import 'package:flutter_app/app.dart';
 
 void main() {
-  testWidgets('shows CareerIQ connection screen', (WidgetTester tester) async {
+  testWidgets('uses CareerIQ brand theme', (WidgetTester tester) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyApp());
     await tester.pump();
 
-    expect(find.text('Welcome to CareerIQ'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+    expect(app.theme?.scaffoldBackgroundColor, const Color(0xFFF8FAFC));
   });
 }
