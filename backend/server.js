@@ -5,6 +5,7 @@ const cors = require('cors');
 const { connectDatabase, getDatabaseStatus } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const personalityRoutes = require('./routes/personalityRoutes');
 const errorHandler = require('./middleware/errorMiddleware');
 
 const app = express();
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/personality', personalityRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({

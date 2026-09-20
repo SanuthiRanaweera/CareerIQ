@@ -122,8 +122,8 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 CircleAvatar(
                   radius: 32,
-                  backgroundColor: const Color(0xFFCCF3EF),
-                  foregroundColor: const Color(0xFF087F78),
+                  backgroundColor: const Color(0xFFDBEAFE),
+                  foregroundColor: const Color(0xFF3B82F6),
                   child: Text(
                     _name.text.isEmpty ? '?' : _name.text[0].toUpperCase(),
                     style: const TextStyle(
@@ -165,7 +165,7 @@ class _ProfilePageState extends State<ProfilePage> {
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
             letterSpacing: 1.2,
             fontWeight: FontWeight.w800,
-            color: const Color(0xFF087F78),
+            color: const Color(0xFF3B82F6),
           ),
         ),
         const SizedBox(height: 12),
@@ -210,7 +210,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 style: Theme.of(context).textTheme.labelLarge?.copyWith(
                   letterSpacing: 1.2,
                   fontWeight: FontWeight.w800,
-                  color: const Color(0xFF087F78),
+                  color: const Color(0xFF3B82F6),
                 ),
               ),
             ),

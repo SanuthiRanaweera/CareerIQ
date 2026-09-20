@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: Theme.of(context).textTheme.labelLarge?.copyWith(
                     letterSpacing: 1.2,
                     fontWeight: FontWeight.w800,
-                    color: const Color(0xFF087F78),
+                    color: const Color(0xFF3B82F6),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 14),
-                  Text(_error!, style: TextStyle(color: Colors.red)),
+                  Text(_error!, style: TextStyle(color: Color(0xFFEF4444))),
                 ],
                 const SizedBox(height: 24),
                 FilledButton(
