@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'features/chatbot/screens/chatbot_screen.dart';
 import 'features/authentication/login_page.dart';
 import 'features/authentication/register_page.dart';
 import 'features/student/dashboard_page.dart';
@@ -210,6 +211,17 @@ class _AuthGateState extends State<AuthGate> {
             ),
           );
           await _refreshStudent();
+        },
+        onChatbot: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => ChatbotScreen(
+                token: _token!,
+                studentName: _student!.fullName,
+              ),
+            ),
+          );
         },
       );
     }

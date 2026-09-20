@@ -9,11 +9,13 @@ class DashboardPage extends StatelessWidget {
     required this.onProfile,
     required this.onLogout,
     required this.onPersonalityTest,
+    required this.onChatbot,
   });
   final Student student;
   final VoidCallback onProfile;
   final VoidCallback onLogout;
   final VoidCallback onPersonalityTest;
+  final VoidCallback onChatbot;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,15 @@ class DashboardPage extends StatelessWidget {
             icon: const Icon(Icons.logout),
           ),
         ],
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: onChatbot,
+        backgroundColor: const Color(0xFF3B82F6),
+        foregroundColor: Colors.white,
+        elevation: 5,
+        icon: const Icon(Icons.auto_awesome_rounded),
+        label: const Text('Ask CareerIQ'),
       ),
       body: RefreshIndicator(
         onRefresh: () async => onProfile(),
@@ -162,6 +173,13 @@ class DashboardPage extends StatelessWidget {
               title: 'Course recommendations',
               value: 'Coming soon',
               subtitle: 'Explore courses that fit your goals',
+            ),
+            _InfoCard(
+              icon: Icons.auto_awesome_outlined,
+              title: 'CareerIQ AI Assistant',
+              value: 'Ask your career mentor',
+              subtitle: 'Get personalized guidance on demand',
+              onTap: onChatbot,
             ),
           ],
         ),

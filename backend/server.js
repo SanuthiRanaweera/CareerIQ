@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 
 const express = require('express');
 const cors = require('cors');
@@ -6,6 +6,7 @@ const { connectDatabase, getDatabaseStatus } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const personalityRoutes = require('./routes/personalityRoutes');
+const chatbotRoutes = require('./routes/chatbotRoutes');
 const errorHandler = require('./middleware/errorMiddleware');
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/personality', personalityRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 app.get('/api/health', (_req, res) => {
   res.json({
