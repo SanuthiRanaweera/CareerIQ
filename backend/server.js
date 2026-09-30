@@ -15,11 +15,6 @@ const port = Number(process.env.PORT) || 3000;
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/auth', authRoutes);
-app.use('/api/students', studentRoutes);
-app.use('/api/personality', personalityRoutes);
-app.use('/api/chatbot', chatbotRoutes);
-
 app.get('/api/health', (_req, res) => {
   res.json({
     status: 'ok',
@@ -28,6 +23,21 @@ app.get('/api/health', (_req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+app.use('/api', (_req, res, next) => {
+  if (getDatabaseStatus() !== 'connected') {
+    return res.status(503).json({
+      success: false,
+      message: 'Database unavailable. Please try again shortly.',
+    });
+  }
+  next();
+});
+
+app.use('/api/auth', authRoutes);
+app.use('/api/students', studentRoutes);
+app.use('/api/personality', personalityRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });
