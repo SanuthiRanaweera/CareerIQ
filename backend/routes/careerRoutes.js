@@ -25,6 +25,9 @@ function adminOnly(req, res, next) {
 
 // --- Student-facing (read) ---
 router.get('/', controller.getCareers);
+// Declared before '/:id', otherwise Express would treat the literal word
+// "categories" as a career id and the request would 404.
+router.get('/categories', controller.getCareerCategories);
 router.get('/:id', controller.getCareerById);
 
 // --- Admin-facing (write) ---

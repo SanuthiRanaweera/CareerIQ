@@ -10,6 +10,13 @@ function isValidId(id) {
 
 const NOT_FOUND = { success: false, message: 'Career not found' };
 
+// Escapes a user-typed search term so characters such as ( * or ? are matched
+// literally instead of being interpreted as regular-expression syntax, which
+// would otherwise either crash the query or return surprising results.
+function escapeRegex(text) {
+	return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 /**
  * POST /api/careers
  * Creates a new career. Career titles are unique, so a repeated title is
@@ -29,14 +36,47 @@ async function createCareer(req, res, next) {
 }
 
 /**
- * GET /api/careers
- * Returns every career, alphabetically by title so the list screen has a
- * stable, predictable order. Search and category filtering are added later.
+ * GET /api/careers?search=&category=
+ * Returns careers alphabetically by title so the list screen has a stable
+ * order. Both query parameters are optional and combine with AND: searching
+ * "data" inside the "Finance & Banking" category returns only the finance
+ * careers that match the term.
  */
-async function getCareers(_req, res, next) {
+async function getCareers(req, res, next) {
 	try {
-		const careers = await Career.find().sort({ title: 1 });
+		const search = (req.query.search || '').trim();
+		const category = (req.query.category || '').trim();
+		const filter = {};
+
+		// "All" is the default chip on the careers screen and means "no filter",
+		// so it is ignored rather than matched against a real category name.
+		if (category && category.toLowerCase() !== 'all') {
+			filter.category = new RegExp(`^${escapeRegex(category)}$`, 'i');
+		}
+
+		// Partial, case-insensitive match so the list narrows while the student
+		// is still typing. Skills are included so searching "python" works.
+		if (search) {
+			const term = new RegExp(escapeRegex(search), 'i');
+			filter.$or = [{ title: term }, { category: term }, { description: term }, { requiredSkills: term }];
+		}
+
+		const careers = await Career.find(filter).sort({ title: 1 });
 		return res.json({ success: true, count: careers.length, data: careers });
+	} catch (error) {
+		return next(error);
+	}
+}
+
+/**
+ * GET /api/careers/categories
+ * Distinct category names, used to build the filter chips on the careers
+ * screen so the chip list always reflects the data actually stored.
+ */
+async function getCareerCategories(_req, res, next) {
+	try {
+		const categories = await Career.distinct('category');
+		return res.json({ success: true, data: categories.sort((a, b) => a.localeCompare(b)) });
 	} catch (error) {
 		return next(error);
 	}
@@ -94,4 +134,4 @@ async function deleteCareer(req, res, next) {
 	}
 }
 
-module.exports = { createCareer, getCareers, getCareerById, updateCareer, deleteCareer };
+module.exports = { createCareer, getCareers, getCareerCategories, getCareerById, updateCareer, deleteCareer };
