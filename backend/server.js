@@ -42,6 +42,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/universities', universityRoutes);
 app.use('/api/university', universityRoutes);
+app.get('/api/admin/university-statistics', require('./middleware/authMiddleware').protect, require('./middleware/adminMiddleware').adminOnly, require('./controllers/universityController').getUniversityStatistics);
 app.use('/api/personality', personalityRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/careers', careerRoutes);

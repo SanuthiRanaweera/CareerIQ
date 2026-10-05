@@ -182,48 +182,7 @@ class AdminMockData {
     ),
   ];
 
-  static List<AdminUniversity> getInitialUniversities() => [
-    AdminUniversity(
-      id: 'uni_001',
-      name: 'University of Colombo',
-      shortName: 'UoC',
-      location: 'Colombo 03',
-      type: 'State University',
-      courseCount: 48,
-      ranking: 1,
-      website: 'cmb.ac.lk',
-    ),
-    AdminUniversity(
-      id: 'uni_002',
-      name: 'University of Moratuwa',
-      shortName: 'UoM',
-      location: 'Katubedda, Moratuwa',
-      type: 'State University',
-      courseCount: 36,
-      ranking: 2,
-      website: 'uom.lk',
-    ),
-    AdminUniversity(
-      id: 'uni_003',
-      name: 'University of Peradeniya',
-      shortName: 'UoP',
-      location: 'Peradeniya, Kandy',
-      type: 'State University',
-      courseCount: 52,
-      ranking: 3,
-      website: 'pdn.ac.lk',
-    ),
-    AdminUniversity(
-      id: 'uni_004',
-      name: 'Sri Lanka Institute of Information Technology',
-      shortName: 'SLIIT',
-      location: 'Malabe',
-      type: 'Non-State University',
-      courseCount: 30,
-      ranking: 4,
-      website: 'sliit.lk',
-    ),
-  ];
+  static List<AdminUniversity> getInitialUniversities() => [];
 
   static List<AdminCourse> getInitialCourses() => [
     AdminCourse(
