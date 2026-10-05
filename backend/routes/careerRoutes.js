@@ -29,6 +29,9 @@ router.get('/', controller.getCareers);
 // "categories" as a career id and the request would 404.
 router.get('/categories', controller.getCareerCategories);
 router.get('/:id', controller.getCareerById);
+// A POST, but student-facing: it only reads career data and scores it, so it
+// is not behind the admin guard below.
+router.post('/recommend', controller.getRecommendations);
 
 // --- Admin-facing (write) ---
 router.post('/', adminOnly, controller.createCareer);

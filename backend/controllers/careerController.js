@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Career = require('../models/Career');
+const { AL_STREAMS, PERSONALITY_TYPES, WORK_STYLES } = require('../data/careerOptions');
+const careerRecommendationService = require('../services/careerRecommendationService');
 
 // A malformed id can never match a career, so it is treated as "not found"
 // rather than being allowed to reach Mongoose and throw a CastError (which the
@@ -134,4 +136,92 @@ async function deleteCareer(req, res, next) {
 	}
 }
 
-module.exports = { createCareer, getCareers, getCareerCategories, getCareerById, updateCareer, deleteCareer };
+/**
+ * Resolves a submitted answer against an allowed option list, ignoring case.
+ * Returns the canonical spelling so the scoring service and the response both
+ * use the project's own vocabulary rather than whatever the client sent.
+ * An empty answer is valid: the recommendation form does not force every field.
+ */
+function matchOption(value, allowedValues) {
+	if (value === undefined || value === null || String(value).trim() === '') return { valid: true, value: '' };
+	const match = allowedValues.find((allowed) => allowed.toLowerCase() === String(value).trim().toLowerCase());
+	return match ? { valid: true, value: match } : { valid: false, value: '' };
+}
+
+/** Keeps only non-empty strings, so stray nulls from the form cannot reach the scorer. */
+function toStringList(value) {
+	if (!Array.isArray(value)) return [];
+	return value.filter((item) => typeof item === 'string' && item.trim()).map((item) => item.trim());
+}
+
+/**
+ * POST /api/careers/recommend
+ *
+ * Scores every career against the submitted answers and returns them ranked by
+ * match percentage. The request body is a plain student profile object, so the
+ * same endpoint will work unchanged once real student records replace the form.
+ *
+ * Body: { stream?, subjects?: [], interests?: [], personalityType?, workStyle?, limit? }
+ */
+async function getRecommendations(req, res, next) {
+	try {
+		const body = req.body || {};
+
+		// Guard the two list fields explicitly: a client sending a bare string
+		// instead of an array is a mistake worth reporting rather than ignoring.
+		for (const field of ['interests', 'subjects']) {
+			if (body[field] !== undefined && !Array.isArray(body[field])) {
+				return res.status(400).json({ success: false, message: `${field} must be an array` });
+			}
+		}
+
+		const stream = matchOption(body.stream, AL_STREAMS);
+		if (!stream.valid) {
+			return res.status(400).json({ success: false, message: `stream must be one of: ${AL_STREAMS.join(', ')}` });
+		}
+		const personalityType = matchOption(body.personalityType, PERSONALITY_TYPES);
+		if (!personalityType.valid) {
+			return res.status(400).json({ success: false, message: `personalityType must be one of: ${PERSONALITY_TYPES.join(', ')}` });
+		}
+		const workStyle = matchOption(body.workStyle, WORK_STYLES);
+		if (!workStyle.valid) {
+			return res.status(400).json({ success: false, message: `workStyle must be one of: ${WORK_STYLES.join(', ')}` });
+		}
+
+		const profile = {
+			stream: stream.value,
+			subjects: toStringList(body.subjects),
+			interests: toStringList(body.interests),
+			personalityType: personalityType.value,
+			workStyle: workStyle.value,
+		};
+
+		// A profile with nothing filled in would rank every career at 0%, which
+		// is a confusing result to show. Ask for at least one answer instead.
+		const hasAnyAnswer = Boolean(profile.stream || profile.personalityType || profile.workStyle)
+			|| profile.subjects.length > 0
+			|| profile.interests.length > 0;
+		if (!hasAnyAnswer) {
+			return res.status(400).json({ success: false, message: 'Please answer at least one question to get recommendations' });
+		}
+
+		const limit = Number.isInteger(body.limit) && body.limit > 0 ? Math.min(body.limit, 50) : undefined;
+		const matches = await careerRecommendationService.recommendCareers(profile, { limit });
+
+		// The normalised profile is echoed back so the results screen can show
+		// what the ranking was actually based on.
+		return res.json({ success: true, count: matches.length, profile, data: matches });
+	} catch (error) {
+		return next(error);
+	}
+}
+
+module.exports = {
+	createCareer,
+	getCareers,
+	getCareerCategories,
+	getCareerById,
+	updateCareer,
+	deleteCareer,
+	getRecommendations,
+};
