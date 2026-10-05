@@ -5,6 +5,8 @@ const controller = require('../controllers/studentController');
 const router = express.Router();
 router.use(protect);
 router.get('/me', controller.getMyStudent);
+router.get('/favorites/universities', controller.getFavoriteUniversities);
+router.post('/favorites/universities/:universityId', controller.toggleFavoriteUniversity);
 router.post('/', controller.createStudent);
 router.get('/:id', controller.getStudent);
 router.put('/:id', controller.updateStudent);

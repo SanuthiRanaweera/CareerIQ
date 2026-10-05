@@ -302,7 +302,10 @@ async function listUniversities(req, res, next) {
     const { search, status } = req.query;
     const filter = {};
 
-    if (status && status !== 'all' && status !== 'All') {
+    if (req.user?.role !== 'admin') {
+      // Non-admins only see active universities
+      filter.status = 'active';
+    } else if (status && status !== 'all' && status !== 'All') {
       if (status.toLowerCase() === 'pending verification' || status.toLowerCase() === 'pending_verification') {
         filter.status = { $in: ['pending', 'pending_verification'] };
       } else {
@@ -316,6 +319,8 @@ async function listUniversities(req, res, next) {
         { universityName: { $regex: q, $options: 'i' } },
         { location: { $regex: q, $options: 'i' } },
         { officialEmail: { $regex: q, $options: 'i' } },
+        { district: { $regex: q, $options: 'i' } },
+        { universityType: { $regex: q, $options: 'i' } },
       ];
     }
 
@@ -334,6 +339,129 @@ async function listUniversities(req, res, next) {
   }
 }
 
+// 4.1 COMPARE UNIVERSITIES (Supports up to 3 universities)
+async function getCompareUniversities(req, res, next) {
+  try {
+    let ids = req.query.ids;
+    if (typeof ids === 'string') {
+      ids = ids.split(',').map((s) => s.trim()).filter(Boolean);
+    } else if (Array.isArray(ids)) {
+      ids = ids.map((s) => String(s).trim()).filter(Boolean);
+    } else {
+      ids = [];
+    }
+
+    if (ids.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Select two or more universities to compare.',
+      });
+    }
+
+    if (ids.length > 3) {
+      return res.status(400).json({
+        success: false,
+        message: 'Compare up to 3 universities at a time.',
+      });
+    }
+
+    const validIds = ids.filter((id) => /^[0-9a-fA-F]{24}$/.test(id));
+    if (validIds.length !== ids.length) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid university ID provided.',
+      });
+    }
+
+    const rawUnis = await University.find({ _id: { $in: validIds } }).lean();
+    const uniMap = new Map(rawUnis.map((u) => [u._id.toString(), u]));
+    const universities = validIds
+      .map((id) => uniMap.get(id))
+      .filter(Boolean);
+
+    if (universities.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'No matching universities found.',
+      });
+    }
+
+    const comparedData = await Promise.all(
+      universities.map(async (u) => {
+        const courseRegex = new RegExp(`^${escapeRegex(u.universityName.trim())}$`, 'i');
+        const courses = await Course.find({
+          university: courseRegex,
+          isActive: true,
+        }).lean();
+
+        const degreeTitles = courses.map((c) => c.title);
+        const streams = [...new Set(courses.map((c) => c.stream).filter(Boolean))];
+        const degreeTypes = [...new Set(courses.map((c) => c.degreeType).filter(Boolean))];
+        const durations = [...new Set(courses.map((c) => c.durationYears).filter((d) => d != null))];
+
+        const validZScores = courses
+          .map((c) => c.minZScore)
+          .filter((z) => typeof z === 'number' && !isNaN(z));
+        const minZScore = validZScores.length > 0 ? Math.min(...validZScores) : null;
+
+        const allSubjects = [
+          ...new Set(courses.flatMap((c) => c.subjects || []).filter(Boolean)),
+        ];
+
+        return {
+          id: u._id.toString(),
+          _id: u._id.toString(),
+          universityName: u.universityName || '',
+          location: u.location || '',
+          district: u.district || '',
+          city: u.city || '',
+          country: u.country || 'Sri Lanka',
+          universityType: u.universityType || 'State University',
+          establishedYear: u.establishedYear || null,
+          website: u.website || '',
+          officialEmail: u.officialEmail || '',
+          contactNumber: u.contactNumber || '',
+          address: u.address || '',
+          description: u.description || '',
+          logo: u.logo || '',
+          tuitionFee: u.tuitionFee || null,
+          status: u.status || 'active',
+          courseCount: courses.length,
+          courses: courses.map((c) => ({
+            id: c._id.toString(),
+            _id: c._id.toString(),
+            title: c.title,
+            stream: c.stream,
+            degreeType: c.degreeType || "Bachelor's Degree",
+            durationYears: c.durationYears,
+            minZScore: c.minZScore != null ? c.minZScore : null,
+            subjects: c.subjects || [],
+            careerPaths: c.careerPaths || [],
+            website: c.website || '',
+            applicationUrl: c.applicationUrl || '',
+          })),
+          degreeTitles,
+          streams,
+          degreeTypes,
+          durations,
+          minZScore,
+          subjects: allSubjects,
+        };
+      })
+    );
+
+    return res.json({
+      success: true,
+      data: {
+        universities: comparedData,
+        comparedCount: comparedData.length,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
 // 5. GET SINGLE UNIVERSITY
 async function getUniversity(req, res, next) {
   try {
@@ -345,7 +473,21 @@ async function getUniversity(req, res, next) {
       return res.status(404).json({ success: false, message: 'University not found' });
     }
 
-    return res.json({ success: true, data: university });
+    const courseRegex = new RegExp(`^${escapeRegex(university.universityName.trim())}$`, 'i');
+    const courses = await Course.find({
+      university: courseRegex,
+      isActive: true,
+    }).lean();
+
+    return res.json({
+      success: true,
+      data: {
+        ...university,
+        id: university._id.toString(),
+        courseCount: courses.length,
+        courses,
+      },
+    });
   } catch (error) {
     return next(error);
   }
@@ -722,6 +864,7 @@ module.exports = {
   verifyUniversityOtp,
   resendUniversityOtp,
   listUniversities,
+  getCompareUniversities,
   getUniversity,
   updateUniversity,
   deleteUniversity,

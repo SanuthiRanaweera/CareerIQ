@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'courses/course_catalog_page.dart';
 import 'notifications/student_notifications_sheet.dart';
+import 'university/screens/student_university_search_page.dart';
 import '../../models/career.dart';
 import '../../models/student.dart';
 import '../../services/notification_service.dart';
@@ -144,11 +145,9 @@ class _DashboardPageState extends State<DashboardPage> {
         index: _selectedTab,
         children: [
           _buildHome(context, firstName),
-          const _StudentModulePlaceholder(
-            title: 'Universities',
-            description:
-                'University information will appear here when that module is connected.',
-            icon: Icons.account_balance_outlined,
+          StudentUniversitySearchPage(
+            token: widget.token,
+            student: widget.student,
           ),
           CourseCatalogPage(initialStream: student.stream),
           CareersListPage(
@@ -318,6 +317,13 @@ class _DashboardPageState extends State<DashboardPage> {
           onTap: widget.onCareerRecommendations,
         ),
         _InfoCard(
+          icon: Icons.account_balance_outlined,
+          title: 'Universities & Comparison',
+          value: 'Compare up to 3 universities',
+          subtitle: 'Side-by-side degree, Z-score & criteria comparison',
+          onTap: () => setState(() => _selectedTab = 1),
+        ),
+        _InfoCard(
           icon: Icons.menu_book_outlined,
           title: 'Course recommendations',
           value: widget.student.stream ?? 'All A/L streams',
@@ -443,37 +449,6 @@ class _CareerBotIcon extends StatelessWidget {
   );
 }
 
-class _StudentModulePlaceholder extends StatelessWidget {
-  const _StudentModulePlaceholder({
-    required this.title,
-    required this.description,
-    required this.icon,
-  });
-
-  final String title;
-  final String description;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text(title)),
-    body: Center(
-      child: Padding(
-        padding: const EdgeInsets.all(28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 52, color: const Color(0xFF3478F6)),
-            const SizedBox(height: 14),
-            Text(title, style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 8),
-            Text(description, textAlign: TextAlign.center),
-          ],
-        ),
-      ),
-    ),
-  );
-}
 
 class _InfoCard extends StatelessWidget {
   const _InfoCard({

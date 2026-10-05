@@ -13,17 +13,22 @@ router.get('/profile', controller.getUniversityProfile);
 router.put('/profile', controller.updateUniversityProfile);
 router.get('/courses', controller.getUniversityCourses);
 
-// Admin-only University Management routes
-router.use(adminOnly);
+// University comparison route (Accessible to authenticated users/students)
+router.get('/compare', controller.getCompareUniversities);
 
-router.get('/statistics', controller.getUniversityStatistics);
+// Admin statistics route
+router.get('/statistics', adminOnly, controller.getUniversityStatistics);
+
+// University listing & details (Accessible to authenticated users/students and admins)
 router.get('/', controller.listUniversities);
-router.post('/', controller.createUniversity);
-router.post('/verify-otp', controller.verifyUniversityOtp);
-router.post('/resend-otp', controller.resendUniversityOtp);
 router.get('/:id', controller.getUniversity);
-router.put('/:id', controller.updateUniversity);
-router.delete('/:id', controller.deleteUniversity);
-router.patch('/:id/status', controller.updateUniversityStatus);
+
+// Admin-only University Management modification routes
+router.post('/', adminOnly, controller.createUniversity);
+router.post('/verify-otp', adminOnly, controller.verifyUniversityOtp);
+router.post('/resend-otp', adminOnly, controller.resendUniversityOtp);
+router.put('/:id', adminOnly, controller.updateUniversity);
+router.delete('/:id', adminOnly, controller.deleteUniversity);
+router.patch('/:id/status', adminOnly, controller.updateUniversityStatus);
 
 module.exports = router;

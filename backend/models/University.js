@@ -18,6 +18,8 @@ const universitySchema = new mongoose.Schema(
     city: { type: String, trim: true, maxlength: 80 },
     district: { type: String, trim: true, maxlength: 80 },
     country: { type: String, trim: true, maxlength: 80 },
+    establishedYear: { type: Number },
+    tuitionFee: { type: String, trim: true },
     status: {
       type: String,
       enum: ['active', 'inactive', 'pending', 'pending_verification'],
