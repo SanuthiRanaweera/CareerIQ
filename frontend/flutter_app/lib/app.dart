@@ -209,6 +209,7 @@ class _AuthGateState extends State<AuthGate> {
     if (_student != null && _token != null) {
       return DashboardPage(
         student: _student!,
+        token: _token!,
         onLogout: _logout,
         onProfile: () async {
           await Navigator.push(

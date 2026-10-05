@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 
 import 'courses/course_catalog_page.dart';
+import 'notifications/student_notifications_sheet.dart';
 import '../../models/student.dart';
+import '../../services/notification_service.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({
     super.key,
     required this.student,
+    required this.token,
     required this.onProfile,
     required this.onLogout,
     required this.onPersonalityTest,
@@ -14,6 +17,7 @@ class DashboardPage extends StatefulWidget {
     required this.onChatbot,
   });
   final Student student;
+  final String token;
   final VoidCallback onProfile;
   final VoidCallback onLogout;
   final VoidCallback onPersonalityTest;
@@ -26,6 +30,25 @@ class DashboardPage extends StatefulWidget {
 
 class _DashboardPageState extends State<DashboardPage> {
   int _selectedTab = 0;
+  int _unreadNotificationCount = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshUnreadNotificationCount();
+  }
+
+  Future<void> _refreshUnreadNotificationCount() async {
+    try {
+      final notifications = await NotificationService().listMine(widget.token);
+      if (!mounted) return;
+      setState(
+        () => _unreadNotificationCount = notifications
+            .where((notification) => !notification.isRead)
+            .length,
+      );
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +81,14 @@ class _DashboardPageState extends State<DashboardPage> {
                     minWidth: 48,
                     minHeight: 48,
                   ),
-                  icon: const Icon(Icons.notifications_none_rounded, size: 28),
+                  icon: Badge(
+                    isLabelVisible: _unreadNotificationCount > 0,
+                    label: Text('$_unreadNotificationCount'),
+                    child: const Icon(
+                      Icons.notifications_none_rounded,
+                      size: 28,
+                    ),
+                  ),
                 ),
                 IconButton(
                   onPressed: widget.onProfile,
@@ -137,50 +167,15 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Future<void> _showNotifications() => showModalBottomSheet<void>(
-    context: context,
-    showDragHandle: true,
-    builder: (context) => SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Text(
-                  'Notifications',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const Spacer(),
-                IconButton(
-                  tooltip: 'Close',
-                  onPressed: () => Navigator.pop(context),
-                  icon: const Icon(Icons.close_rounded),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Icon(
-              Icons.notifications_off_outlined,
-              size: 42,
-              color: Color(0xFF6B778C),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'You are all caught up',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'New updates will appear here.',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
+  Future<void> _showNotifications() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (_) => StudentNotificationsSheet(token: widget.token),
+    );
+    await _refreshUnreadNotificationCount();
+  }
 
   Widget _buildHome(BuildContext context, String firstName) => RefreshIndicator(
     onRefresh: () async => widget.onProfile(),

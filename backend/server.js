@@ -8,6 +8,7 @@ const studentRoutes = require('./routes/studentRoutes');
 const personalityRoutes = require('./routes/personalityRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
 const courseRoutes = require('./routes/courseRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
 const errorHandler = require('./middleware/errorMiddleware');
 
 const app = express();
@@ -40,6 +41,7 @@ app.use('/api/students', studentRoutes);
 app.use('/api/personality', personalityRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });

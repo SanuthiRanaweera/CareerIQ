@@ -4,6 +4,7 @@ import '../../app.dart';
 import '../../services/auth_service.dart';
 import '../../models/course.dart';
 import '../../services/course_service.dart';
+import 'admin_notifications_page.dart';
 import 'models/admin_models.dart';
 
 enum AdminNavSection {
@@ -12,6 +13,7 @@ enum AdminNavSection {
   universities,
   courses,
   careers,
+  notifications,
   settings,
 }
 
@@ -225,12 +227,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             visualDensity: VisualDensity.compact,
             padding: const EdgeInsets.all(4),
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-            tooltip: 'System Notifications',
+            tooltip: 'Send student notifications',
             icon: const Badge(
-              label: Text('3'),
-              child: Icon(Icons.notifications_outlined, size: 20),
+              isLabelVisible: false,
+              child: Icon(Icons.campaign_outlined, size: 20),
             ),
-            onPressed: () => _showNotificationSheet(context),
+            onPressed: () => _selectSection(AdminNavSection.notifications),
           ),
           const Padding(
             padding: EdgeInsets.only(left: 4, right: 12),
@@ -400,6 +402,23 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   label: '💼 Careers',
                   badge: '${_careers.length}',
                 ),
+                const Padding(
+                  padding: EdgeInsets.fromLTRB(14, 20, 14, 8),
+                  child: Text(
+                    'COMMUNICATIONS',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.4,
+                      color: Color(0xFF94A3B8),
+                    ),
+                  ),
+                ),
+                _buildNavItem(
+                  section: AdminNavSection.notifications,
+                  icon: Icons.campaign_outlined,
+                  label: 'Notifications',
+                ),
                 _buildNavItem(
                   section: AdminNavSection.settings,
                   icon: Icons.settings_rounded,
@@ -450,49 +469,56 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     String? badge,
   }) {
     final isSelected = _currentSection == section;
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 3),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFEFF6FF) : Colors.transparent,
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Material(
+        color: isSelected ? const Color(0xFFEFF6FF) : Colors.white,
         borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        dense: true,
-        leading: Icon(
-          icon,
-          color: isSelected ? const Color(0xFF2563EB) : const Color(0xFF64748B),
-          size: 22,
-        ),
-        title: Text(
-          label,
-          style: TextStyle(
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+        child: ListTile(
+          dense: true,
+          leading: Icon(
+            icon,
             color: isSelected
-                ? const Color(0xFF1E3A8A)
-                : const Color(0xFF334155),
-            fontSize: 14,
+                ? const Color(0xFF2563EB)
+                : const Color(0xFF64748B),
+            size: 22,
           ),
-        ),
-        trailing: badge != null
-            ? Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? const Color(0xFF3B82F6)
-                      : const Color(0xFFE2E8F0),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  badge,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: isSelected ? Colors.white : const Color(0xFF475569),
+          title: Text(
+            label,
+            style: TextStyle(
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+              color: isSelected
+                  ? const Color(0xFF1E3A8A)
+                  : const Color(0xFF334155),
+              fontSize: 14,
+            ),
+          ),
+          trailing: badge != null
+              ? Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
                   ),
-                ),
-              )
-            : null,
-        onTap: () => _selectSection(section),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? const Color(0xFF3B82F6)
+                        : const Color(0xFFE2E8F0),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    badge,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: isSelected
+                          ? Colors.white
+                          : const Color(0xFF475569),
+                    ),
+                  ),
+                )
+              : null,
+          onTap: () => _selectSection(section),
+        ),
       ),
     );
   }
@@ -509,6 +535,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         return _buildCoursesTab();
       case AdminNavSection.careers:
         return _buildCareersTab();
+      case AdminNavSection.notifications:
+        return const AdminNotificationsPage();
       case AdminNavSection.settings:
         return _buildSettingsTab();
     }
@@ -2171,8 +2199,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               )
                               .toList(),
                       onChanged: (val) {
-                        if (val != null)
+                        if (val != null) {
                           setDialogState(() => selectedStream = val);
+                        }
                       },
                     ),
                   ],
@@ -2522,46 +2551,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             child: const Text('Save Career'),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showNotificationSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Admin Notifications',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 12),
-            const ListTile(
-              leading: Icon(Icons.person_add_alt_1, color: Colors.blue),
-              title: Text('New student registration'),
-              subtitle: Text(
-                'Sanuthi Ranaweera registered from Colombo district',
-              ),
-            ),
-            const ListTile(
-              leading: Icon(Icons.assignment_turned_in, color: Colors.purple),
-              title: Text('Personality test completed'),
-              subtitle: Text('850 total completed tests reached today'),
-            ),
-            const ListTile(
-              leading: Icon(Icons.cloud_done, color: Colors.green),
-              title: Text('Database backup'),
-              subtitle: Text('Automated MongoDB sync completed successfully'),
-            ),
-          ],
-        ),
       ),
     );
   }
