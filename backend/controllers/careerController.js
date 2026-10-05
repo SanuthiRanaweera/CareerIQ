@@ -209,8 +209,18 @@ async function getRecommendations(req, res, next) {
 		const matches = await careerRecommendationService.recommendCareers(profile, { limit });
 
 		// The normalised profile is echoed back so the results screen can show
-		// what the ranking was actually based on.
-		return res.json({ success: true, count: matches.length, profile, data: matches });
+		// what the ranking was actually based on, together with how many of the
+		// five scoring components were answered. The results screen turns that
+		// into a confidence note such as "Based on 3 of 5 answers", so a high
+		// percentage from a half-filled form is read in context.
+		return res.json({
+			success: true,
+			count: matches.length,
+			profile,
+			answeredComponents: careerRecommendationService.countAnsweredComponents(profile),
+			totalComponents: careerRecommendationService.TOTAL_SCORING_COMPONENTS,
+			data: matches,
+		});
 	} catch (error) {
 		return next(error);
 	}

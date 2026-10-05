@@ -16,6 +16,10 @@ const RECOMMENDATION_WEIGHTS = {
 	workStyle: 15, // office, remote, fieldwork, laboratory, team-based, independent
 };
 
+// How many scoring components exist in total (currently five). Derived from the
+// weights so it stays correct if a component is ever added or removed.
+const TOTAL_SCORING_COMPONENTS = Object.keys(RECOMMENDATION_WEIGHTS).length;
+
 /**
  * The shape of the input this service scores against.
  *
@@ -54,6 +58,48 @@ function overlapRatio(studentValues, careerValues) {
 }
 
 /**
+ * Normalises a profile once and records which of the five components the
+ * student actually answered. Shared by the scorer and by the answered-count so
+ * both always agree on what counts as an answer.
+ */
+function readProfile(profile = {}) {
+	const interests = normaliseList(profile.interests);
+	const subjects = normaliseList(profile.subjects);
+	const stream = normaliseValue(profile.stream);
+	const personalityType = normaliseValue(profile.personalityType);
+	const workStyle = normaliseValue(profile.workStyle);
+
+	return {
+		interests,
+		subjects,
+		stream,
+		personalityType,
+		workStyle,
+		answered: {
+			interests: interests.length > 0,
+			stream: Boolean(stream),
+			subjects: subjects.length > 0,
+			personality: Boolean(personalityType),
+			workStyle: Boolean(workStyle),
+		},
+	};
+}
+
+/**
+ * How many of the five scoring components the student answered.
+ *
+ * The results screen shows this as a confidence note ("Based on 3 of 5
+ * answers"), so a high percentage from a half-filled form is not mistaken for
+ * a stronger result than it is.
+ *
+ * @param   {StudentProfileInput} profile
+ * @returns {number} 0 to TOTAL_SCORING_COMPONENTS
+ */
+function countAnsweredComponents(profile = {}) {
+	return Object.values(readProfile(profile).answered).filter(Boolean).length;
+}
+
+/**
  * Scores a single career against one student profile.
  *
  * Only the components the student actually answered take part in the result,
@@ -66,11 +112,7 @@ function overlapRatio(studentValues, careerValues) {
  * @returns {{ score: number, breakdown: Object, reasons: string[] }}
  */
 function scoreCareer(career, profile) {
-	const interests = normaliseList(profile.interests);
-	const subjects = normaliseList(profile.subjects);
-	const stream = normaliseValue(profile.stream);
-	const personalityType = normaliseValue(profile.personalityType);
-	const workStyle = normaliseValue(profile.workStyle);
+	const { interests, subjects, stream, personalityType, workStyle, answered: isAnswered } = readProfile(profile);
 
 	const interestResult = overlapRatio(interests, normaliseList(career.interestTags));
 	const subjectResult = overlapRatio(subjects, normaliseList(career.alSubjects));
@@ -85,11 +127,11 @@ function scoreCareer(career, profile) {
 	const workStyleMatched = Boolean(matchedWorkStyle);
 
 	const components = [
-		{ key: 'interests', weight: RECOMMENDATION_WEIGHTS.interests, answered: interests.length > 0, ratio: interestResult.ratio },
-		{ key: 'stream', weight: RECOMMENDATION_WEIGHTS.stream, answered: Boolean(stream), ratio: streamMatched ? 1 : 0 },
-		{ key: 'subjects', weight: RECOMMENDATION_WEIGHTS.subjects, answered: subjects.length > 0, ratio: subjectResult.ratio },
-		{ key: 'personality', weight: RECOMMENDATION_WEIGHTS.personality, answered: Boolean(personalityType), ratio: personalityMatched ? 1 : 0 },
-		{ key: 'workStyle', weight: RECOMMENDATION_WEIGHTS.workStyle, answered: Boolean(workStyle), ratio: workStyleMatched ? 1 : 0 },
+		{ key: 'interests', weight: RECOMMENDATION_WEIGHTS.interests, answered: isAnswered.interests, ratio: interestResult.ratio },
+		{ key: 'stream', weight: RECOMMENDATION_WEIGHTS.stream, answered: isAnswered.stream, ratio: streamMatched ? 1 : 0 },
+		{ key: 'subjects', weight: RECOMMENDATION_WEIGHTS.subjects, answered: isAnswered.subjects, ratio: subjectResult.ratio },
+		{ key: 'personality', weight: RECOMMENDATION_WEIGHTS.personality, answered: isAnswered.personality, ratio: personalityMatched ? 1 : 0 },
+		{ key: 'workStyle', weight: RECOMMENDATION_WEIGHTS.workStyle, answered: isAnswered.workStyle, ratio: workStyleMatched ? 1 : 0 },
 	];
 
 	const answered = components.filter((component) => component.answered);
@@ -152,4 +194,4 @@ async function recommendCareers(profile = {}, options = {}) {
 	return options.limit ? ranked.slice(0, options.limit) : ranked;
 }
 
-module.exports = { RECOMMENDATION_WEIGHTS, scoreCareer, recommendCareers };
+module.exports = { RECOMMENDATION_WEIGHTS, TOTAL_SCORING_COMPONENTS, countAnsweredComponents, scoreCareer, recommendCareers };
