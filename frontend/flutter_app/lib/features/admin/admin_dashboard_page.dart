@@ -42,7 +42,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   final Map<String, Course> _courseRecords = {};
 
   // Search & Filter controllers
-  final TextEditingController _studentSearchController = TextEditingController();
+  final TextEditingController _studentSearchController =
+      TextEditingController();
   String _selectedStreamFilter = 'All';
   String _selectedStatusFilter = 'All';
 
@@ -95,9 +96,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     } catch (error) {
       if (!mounted) return;
       setState(() => _coursesLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not load courses: $error')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Could not load courses: $error')));
     }
   }
 
@@ -117,9 +118,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       await _courseService.archive(token, course.id);
       await _loadAdminCourses();
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Course archived')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Course archived')));
       }
     } catch (error) {
       if (mounted) {
@@ -213,7 +214,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             padding: const EdgeInsets.all(4),
             constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
             tooltip: 'Log Out',
-            icon: const Icon(Icons.logout_rounded, size: 20, color: Color(0xFFDC2626)),
+            icon: const Icon(
+              Icons.logout_rounded,
+              size: 20,
+              color: Color(0xFFDC2626),
+            ),
             onPressed: () => _confirmLogout(context),
           ),
           IconButton(
@@ -248,10 +253,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       body: Row(
         children: [
           if (isDesktop)
-            SizedBox(
-              width: 270,
-              child: _buildDrawerContent(isPermanent: true),
-            ),
+            SizedBox(width: 270, child: _buildDrawerContent(isPermanent: true)),
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 250),
@@ -263,7 +265,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  Widget _buildDrawer() => Drawer(child: _buildDrawerContent(isPermanent: false));
+  Widget _buildDrawer() =>
+      Drawer(child: _buildDrawerContent(isPermanent: false));
 
   Widget _buildDrawerContent({required bool isPermanent}) {
     return Container(
@@ -321,7 +324,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 ),
                 const SizedBox(height: 16),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(8),
@@ -329,11 +335,19 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.verified_user_rounded, color: Colors.white, size: 16),
+                      Icon(
+                        Icons.verified_user_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                       SizedBox(width: 6),
                       Text(
                         'admin@careeriq.lk',
-                        style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ],
                   ),
@@ -453,7 +467,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           label,
           style: TextStyle(
             fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-            color: isSelected ? const Color(0xFF1E3A8A) : const Color(0xFF334155),
+            color: isSelected
+                ? const Color(0xFF1E3A8A)
+                : const Color(0xFF334155),
             fontSize: 14,
           ),
         ),
@@ -461,7 +477,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ? Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFF3B82F6) : const Color(0xFFE2E8F0),
+                  color: isSelected
+                      ? const Color(0xFF3B82F6)
+                      : const Color(0xFFE2E8F0),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
@@ -577,10 +595,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             Text(
               'PLATFORM HIGHLIGHTS',
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    letterSpacing: 1.2,
-                    fontWeight: FontWeight.w800,
-                    color: const Color(0xFF3B82F6),
-                  ),
+                letterSpacing: 1.2,
+                fontWeight: FontWeight.w800,
+                color: const Color(0xFF3B82F6),
+              ),
             ),
             Text(
               'Real-time metrics',
@@ -678,51 +696,56 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         Text(
           'Management',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.w800,
-                color: const Color(0xFF1E293B),
-              ),
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF1E293B),
+          ),
         ),
         const SizedBox(height: 4),
         Text(
           'Quick access to core administrative operational modules.',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: const Color(0xFF64748B),
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B)),
         ),
         const SizedBox(height: 16),
 
         // MANAGEMENT QUICK TILES
         _buildManagementRow(
           title: '👨‍🎓 Students',
-          subtitle: 'Browse all 1,250 registered students, manage accounts & A/L data',
+          subtitle:
+              'Browse all 1,250 registered students, manage accounts & A/L data',
           countLabel: '1,250 Total',
           color: const Color(0xFF3B82F6),
           onTap: () => _selectSection(AdminNavSection.students),
         ),
         _buildManagementRow(
           title: '🏫 Universities',
-          subtitle: 'Directory of 24 national state and non-state higher education institutes',
+          subtitle:
+              'Directory of 24 national state and non-state higher education institutes',
           countLabel: '${_universities.length} Registered',
           color: const Color(0xFF0EA5E9),
           onTap: () => _selectSection(AdminNavSection.universities),
         ),
         _buildManagementRow(
           title: '📚 Courses',
-          subtitle: 'Undergraduate degree programs, entry requirements & minimum Z-scores',
+          subtitle:
+              'Undergraduate degree programs, entry requirements & minimum Z-scores',
           countLabel: '${_courses.length} Degrees',
           color: const Color(0xFFF59E0B),
           onTap: () => _selectSection(AdminNavSection.courses),
         ),
         _buildManagementRow(
           title: '💼 Careers',
-          subtitle: 'Industry career pathways, future market demand & personality compatibility',
+          subtitle:
+              'Industry career pathways, future market demand & personality compatibility',
           countLabel: '${_careers.length} Pathways',
           color: const Color(0xFF10B981),
           onTap: () => _selectSection(AdminNavSection.careers),
         ),
         _buildManagementRow(
           title: '⚙ Settings',
-          subtitle: 'System configurations, database connections, and operational preferences',
+          subtitle:
+              'System configurations, database connections, and operational preferences',
           countLabel: 'Preferences',
           color: const Color(0xFF64748B),
           onTap: () => _selectSection(AdminNavSection.settings),
@@ -894,14 +917,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   Widget _buildStudentsTab() {
     final query = _studentSearchController.text.trim().toLowerCase();
     final filtered = _students.where((s) {
-      final matchesQuery = query.isEmpty ||
+      final matchesQuery =
+          query.isEmpty ||
           s.fullName.toLowerCase().contains(query) ||
           s.email.toLowerCase().contains(query) ||
           s.school.toLowerCase().contains(query) ||
           s.district.toLowerCase().contains(query);
 
-      final matchesStream = _selectedStreamFilter == 'All' || s.stream == _selectedStreamFilter;
-      final matchesStatus = _selectedStatusFilter == 'All' ||
+      final matchesStream =
+          _selectedStreamFilter == 'All' || s.stream == _selectedStreamFilter;
+      final matchesStatus =
+          _selectedStatusFilter == 'All' ||
           (_selectedStatusFilter == 'Active' && s.isActive) ||
           (_selectedStatusFilter == 'Inactive' && !s.isActive);
 
@@ -925,11 +951,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     children: [
                       const Text(
                         '👨‍🎓 Students Management',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                       Text(
                         '${_stats.totalStudents} enrolled • ${_stats.activeStudents} active',
-                        style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
@@ -939,7 +971,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     label: const Text('Add Student'),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(130, 44),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ],
@@ -949,7 +983,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 controller: _studentSearchController,
                 onChanged: (_) => setState(() {}),
                 decoration: InputDecoration(
-                  hintText: 'Search by student name, school, email, or district...',
+                  hintText:
+                      'Search by student name, school, email, or district...',
                   prefixIcon: const Icon(Icons.search_rounded),
                   suffixIcon: _studentSearchController.text.isNotEmpty
                       ? IconButton(
@@ -961,7 +996,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         )
                       : null,
                   fillColor: const Color(0xFFF1F5F9),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -969,20 +1007,40 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: [
-                    const Text('Stream: ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
-                    ...['All', 'Mathematics', 'Science', 'Technology', 'Commerce', 'Arts'].map((stream) {
+                    const Text(
+                      'Stream: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
+                    ...[
+                      'All',
+                      'Mathematics',
+                      'Science',
+                      'Technology',
+                      'Commerce',
+                      'Arts',
+                    ].map((stream) {
                       final isSelected = _selectedStreamFilter == stream;
                       return Padding(
                         padding: const EdgeInsets.only(right: 6),
                         child: FilterChip(
                           label: Text(stream),
                           selected: isSelected,
-                          onSelected: (_) => setState(() => _selectedStreamFilter = stream),
+                          onSelected: (_) =>
+                              setState(() => _selectedStreamFilter = stream),
                         ),
                       );
                     }),
                     const SizedBox(width: 8),
-                    const Text('Status: ', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                    const Text(
+                      'Status: ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12,
+                      ),
+                    ),
                     ...['All', 'Active', 'Inactive'].map((status) {
                       final isSelected = _selectedStatusFilter == status;
                       return Padding(
@@ -990,7 +1048,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         child: FilterChip(
                           label: Text(status),
                           selected: isSelected,
-                          onSelected: (_) => setState(() => _selectedStatusFilter = status),
+                          onSelected: (_) =>
+                              setState(() => _selectedStatusFilter = status),
                         ),
                       );
                     }),
@@ -1012,7 +1071,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: filtered.length,
-                  itemBuilder: (context, index) => _buildStudentListCard(filtered[index]),
+                  itemBuilder: (context, index) =>
+                      _buildStudentListCard(filtered[index]),
                 ),
         ),
       ],
@@ -1031,12 +1091,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         contentPadding: const EdgeInsets.all(16),
         leading: CircleAvatar(
           radius: 24,
-          backgroundColor: student.isActive ? const Color(0xFFDBEAFE) : const Color(0xFFF1F5F9),
+          backgroundColor: student.isActive
+              ? const Color(0xFFDBEAFE)
+              : const Color(0xFFF1F5F9),
           child: Text(
             student.fullName.isNotEmpty ? student.fullName[0] : 'S',
             style: TextStyle(
               fontWeight: FontWeight.w800,
-              color: student.isActive ? const Color(0xFF2563EB) : const Color(0xFF64748B),
+              color: student.isActive
+                  ? const Color(0xFF2563EB)
+                  : const Color(0xFF64748B),
               fontSize: 18,
             ),
           ),
@@ -1046,13 +1110,18 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             Expanded(
               child: Text(
                 student.fullName,
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: student.isActive ? const Color(0xFFDCFCE7) : const Color(0xFFFEE2E2),
+                color: student.isActive
+                    ? const Color(0xFFDCFCE7)
+                    : const Color(0xFFFEE2E2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -1060,7 +1129,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
-                  color: student.isActive ? const Color(0xFF16A34A) : const Color(0xFFDC2626),
+                  color: student.isActive
+                      ? const Color(0xFF16A34A)
+                      : const Color(0xFFDC2626),
                 ),
               ),
             ),
@@ -1080,19 +1151,29 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   labelPadding: EdgeInsets.zero,
                   padding: const EdgeInsets.symmetric(horizontal: 8),
                   visualDensity: VisualDensity.compact,
-                  label: Text(student.stream, style: const TextStyle(fontSize: 11)),
+                  label: Text(
+                    student.stream,
+                    style: const TextStyle(fontSize: 11),
+                  ),
                   backgroundColor: const Color(0xFFEFF6FF),
                   side: BorderSide.none,
                 ),
                 if (student.hasCompletedTest)
                   Chip(
-                    avatar: const Icon(Icons.check_circle_rounded, size: 14, color: Color(0xFF7C3AED)),
+                    avatar: const Icon(
+                      Icons.check_circle_rounded,
+                      size: 14,
+                      color: Color(0xFF7C3AED),
+                    ),
                     labelPadding: EdgeInsets.zero,
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     visualDensity: VisualDensity.compact,
                     label: Text(
                       student.personalityCategory ?? 'Personality Done',
-                      style: const TextStyle(fontSize: 11, color: Color(0xFF6D28D9)),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF6D28D9),
+                      ),
                     ),
                     backgroundColor: const Color(0xFFF5F3FF),
                     side: BorderSide.none,
@@ -1123,7 +1204,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ),
             const PopupMenuItem(
               value: 'delete',
-              child: Text('Delete Student', style: TextStyle(color: Colors.red)),
+              child: Text(
+                'Delete Student',
+                style: TextStyle(color: Colors.red),
+              ),
             ),
           ],
         ),
@@ -1160,11 +1244,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     children: [
                       const Text(
                         '🏫 Universities Management',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                       Text(
                         '${_universities.length} partnered institutes & universities',
-                        style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
@@ -1174,7 +1264,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     label: const Text('Add University'),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(140, 44),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ],
@@ -1187,7 +1279,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   hintText: 'Search universities by name or location...',
                   prefixIcon: Icon(Icons.search_rounded),
                   fillColor: Color(0xFFF1F5F9),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
               ),
             ],
@@ -1246,7 +1341,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 2,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFFF1F5F9),
                                     borderRadius: BorderRadius.circular(6),
@@ -1265,12 +1363,19 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             const SizedBox(height: 4),
                             Text(
                               '${uni.location} • ${uni.type}',
-                              style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                              style: const TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 13,
+                              ),
                             ),
                             const SizedBox(height: 6),
                             Row(
                               children: [
-                                const Icon(Icons.school_outlined, size: 14, color: Color(0xFF3B82F6)),
+                                const Icon(
+                                  Icons.school_outlined,
+                                  size: 14,
+                                  color: Color(0xFF3B82F6),
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   '${uni.courseCount} Courses Offered',
@@ -1281,11 +1386,18 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                                   ),
                                 ),
                                 const SizedBox(width: 14),
-                                const Icon(Icons.language_rounded, size: 14, color: Color(0xFF64748B)),
+                                const Icon(
+                                  Icons.language_rounded,
+                                  size: 14,
+                                  color: Color(0xFF64748B),
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   uni.website,
-                                  style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF64748B),
+                                  ),
                                 ),
                               ],
                             ),
@@ -1331,11 +1443,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     children: [
                       const Text(
                         '📚 Courses Management',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                       Text(
                         '${_courses.length} degree programs cataloged',
-                        style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
@@ -1345,7 +1463,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     label: const Text('Add Course'),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(130, 44),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ],
@@ -1355,10 +1475,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 controller: _courseSearchController,
                 onChanged: (_) => setState(() {}),
                 decoration: const InputDecoration(
-                  hintText: 'Search courses by degree title, stream, or university...',
+                  hintText:
+                      'Search courses by degree title, stream, or university...',
                   prefixIcon: Icon(Icons.search_rounded),
                   fillColor: Color(0xFFF1F5F9),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
               ),
             ],
@@ -1369,115 +1493,148 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           child: _coursesLoading
               ? const Center(child: CircularProgressIndicator())
               : filtered.isEmpty
-              ? const Center(child: Text('No courses found. Add a course to start the catalog.'))
+              ? const Center(
+                  child: Text(
+                    'No courses found. Add a course to start the catalog.',
+                  ),
+                )
               : ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: filtered.length,
-            itemBuilder: (context, index) {
-              final course = filtered[index];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: Color(0xFFE2E8F0)),
-                ),
-                child: Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              course.title,
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              course.stream,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF2563EB),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            tooltip: 'Edit course',
-                            onPressed: () => _showCourseDialog(context, course: course),
-                            icon: const Icon(Icons.edit_outlined),
-                          ),
-                          IconButton(
-                            tooltip: 'Archive course',
-                            onPressed: () => _archiveCourse(course),
-                            icon: const Icon(Icons.archive_outlined),
-                          ),
-                        ],
+                  itemCount: filtered.length,
+                  itemBuilder: (context, index) {
+                    final course = filtered[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: const BorderSide(color: Color(0xFFE2E8F0)),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        course.university,
-                        style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF1F5F9),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFF475569)),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${course.durationYears.toStringAsFixed(0)} Years Duration',
-                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                                Expanded(
+                                  child: Text(
+                                    course.title,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFEFF6FF),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    course.stream,
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF2563EB),
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: 'Edit course',
+                                  onPressed: () => _showCourseDialog(
+                                    context,
+                                    course: course,
+                                  ),
+                                  icon: const Icon(Icons.edit_outlined),
+                                ),
+                                IconButton(
+                                  tooltip: 'Archive course',
+                                  onPressed: () => _archiveCourse(course),
+                                  icon: const Icon(Icons.archive_outlined),
                                 ),
                               ],
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFEF3C7),
-                              borderRadius: BorderRadius.circular(6),
+                            const SizedBox(height: 6),
+                            Text(
+                              course.university,
+                              style: const TextStyle(
+                                color: Color(0xFF64748B),
+                                fontSize: 14,
+                              ),
                             ),
-                            child: Row(
+                            const SizedBox(height: 10),
+                            Row(
                               children: [
-                                const Icon(Icons.star_rounded, size: 14, color: Color(0xFFD97706)),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Min Z-Score: ${course.minZScore}',
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFFB45309),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF1F5F9),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.access_time_rounded,
+                                        size: 14,
+                                        color: Color(0xFF475569),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '${course.durationYears.toStringAsFixed(0)} Years Duration',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFFEF3C7),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.star_rounded,
+                                        size: 14,
+                                        color: Color(0xFFD97706),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Min Z-Score: ${course.minZScore}',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFFB45309),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
-              );
-            },
-          ),
         ),
       ],
     );
@@ -1511,11 +1668,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     children: [
                       const Text(
                         '💼 Careers Management',
-                        style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                       Text(
                         '${_careers.length} career pathways mapped to personality test results',
-                        style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
@@ -1525,7 +1688,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     label: const Text('Add Career'),
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(130, 44),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
                 ],
@@ -1535,10 +1700,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 controller: _careerSearchController,
                 onChanged: (_) => setState(() {}),
                 decoration: const InputDecoration(
-                  hintText: 'Search careers by title, industry, or personality match...',
+                  hintText:
+                      'Search careers by title, industry, or personality match...',
                   prefixIcon: Icon(Icons.search_rounded),
                   fillColor: Color(0xFFF1F5F9),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
               ),
             ],
@@ -1569,11 +1738,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           Expanded(
                             child: Text(
                               career.title,
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 16,
+                              ),
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: career.demandLevel == 'Very High'
                                   ? const Color(0xFFDCFCE7)
@@ -1596,12 +1771,19 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       const SizedBox(height: 4),
                       Text(
                         career.category,
-                        style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Row(
                         children: [
-                          const Icon(Icons.psychology_rounded, size: 16, color: Color(0xFF8B5CF6)),
+                          const Icon(
+                            Icons.psychology_rounded,
+                            size: 16,
+                            color: Color(0xFF8B5CF6),
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             'Matches: ${career.personalityMatch}',
@@ -1616,7 +1798,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          const Icon(Icons.payments_outlined, size: 16, color: Color(0xFF10B981)),
+                          const Icon(
+                            Icons.payments_outlined,
+                            size: 16,
+                            color: Color(0xFF10B981),
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             career.salaryRange,
@@ -1679,9 +1865,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                _buildHealthItem('MongoDB Atlas Database', 'Connected', Colors.green),
-                _buildHealthItem('CareerIQ REST API (/api)', 'Active :3000', Colors.green),
-                _buildHealthItem('Personality Scoring Engine', 'Operational', Colors.green),
+                _buildHealthItem(
+                  'MongoDB Atlas Database',
+                  'Connected',
+                  Colors.green,
+                ),
+                _buildHealthItem(
+                  'CareerIQ REST API (/api)',
+                  'Active :3000',
+                  Colors.green,
+                ),
+                _buildHealthItem(
+                  'Personality Scoring Engine',
+                  'Operational',
+                  Colors.green,
+                ),
                 _buildHealthItem('AI Assistant Service', 'Ready', Colors.green),
               ],
             ),
@@ -1699,22 +1897,37 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           child: Column(
             children: [
               SwitchListTile(
-                title: const Text('Student Self-Registration', style: TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: const Text('Allow new A/L students to sign up via mobile app'),
+                title: const Text(
+                  'Student Self-Registration',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: const Text(
+                  'Allow new A/L students to sign up via mobile app',
+                ),
                 value: true,
                 onChanged: (_) {},
               ),
               const Divider(height: 1),
               SwitchListTile(
-                title: const Text('Maintenance Mode', style: TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: const Text('Temporarily pause mobile access for scheduled maintenance'),
+                title: const Text(
+                  'Maintenance Mode',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: const Text(
+                  'Temporarily pause mobile access for scheduled maintenance',
+                ),
                 value: false,
                 onChanged: (_) {},
               ),
               const Divider(height: 1),
               SwitchListTile(
-                title: const Text('Automated Email Verification', style: TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: const Text('Require 6-digit OTP verification upon student signup'),
+                title: const Text(
+                  'Automated Email Verification',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: const Text(
+                  'Require 6-digit OTP verification upon student signup',
+                ),
                 value: true,
                 onChanged: (_) {},
               ),
@@ -1738,7 +1951,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         OutlinedButton.icon(
           onPressed: () => _confirmLogout(context),
           icon: const Icon(Icons.logout_rounded, color: Color(0xFFDC2626)),
-          label: const Text('Log Out of CareerIQ Admin', style: TextStyle(color: Color(0xFFDC2626))),
+          label: const Text(
+            'Log Out of CareerIQ Admin',
+            style: TextStyle(color: Color(0xFFDC2626)),
+          ),
           style: OutlinedButton.styleFrom(
             side: const BorderSide(color: Color(0xFFFCA5A5)),
           ),
@@ -1753,7 +1969,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+          Text(
+            name,
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+          ),
           Row(
             children: [
               Container(
@@ -1764,7 +1983,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               const SizedBox(width: 6),
               Text(
                 status,
-                style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 13),
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13,
+                ),
               ),
             ],
           ),
@@ -1809,7 +2032,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     backgroundColor: const Color(0xFFDBEAFE),
                     child: Text(
                       student.fullName[0],
-                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1D4ED8)),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1D4ED8),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -1819,11 +2046,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       children: [
                         Text(
                           student.fullName,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         Text(
                           student.email,
-                          style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                          style: const TextStyle(
+                            color: Color(0xFF64748B),
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     ),
@@ -1837,10 +2070,15 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               _buildDetailRow('A/L Examination Year', '${student.alYear}'),
               _buildDetailRow('School', student.school),
               _buildDetailRow('District', student.district),
-              _buildDetailRow('Account Status', student.isActive ? 'Active' : 'Inactive'),
+              _buildDetailRow(
+                'Account Status',
+                student.isActive ? 'Active' : 'Inactive',
+              ),
               _buildDetailRow(
                 'Personality Test',
-                student.hasCompletedTest ? (student.personalityCategory ?? 'Completed') : 'Pending',
+                student.hasCompletedTest
+                    ? (student.personalityCategory ?? 'Completed')
+                    : 'Pending',
               ),
               _buildDetailRow('Registered', student.joinedDate),
               const SizedBox(height: 20),
@@ -1861,8 +2099,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: const TextStyle(color: Color(0xFF64748B), fontSize: 13)),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
+          ),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+          ),
         ],
       ),
     );
@@ -1893,7 +2137,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     const SizedBox(height: 12),
                     TextField(
                       controller: emailCtrl,
-                      decoration: const InputDecoration(labelText: 'Email Address'),
+                      decoration: const InputDecoration(
+                        labelText: 'Email Address',
+                      ),
                     ),
                     const SizedBox(height: 12),
                     TextField(
@@ -1908,12 +2154,25 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
                       initialValue: selectedStream,
-                      decoration: const InputDecoration(labelText: 'A/L Stream'),
-                      items: ['Mathematics', 'Science', 'Technology', 'Commerce', 'Arts']
-                          .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                          .toList(),
+                      decoration: const InputDecoration(
+                        labelText: 'A/L Stream',
+                      ),
+                      items:
+                          [
+                                'Mathematics',
+                                'Science',
+                                'Technology',
+                                'Commerce',
+                                'Arts',
+                              ]
+                              .map(
+                                (s) =>
+                                    DropdownMenuItem(value: s, child: Text(s)),
+                              )
+                              .toList(),
                       onChanged: (val) {
-                        if (val != null) setDialogState(() => selectedStream = val);
+                        if (val != null)
+                          setDialogState(() => selectedStream = val);
                       },
                     ),
                   ],
@@ -1934,8 +2193,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             id: 'std_${DateTime.now().millisecondsSinceEpoch}',
                             fullName: nameCtrl.text.trim(),
                             email: emailCtrl.text.trim(),
-                            school: schoolCtrl.text.trim().isEmpty ? 'Not specified' : schoolCtrl.text.trim(),
-                            district: districtCtrl.text.trim().isEmpty ? 'Colombo' : districtCtrl.text.trim(),
+                            school: schoolCtrl.text.trim().isEmpty
+                                ? 'Not specified'
+                                : schoolCtrl.text.trim(),
+                            district: districtCtrl.text.trim().isEmpty
+                                ? 'Colombo'
+                                : districtCtrl.text.trim(),
                             stream: selectedStream,
                             alYear: 2025,
                             isActive: true,
@@ -1946,7 +2209,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       });
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Added ${nameCtrl.text.trim()}')),
+                        SnackBar(
+                          content: Text('Added ${nameCtrl.text.trim()}'),
+                        ),
                       );
                     }
                   },
@@ -1973,17 +2238,34 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'University Name')),
+            TextField(
+              controller: nameCtrl,
+              decoration: const InputDecoration(labelText: 'University Name'),
+            ),
             const SizedBox(height: 10),
-            TextField(controller: shortNameCtrl, decoration: const InputDecoration(labelText: 'Abbreviation (e.g. UoC)')),
+            TextField(
+              controller: shortNameCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Abbreviation (e.g. UoC)',
+              ),
+            ),
             const SizedBox(height: 10),
-            TextField(controller: locCtrl, decoration: const InputDecoration(labelText: 'Location')),
+            TextField(
+              controller: locCtrl,
+              decoration: const InputDecoration(labelText: 'Location'),
+            ),
             const SizedBox(height: 10),
-            TextField(controller: websiteCtrl, decoration: const InputDecoration(labelText: 'Website domain')),
+            TextField(
+              controller: websiteCtrl,
+              decoration: const InputDecoration(labelText: 'Website domain'),
+            ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             onPressed: () {
               if (nameCtrl.text.isNotEmpty) {
@@ -1992,12 +2274,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     AdminUniversity(
                       id: 'uni_${DateTime.now().millisecondsSinceEpoch}',
                       name: nameCtrl.text.trim(),
-                      shortName: shortNameCtrl.text.trim().isEmpty ? 'UNI' : shortNameCtrl.text.trim(),
+                      shortName: shortNameCtrl.text.trim().isEmpty
+                          ? 'UNI'
+                          : shortNameCtrl.text.trim(),
                       location: locCtrl.text.trim(),
                       type: 'State University',
                       courseCount: 12,
                       ranking: _universities.length + 1,
-                      website: websiteCtrl.text.trim().isEmpty ? 'ac.lk' : websiteCtrl.text.trim(),
+                      website: websiteCtrl.text.trim().isEmpty
+                          ? 'ac.lk'
+                          : websiteCtrl.text.trim(),
                     ),
                   );
                 });
@@ -2014,86 +2300,165 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   void _showCourseDialog(BuildContext context, {AdminCourse? course}) {
     final titleCtrl = TextEditingController(text: course?.title ?? '');
     final uniCtrl = TextEditingController(text: course?.university ?? '');
-    final zScoreCtrl = TextEditingController(text: course == null || course.minZScore == 0 ? '' : course.minZScore.toString());
-    final durationCtrl = TextEditingController(text: course?.durationYears.toStringAsFixed(1) ?? '4');
+    final zScoreCtrl = TextEditingController(
+      text: course == null || course.minZScore == 0
+          ? ''
+          : course.minZScore.toString(),
+    );
+    final durationCtrl = TextEditingController(
+      text: course?.durationYears.toStringAsFixed(1) ?? '4',
+    );
     final descriptionCtrl = TextEditingController(
       text: _courseRecords[course?.id]?.description ?? '',
     );
-    const streams = ['Mathematics', 'Science', 'Technology', 'Commerce', 'Arts', 'Any'];
-    String stream = streams.contains(course?.stream) ? course!.stream : 'Mathematics';
+    const streams = [
+      'Mathematics',
+      'Science',
+      'Technology',
+      'Commerce',
+      'Arts',
+      'Any',
+    ];
+    String stream = streams.contains(course?.stream)
+        ? course!.stream
+        : 'Mathematics';
 
     showDialog(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(builder: (context, setDialogState) => AlertDialog(
-        title: Text(course == null ? 'Add Academic Course' : 'Edit Academic Course'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Degree Title')),
-            const SizedBox(height: 10),
-            TextField(controller: uniCtrl, decoration: const InputDecoration(labelText: 'Awarding University')),
-            const SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              initialValue: stream,
-              decoration: const InputDecoration(labelText: 'A/L stream'),
-              items: const ['Mathematics', 'Science', 'Technology', 'Commerce', 'Arts', 'Any']
-                  .map((value) => DropdownMenuItem(value: value, child: Text(value)))
-                  .toList(),
-              onChanged: (value) => setDialogState(() => stream = value ?? stream),
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(
+            course == null ? 'Add Academic Course' : 'Edit Academic Course',
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: titleCtrl,
+                decoration: const InputDecoration(labelText: 'Degree Title'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: uniCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Awarding University',
+                ),
+              ),
+              const SizedBox(height: 10),
+              DropdownButtonFormField<String>(
+                initialValue: stream,
+                decoration: const InputDecoration(labelText: 'A/L stream'),
+                items:
+                    const [
+                          'Mathematics',
+                          'Science',
+                          'Technology',
+                          'Commerce',
+                          'Arts',
+                          'Any',
+                        ]
+                        .map(
+                          (value) => DropdownMenuItem(
+                            value: value,
+                            child: Text(value),
+                          ),
+                        )
+                        .toList(),
+                onChanged: (value) =>
+                    setDialogState(() => stream = value ?? stream),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: durationCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: 'Duration (years)',
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: zScoreCtrl,
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(
+                  labelText: 'Minimum Z-Score (optional)',
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: descriptionCtrl,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  labelText: 'Description (optional)',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
             ),
-            const SizedBox(height: 10),
-            TextField(controller: durationCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Duration (years)')),
-            const SizedBox(height: 10),
-            TextField(controller: zScoreCtrl, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Minimum Z-Score (optional)')),
-            const SizedBox(height: 10),
-            TextField(controller: descriptionCtrl, maxLines: 3, decoration: const InputDecoration(labelText: 'Description (optional)')),
+            FilledButton(
+              onPressed: () async {
+                final duration = double.tryParse(durationCtrl.text);
+                if (titleCtrl.text.trim().isEmpty ||
+                    uniCtrl.text.trim().isEmpty ||
+                    duration == null ||
+                    duration <= 0) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Enter a title, university, and valid duration.',
+                      ),
+                    ),
+                  );
+                  return;
+                }
+                final token = await AuthService().token();
+                if (token == null) return;
+                try {
+                  final values = {
+                    'title': titleCtrl.text.trim(),
+                    'university': uniCtrl.text.trim(),
+                    'stream': stream,
+                    'durationYears': duration,
+                    'minZScore': zScoreCtrl.text.trim().isEmpty
+                        ? null
+                        : double.tryParse(zScoreCtrl.text),
+                    'description': descriptionCtrl.text.trim(),
+                  };
+                  final saved = course == null
+                      ? await _courseService.create(token, values)
+                      : await _courseService.update(token, course.id, values);
+                  if (!mounted || !dialogContext.mounted) return;
+                  setState(() {
+                    _courseRecords[saved.id] = saved;
+                    final index = _courses.indexWhere(
+                      (item) => item.id == saved.id,
+                    );
+                    if (index == -1) {
+                      _courses.insert(0, _toAdminCourse(saved));
+                    } else {
+                      _courses[index] = _toAdminCourse(saved);
+                    }
+                  });
+                  Navigator.pop(dialogContext);
+                } catch (error) {
+                  if (dialogContext.mounted) {
+                    ScaffoldMessenger.of(dialogContext).showSnackBar(
+                      SnackBar(content: Text('Could not save course: $error')),
+                    );
+                  }
+                }
+              },
+              child: const Text('Save Course'),
+            ),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-          FilledButton(
-            onPressed: () async {
-              final duration = double.tryParse(durationCtrl.text);
-              if (titleCtrl.text.trim().isEmpty || uniCtrl.text.trim().isEmpty || duration == null || duration <= 0) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enter a title, university, and valid duration.')));
-                return;
-              }
-              final token = await AuthService().token();
-              if (token == null) return;
-              try {
-                final values = {
-                  'title': titleCtrl.text.trim(),
-                  'university': uniCtrl.text.trim(),
-                  'stream': stream,
-                  'durationYears': duration,
-                  'minZScore': zScoreCtrl.text.trim().isEmpty ? null : double.tryParse(zScoreCtrl.text),
-                  'description': descriptionCtrl.text.trim(),
-                };
-                final saved = course == null
-                    ? await _courseService.create(token, values)
-                    : await _courseService.update(token, course.id, values);
-                if (!mounted || !dialogContext.mounted) return;
-                setState(() {
-                  _courseRecords[saved.id] = saved;
-                  final index = _courses.indexWhere((item) => item.id == saved.id);
-                  if (index == -1) {
-                    _courses.insert(0, _toAdminCourse(saved));
-                  } else {
-                    _courses[index] = _toAdminCourse(saved);
-                  }
-                });
-                Navigator.pop(dialogContext);
-              } catch (error) {
-                if (dialogContext.mounted) {
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text('Could not save course: $error')));
-                }
-              }
-            },
-            child: const Text('Save Course'),
-          ),
-        ],
-      )),
+      ),
     );
   }
 
@@ -2109,15 +2474,29 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Career Title')),
+            TextField(
+              controller: titleCtrl,
+              decoration: const InputDecoration(labelText: 'Career Title'),
+            ),
             const SizedBox(height: 10),
-            TextField(controller: catCtrl, decoration: const InputDecoration(labelText: 'Industry / Category')),
+            TextField(
+              controller: catCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Industry / Category',
+              ),
+            ),
             const SizedBox(height: 10),
-            TextField(controller: personalityCtrl, decoration: const InputDecoration(labelText: 'Personality Fit')),
+            TextField(
+              controller: personalityCtrl,
+              decoration: const InputDecoration(labelText: 'Personality Fit'),
+            ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
             onPressed: () {
               if (titleCtrl.text.isNotEmpty) {
@@ -2126,8 +2505,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     AdminCareer(
                       id: 'car_${DateTime.now().millisecondsSinceEpoch}',
                       title: titleCtrl.text.trim(),
-                      category: catCtrl.text.trim().isEmpty ? 'General' : catCtrl.text.trim(),
-                      personalityMatch: personalityCtrl.text.trim().isEmpty ? 'Analytical' : personalityCtrl.text.trim(),
+                      category: catCtrl.text.trim().isEmpty
+                          ? 'General'
+                          : catCtrl.text.trim(),
+                      personalityMatch: personalityCtrl.text.trim().isEmpty
+                          ? 'Analytical'
+                          : personalityCtrl.text.trim(),
                       demandLevel: 'High',
                       salaryRange: 'LKR 150K - 400K/mo',
                     ),
@@ -2155,12 +2538,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Admin Notifications', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text(
+              'Admin Notifications',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 12),
             const ListTile(
               leading: Icon(Icons.person_add_alt_1, color: Colors.blue),
               title: Text('New student registration'),
-              subtitle: Text('Sanuthi Ranaweera registered from Colombo district'),
+              subtitle: Text(
+                'Sanuthi Ranaweera registered from Colombo district',
+              ),
             ),
             const ListTile(
               leading: Icon(Icons.assignment_turned_in, color: Colors.purple),

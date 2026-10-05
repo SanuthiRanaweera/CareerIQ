@@ -20,30 +20,51 @@ class CourseService {
         .toList();
   }
 
-        Future<List<Course>> listAdmin(String token) async {
-          final response = await _api.request('GET', '/courses/admin', token: token);
-          return (response['data'] as List? ?? const [])
-          .whereType<Map<String, dynamic>>()
-          .map(Course.fromJson)
-          .toList();
-        }
+  Future<List<Course>> listAdmin(String token) async {
+    final response = await _api.request('GET', '/courses/admin', token: token);
+    return (response['data'] as List? ?? const [])
+        .whereType<Map<String, dynamic>>()
+        .map(Course.fromJson)
+        .toList();
+  }
 
   Future<Course> get(String id) async {
-    final response = await _api.request('GET', '/courses/${Uri.encodeComponent(id)}');
+    final response = await _api.request(
+      'GET',
+      '/courses/${Uri.encodeComponent(id)}',
+    );
     return Course.fromJson(response['data'] as Map<String, dynamic>);
   }
 
   Future<Course> create(String token, Map<String, dynamic> values) async {
-    final response = await _api.request('POST', '/courses', token: token, body: values);
+    final response = await _api.request(
+      'POST',
+      '/courses',
+      token: token,
+      body: values,
+    );
     return Course.fromJson(response['data'] as Map<String, dynamic>);
   }
 
-  Future<Course> update(String token, String id, Map<String, dynamic> values) async {
-    final response = await _api.request('PUT', '/courses/${Uri.encodeComponent(id)}', token: token, body: values);
+  Future<Course> update(
+    String token,
+    String id,
+    Map<String, dynamic> values,
+  ) async {
+    final response = await _api.request(
+      'PUT',
+      '/courses/${Uri.encodeComponent(id)}',
+      token: token,
+      body: values,
+    );
     return Course.fromJson(response['data'] as Map<String, dynamic>);
   }
 
   Future<void> archive(String token, String id) async {
-    await _api.request('DELETE', '/courses/${Uri.encodeComponent(id)}', token: token);
+    await _api.request(
+      'DELETE',
+      '/courses/${Uri.encodeComponent(id)}',
+      token: token,
+    );
   }
 }

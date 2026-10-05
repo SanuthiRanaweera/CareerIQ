@@ -5,7 +5,14 @@ import 'package:flutter/material.dart';
 import '../../../models/course.dart';
 import '../../../services/course_service.dart';
 
-const _streams = ['All', 'Mathematics', 'Science', 'Technology', 'Commerce', 'Arts'];
+const _streams = [
+  'All',
+  'Mathematics',
+  'Science',
+  'Technology',
+  'Commerce',
+  'Arts',
+];
 
 class CourseCatalogPage extends StatefulWidget {
   const CourseCatalogPage({super.key, this.initialStream});
@@ -80,9 +87,15 @@ class _CourseCatalogPageState extends State<CourseCatalogPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Find your next step', style: Theme.of(context).textTheme.headlineSmall),
+              Text(
+                'Find your next step',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
               const SizedBox(height: 5),
-              Text('Compare degree programmes by university and A/L stream.', style: Theme.of(context).textTheme.bodyMedium),
+              Text(
+                'Compare degree programmes by university and A/L stream.',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
               const SizedBox(height: 18),
               TextField(
                 controller: _searchController,
@@ -144,13 +157,24 @@ class _CourseCatalogPageState extends State<CourseCatalogPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.cloud_off_outlined, size: 42, color: Color(0xFF64748B)),
+              const Icon(
+                Icons.cloud_off_outlined,
+                size: 42,
+                color: Color(0xFF64748B),
+              ),
               const SizedBox(height: 12),
-              Text('Courses could not be loaded', style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'Courses could not be loaded',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 6),
               Text(_error!, textAlign: TextAlign.center),
               const SizedBox(height: 16),
-              OutlinedButton.icon(onPressed: _loadCourses, icon: const Icon(Icons.refresh_rounded), label: const Text('Try again')),
+              OutlinedButton.icon(
+                onPressed: _loadCourses,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Try again'),
+              ),
             ],
           ),
         ),
@@ -163,11 +187,22 @@ class _CourseCatalogPageState extends State<CourseCatalogPage> {
           physics: const AlwaysScrollableScrollPhysics(),
           children: [
             const SizedBox(height: 100),
-            Icon(Icons.menu_book_outlined, size: 48, color: Theme.of(context).colorScheme.primary),
+            Icon(
+              Icons.menu_book_outlined,
+              size: 48,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(height: 14),
-            Text('No courses found', textAlign: TextAlign.center, style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'No courses found',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 6),
-            const Text('Try another stream or search term.', textAlign: TextAlign.center),
+            const Text(
+              'Try another stream or search term.',
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       );
@@ -222,9 +257,15 @@ class _CourseTile extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(course.title, style: Theme.of(context).textTheme.titleLarge),
+                      Text(
+                        course.title,
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
                       const SizedBox(height: 4),
-                      Text(course.university, style: Theme.of(context).textTheme.bodyMedium),
+                      Text(
+                        course.university,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                     ],
                   ),
                 ),
@@ -236,10 +277,22 @@ class _CourseTile extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _CourseTag(label: course.stream, color: const Color(0xFFDBEAFE), textColor: const Color(0xFF1D4ED8)),
-                _CourseTag(label: '${_formatDuration(course.durationYears)} years', color: const Color(0xFFDCFCE7), textColor: const Color(0xFF166534)),
+                _CourseTag(
+                  label: course.stream,
+                  color: const Color(0xFFDBEAFE),
+                  textColor: const Color(0xFF1D4ED8),
+                ),
+                _CourseTag(
+                  label: '${_formatDuration(course.durationYears)} years',
+                  color: const Color(0xFFDCFCE7),
+                  textColor: const Color(0xFF166534),
+                ),
                 if (course.minZScore != null)
-                  _CourseTag(label: 'Min Z ${course.minZScore!.toStringAsFixed(2)}', color: const Color(0xFFFEF3C7), textColor: const Color(0xFF92400E)),
+                  _CourseTag(
+                    label: 'Min Z ${course.minZScore!.toStringAsFixed(2)}',
+                    color: const Color(0xFFFEF3C7),
+                    textColor: const Color(0xFF92400E),
+                  ),
               ],
             ),
           ],
@@ -250,7 +303,11 @@ class _CourseTile extends StatelessWidget {
 }
 
 class _CourseTag extends StatelessWidget {
-  const _CourseTag({required this.label, required this.color, required this.textColor});
+  const _CourseTag({
+    required this.label,
+    required this.color,
+    required this.textColor,
+  });
 
   final String label;
   final Color color;
@@ -259,8 +316,18 @@ class _CourseTag extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-    decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(8)),
-    child: Text(label, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w700)),
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Text(
+      label,
+      style: TextStyle(
+        color: textColor,
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
   );
 }
 
@@ -278,42 +345,80 @@ class _CourseDetails extends StatelessWidget {
         children: [
           Text(course.title, style: Theme.of(context).textTheme.headlineSmall),
           const SizedBox(height: 6),
-          Text(course.university, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: const Color(0xFF2563EB))),
+          Text(
+            course.university,
+            style: Theme.of(
+              context,
+            ).textTheme.titleLarge?.copyWith(color: const Color(0xFF2563EB)),
+          ),
           const SizedBox(height: 18),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
-              _CourseTag(label: course.degreeType, color: const Color(0xFFE0F2FE), textColor: const Color(0xFF075985)),
-              _CourseTag(label: course.stream, color: const Color(0xFFDBEAFE), textColor: const Color(0xFF1D4ED8)),
-              _CourseTag(label: '${_formatDuration(course.durationYears)} years', color: const Color(0xFFDCFCE7), textColor: const Color(0xFF166534)),
+              _CourseTag(
+                label: course.degreeType,
+                color: const Color(0xFFE0F2FE),
+                textColor: const Color(0xFF075985),
+              ),
+              _CourseTag(
+                label: course.stream,
+                color: const Color(0xFFDBEAFE),
+                textColor: const Color(0xFF1D4ED8),
+              ),
+              _CourseTag(
+                label: '${_formatDuration(course.durationYears)} years',
+                color: const Color(0xFFDCFCE7),
+                textColor: const Color(0xFF166534),
+              ),
             ],
           ),
           if (course.description.isNotEmpty) ...[
             const SizedBox(height: 22),
-            Text('About this programme', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'About this programme',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 7),
-            Text(course.description, style: Theme.of(context).textTheme.bodyLarge),
+            Text(
+              course.description,
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
           ],
           if (course.minZScore != null) ...[
             const SizedBox(height: 18),
-            _DetailLine(icon: Icons.stars_outlined, label: 'Minimum Z-score', value: course.minZScore!.toStringAsFixed(2)),
+            _DetailLine(
+              icon: Icons.stars_outlined,
+              label: 'Minimum Z-score',
+              value: course.minZScore!.toStringAsFixed(2),
+            ),
           ],
           if (course.subjects.isNotEmpty) ...[
             const SizedBox(height: 18),
-            Text('Relevant subjects', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Relevant subjects',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 8),
             Text(course.subjects.join('  ·  ')),
           ],
           if (course.careerPaths.isNotEmpty) ...[
             const SizedBox(height: 18),
-            Text('Possible career paths', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Possible career paths',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 8),
             Text(course.careerPaths.join('  ·  ')),
           ],
-          if (course.website.isNotEmpty || course.applicationUrl.isNotEmpty) ...[
+          if (course.website.isNotEmpty ||
+              course.applicationUrl.isNotEmpty) ...[
             const SizedBox(height: 24),
-            SelectableText(course.applicationUrl.isNotEmpty ? course.applicationUrl : course.website),
+            SelectableText(
+              course.applicationUrl.isNotEmpty
+                  ? course.applicationUrl
+                  : course.website,
+            ),
           ],
         ],
       ),
@@ -322,7 +427,11 @@ class _CourseDetails extends StatelessWidget {
 }
 
 class _DetailLine extends StatelessWidget {
-  const _DetailLine({required this.icon, required this.label, required this.value});
+  const _DetailLine({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
 
   final IconData icon;
   final String label;

@@ -65,13 +65,13 @@ class _DashboardPageState extends State<DashboardPage> {
             )
           : null,
       floatingActionButton: _selectedTab == 0
-          ? FloatingActionButton.extended(
+          ? FloatingActionButton(
               onPressed: widget.onChatbot,
+              tooltip: 'Ask CareerIQ',
               backgroundColor: const Color(0xFF3B82F6),
               foregroundColor: Colors.white,
               elevation: 5,
-              icon: const Icon(Icons.auto_awesome_rounded),
-              label: const Text('Ask CareerIQ'),
+              child: const _CareerBotIcon(),
             )
           : null,
       body: IndexedStack(
@@ -300,6 +300,113 @@ class _DashboardPageState extends State<DashboardPage> {
           value: 'Ask your career mentor',
           subtitle: 'Get personalized guidance on demand',
           onTap: widget.onChatbot,
+        ),
+      ],
+    ),
+  );
+}
+
+class _CareerBotIcon extends StatelessWidget {
+  const _CareerBotIcon();
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: 34,
+    height: 34,
+    child: Stack(
+      alignment: Alignment.center,
+      children: [
+        Positioned(
+          top: 1,
+          child: Container(
+            width: 3,
+            height: 7,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 0,
+          child: Container(
+            width: 5,
+            height: 5,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+        Positioned(
+          top: 9,
+          child: Container(
+            width: 27,
+            height: 21,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 14,
+          left: 9,
+          child: Container(
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: Color(0xFF2563EB),
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+        Positioned(
+          top: 14,
+          right: 9,
+          child: Container(
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: Color(0xFF2563EB),
+              shape: BoxShape.circle,
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 7,
+          child: Container(
+            width: 8,
+            height: 2.5,
+            decoration: BoxDecoration(
+              color: const Color(0xFF60A5FA),
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 15,
+          left: 1,
+          child: Container(
+            width: 4,
+            height: 8,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 15,
+          right: 1,
+          child: Container(
+            width: 4,
+            height: 8,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
         ),
       ],
     ),
