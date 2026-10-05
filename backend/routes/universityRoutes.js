@@ -7,9 +7,11 @@ const router = express.Router();
 
 router.use(protect);
 
-// University's own profile routes
+// University's own profile and dashboard routes
+router.get('/dashboard', controller.getUniversityDashboard);
 router.get('/profile', controller.getUniversityProfile);
 router.put('/profile', controller.updateUniversityProfile);
+router.get('/courses', controller.getUniversityCourses);
 
 // Admin-only University Management routes
 router.use(adminOnly);

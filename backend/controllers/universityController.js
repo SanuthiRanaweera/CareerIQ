@@ -1,12 +1,39 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const University = require('../models/University');
+const Course = require('../models/Course');
 const OtpVerification = require('../models/OtpVerification');
 const { createOtpRecord, verifyOtp, canResendOtp } = require('../services/otpService');
 const { sendUniversityRegistrationOtpEmail } = require('../services/emailService');
 
 function validateEmail(email) {
   return /^\S+@\S+\.\S+$/.test(email);
+}
+
+function escapeRegex(text) {
+  return String(text).replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
+function calculateProfileCompletion(university) {
+  const fields = [
+    university.universityName,
+    university.officialEmail,
+    university.location,
+    university.address,
+    university.contactNumber,
+    university.representativeName,
+    university.representativeEmail,
+    university.representativeContactNumber,
+    university.website,
+    university.description,
+    university.logo,
+  ];
+  const completed = fields.filter(
+    (val) => val && typeof val === 'string' && val.trim().length > 0
+  ).length;
+  const total = fields.length;
+  const percentage = Math.round((completed / total) * 100);
+  return { percentage, completed, total };
 }
 
 // 1. CREATE UNIVERSITY (Admin-only)
@@ -476,7 +503,103 @@ async function getUniversityStatistics(_req, res, next) {
   }
 }
 
-// 10. UNIVERSITY PROFILE (For university role)
+// 10. UNIVERSITY DASHBOARD
+async function getUniversityDashboard(req, res, next) {
+  try {
+    if (req.user?.role !== 'university') {
+      return res.status(403).json({ success: false, message: 'University access required' });
+    }
+    const university = await University.findOne({ userId: req.user.userId });
+    if (!university) {
+      return res.status(404).json({ success: false, message: 'University profile not found' });
+    }
+    const user = await User.findById(req.user.userId).lean();
+
+    const completion = calculateProfileCompletion(university);
+
+    const courseRegex = new RegExp(`^${escapeRegex(university.universityName.trim())}$`, 'i');
+    const courseCount = await Course.countDocuments({
+      university: courseRegex,
+      isActive: true,
+    });
+
+    const notifications = [];
+    if (completion.percentage < 100) {
+      notifications.push({
+        id: 'notif_complete_profile',
+        title: 'Complete Your Profile',
+        message: 'Complete your profile to improve your university presence on CareerIQ.',
+        type: 'warning',
+        timestamp: university.updatedAt || university.createdAt,
+      });
+    }
+    if (user?.isEmailVerified) {
+      notifications.push({
+        id: 'notif_verified',
+        title: 'Account Verified',
+        message: 'Your official email has been verified successfully.',
+        type: 'success',
+        timestamp: university.createdAt,
+      });
+    }
+
+    const recentActivity = [
+      {
+        id: 'act_created',
+        title: 'University Account Created',
+        description: 'Account registered on CareerIQ Platform',
+        timestamp: university.createdAt,
+      },
+    ];
+    if (university.updatedAt && university.updatedAt.getTime() !== university.createdAt.getTime()) {
+      recentActivity.unshift({
+        id: 'act_updated',
+        title: 'Profile Updated',
+        description: 'University profile details were updated',
+        timestamp: university.updatedAt,
+      });
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        university: {
+          id: university._id,
+          userId: university.userId,
+          universityName: university.universityName,
+          officialEmail: university.officialEmail,
+          location: university.location,
+          address: university.address,
+          contactNumber: university.contactNumber,
+          representativeName: university.representativeName,
+          representativeEmail: university.representativeEmail,
+          representativeContactNumber: university.representativeContactNumber,
+          universityType: university.universityType,
+          website: university.website,
+          description: university.description,
+          logo: university.logo,
+          status: university.status,
+          isEmailVerified: user ? user.isEmailVerified : false,
+          createdAt: university.createdAt,
+          updatedAt: university.updatedAt,
+        },
+        statistics: {
+          profileCompletion: completion.percentage,
+          completedFields: completion.completed,
+          totalFields: completion.total,
+          courseCount: courseCount,
+          status: university.status,
+        },
+        notifications,
+        recentActivity,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// 11. UNIVERSITY PROFILE (For university role)
 async function getUniversityProfile(req, res, next) {
   try {
     if (req.user?.role !== 'university') {
@@ -486,12 +609,24 @@ async function getUniversityProfile(req, res, next) {
     if (!university) {
       return res.status(404).json({ success: false, message: 'University profile not found' });
     }
-    return res.json({ success: true, data: university });
+    const user = await User.findById(req.user.userId).lean();
+    const completion = calculateProfileCompletion(university);
+
+    return res.json({
+      success: true,
+      data: {
+        ...university,
+        id: university._id,
+        isEmailVerified: user ? user.isEmailVerified : false,
+        profileCompletion: completion.percentage,
+      },
+    });
   } catch (error) {
     return next(error);
   }
 }
 
+// 12. UPDATE UNIVERSITY PROFILE
 async function updateUniversityProfile(req, res, next) {
   try {
     if (req.user?.role !== 'university') {
@@ -502,14 +637,81 @@ async function updateUniversityProfile(req, res, next) {
       return res.status(404).json({ success: false, message: 'University profile not found' });
     }
 
-    const allowed = ['contactNumber', 'address', 'representativeName', 'representativeEmail', 'representativeContactNumber', 'website', 'description', 'logo'];
-    for (const key of allowed) {
-      if (req.body[key] !== undefined) {
-        university[key] = req.body[key];
+    const allowed = [
+      'universityName',
+      'location',
+      'address',
+      'contactNumber',
+      'representativeName',
+      'representativeEmail',
+      'representativeContactNumber',
+      'universityType',
+      'website',
+      'description',
+      'logo',
+    ];
+
+    if (req.body.universityName !== undefined) {
+      const name = String(req.body.universityName).trim();
+      if (!name) {
+        return res.status(400).json({ success: false, message: 'University Name is required.' });
+      }
+      university.universityName = name;
+      const user = await User.findById(req.user.userId);
+      if (user) {
+        user.fullName = name;
+        await user.save();
       }
     }
+
+    for (const key of allowed) {
+      if (key !== 'universityName' && req.body[key] !== undefined) {
+        university[key] = typeof req.body[key] === 'string' ? req.body[key].trim() : req.body[key];
+      }
+    }
+
     await university.save();
-    return res.json({ success: true, message: 'University profile updated successfully', data: university });
+
+    const user = await User.findById(req.user.userId).lean();
+    const completion = calculateProfileCompletion(university);
+
+    return res.json({
+      success: true,
+      message: 'University profile updated successfully',
+      data: {
+        ...university.toObject(),
+        id: university._id,
+        isEmailVerified: user ? user.isEmailVerified : false,
+        profileCompletion: completion.percentage,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// 13. UNIVERSITY COURSES (Associated with this university)
+async function getUniversityCourses(req, res, next) {
+  try {
+    if (req.user?.role !== 'university') {
+      return res.status(403).json({ success: false, message: 'University access required' });
+    }
+    const university = await University.findOne({ userId: req.user.userId });
+    if (!university) {
+      return res.status(404).json({ success: false, message: 'University profile not found' });
+    }
+
+    const courseRegex = new RegExp(`^${escapeRegex(university.universityName.trim())}$`, 'i');
+    const courses = await Course.find({
+      university: courseRegex,
+      isActive: true,
+    }).sort({ createdAt: -1 }).lean();
+
+    return res.json({
+      success: true,
+      data: courses,
+      count: courses.length,
+    });
   } catch (error) {
     return next(error);
   }
@@ -525,6 +727,8 @@ module.exports = {
   deleteUniversity,
   updateUniversityStatus,
   getUniversityStatistics,
+  getUniversityDashboard,
   getUniversityProfile,
   updateUniversityProfile,
+  getUniversityCourses,
 };
