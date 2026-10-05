@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../app.dart';
 import '../../services/auth_service.dart';
+import '../../models/course.dart';
+import '../../services/course_service.dart';
 import 'models/admin_models.dart';
 
 enum AdminNavSection {
@@ -37,6 +39,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   late List<AdminUniversity> _universities;
   late List<AdminCourse> _courses;
   late List<AdminCareer> _careers;
+  final Map<String, Course> _courseRecords = {};
 
   // Search & Filter controllers
   final TextEditingController _studentSearchController = TextEditingController();
@@ -46,6 +49,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   final TextEditingController _uniSearchController = TextEditingController();
   final TextEditingController _courseSearchController = TextEditingController();
   final TextEditingController _careerSearchController = TextEditingController();
+  final _courseService = CourseService();
+  bool _coursesLoading = false;
 
   @override
   void initState() {
@@ -53,8 +58,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     _currentSection = widget.initialSection;
     _students = AdminMockData.getInitialStudents();
     _universities = AdminMockData.getInitialUniversities();
-    _courses = AdminMockData.getInitialCourses();
+    _courses = [];
     _careers = AdminMockData.getInitialCareers();
+    _loadAdminCourses();
   }
 
   @override
@@ -68,7 +74,60 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   void _selectSection(AdminNavSection section) {
     setState(() => _currentSection = section);
+    if (section == AdminNavSection.courses) _loadAdminCourses();
     Navigator.of(context).maybePop(); // Close drawer if open
+  }
+
+  Future<void> _loadAdminCourses() async {
+    final token = await AuthService().token();
+    if (token == null) return;
+    if (mounted) setState(() => _coursesLoading = true);
+    try {
+      final courses = await _courseService.listAdmin(token);
+      if (!mounted) return;
+      setState(() {
+        _courseRecords
+          ..clear()
+          ..addEntries(courses.map((course) => MapEntry(course.id, course)));
+        _courses = courses.map(_toAdminCourse).toList();
+        _coursesLoading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _coursesLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not load courses: $error')),
+      );
+    }
+  }
+
+  AdminCourse _toAdminCourse(Course course) => AdminCourse(
+    id: course.id,
+    title: course.title,
+    university: course.university,
+    stream: course.stream,
+    durationYears: course.durationYears,
+    minZScore: course.minZScore ?? 0,
+  );
+
+  Future<void> _archiveCourse(AdminCourse course) async {
+    final token = await AuthService().token();
+    if (token == null) return;
+    try {
+      await _courseService.archive(token, course.id);
+      await _loadAdminCourses();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Course archived')),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not archive course: $error')),
+        );
+      }
+    }
   }
 
   Future<void> _confirmLogout(BuildContext context) async {
@@ -1281,7 +1340,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     ],
                   ),
                   FilledButton.icon(
-                    onPressed: () => _showAddCourseDialog(context),
+                    onPressed: () => _showCourseDialog(context),
                     icon: const Icon(Icons.add_rounded, size: 18),
                     label: const Text('Add Course'),
                     style: FilledButton.styleFrom(
@@ -1307,7 +1366,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         ),
         const Divider(height: 1),
         Expanded(
-          child: ListView.builder(
+          child: _coursesLoading
+              ? const Center(child: CircularProgressIndicator())
+              : filtered.isEmpty
+              ? const Center(child: Text('No courses found. Add a course to start the catalog.'))
+              : ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: filtered.length,
             itemBuilder: (context, index) {
@@ -1347,6 +1410,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                                 color: Color(0xFF2563EB),
                               ),
                             ),
+                          ),
+                          IconButton(
+                            tooltip: 'Edit course',
+                            onPressed: () => _showCourseDialog(context, course: course),
+                            icon: const Icon(Icons.edit_outlined),
+                          ),
+                          IconButton(
+                            tooltip: 'Archive course',
+                            onPressed: () => _archiveCourse(course),
+                            icon: const Icon(Icons.archive_outlined),
                           ),
                         ],
                       ),
@@ -1938,49 +2011,89 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  void _showAddCourseDialog(BuildContext context) {
-    final titleCtrl = TextEditingController();
-    final uniCtrl = TextEditingController();
-    final zScoreCtrl = TextEditingController();
+  void _showCourseDialog(BuildContext context, {AdminCourse? course}) {
+    final titleCtrl = TextEditingController(text: course?.title ?? '');
+    final uniCtrl = TextEditingController(text: course?.university ?? '');
+    final zScoreCtrl = TextEditingController(text: course == null || course.minZScore == 0 ? '' : course.minZScore.toString());
+    final durationCtrl = TextEditingController(text: course?.durationYears.toStringAsFixed(1) ?? '4');
+    final descriptionCtrl = TextEditingController(
+      text: _courseRecords[course?.id]?.description ?? '',
+    );
+    const streams = ['Mathematics', 'Science', 'Technology', 'Commerce', 'Arts', 'Any'];
+    String stream = streams.contains(course?.stream) ? course!.stream : 'Mathematics';
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Academic Course'),
+      builder: (dialogContext) => StatefulBuilder(builder: (context, setDialogState) => AlertDialog(
+        title: Text(course == null ? 'Add Academic Course' : 'Edit Academic Course'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(controller: titleCtrl, decoration: const InputDecoration(labelText: 'Degree Title')),
             const SizedBox(height: 10),
             TextField(controller: uniCtrl, decoration: const InputDecoration(labelText: 'Awarding University')),
             const SizedBox(height: 10),
-            TextField(controller: zScoreCtrl, decoration: const InputDecoration(labelText: 'Minimum Z-Score')),
+            DropdownButtonFormField<String>(
+              initialValue: stream,
+              decoration: const InputDecoration(labelText: 'A/L stream'),
+              items: const ['Mathematics', 'Science', 'Technology', 'Commerce', 'Arts', 'Any']
+                  .map((value) => DropdownMenuItem(value: value, child: Text(value)))
+                  .toList(),
+              onChanged: (value) => setDialogState(() => stream = value ?? stream),
+            ),
+            const SizedBox(height: 10),
+            TextField(controller: durationCtrl, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Duration (years)')),
+            const SizedBox(height: 10),
+            TextField(controller: zScoreCtrl, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Minimum Z-Score (optional)')),
+            const SizedBox(height: 10),
+            TextField(controller: descriptionCtrl, maxLines: 3, decoration: const InputDecoration(labelText: 'Description (optional)')),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
           FilledButton(
-            onPressed: () {
-              if (titleCtrl.text.isNotEmpty) {
+            onPressed: () async {
+              final duration = double.tryParse(durationCtrl.text);
+              if (titleCtrl.text.trim().isEmpty || uniCtrl.text.trim().isEmpty || duration == null || duration <= 0) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enter a title, university, and valid duration.')));
+                return;
+              }
+              final token = await AuthService().token();
+              if (token == null) return;
+              try {
+                final values = {
+                  'title': titleCtrl.text.trim(),
+                  'university': uniCtrl.text.trim(),
+                  'stream': stream,
+                  'durationYears': duration,
+                  'minZScore': zScoreCtrl.text.trim().isEmpty ? null : double.tryParse(zScoreCtrl.text),
+                  'description': descriptionCtrl.text.trim(),
+                };
+                final saved = course == null
+                    ? await _courseService.create(token, values)
+                    : await _courseService.update(token, course.id, values);
+                if (!mounted || !dialogContext.mounted) return;
                 setState(() {
-                  _courses.add(
-                    AdminCourse(
-                      id: 'crs_${DateTime.now().millisecondsSinceEpoch}',
-                      title: titleCtrl.text.trim(),
-                      university: uniCtrl.text.trim().isEmpty ? 'University of Colombo' : uniCtrl.text.trim(),
-                      stream: 'Mathematics',
-                      durationYears: 4.0,
-                      minZScore: double.tryParse(zScoreCtrl.text) ?? 1.5,
-                    ),
-                  );
+                  _courseRecords[saved.id] = saved;
+                  final index = _courses.indexWhere((item) => item.id == saved.id);
+                  if (index == -1) {
+                    _courses.insert(0, _toAdminCourse(saved));
+                  } else {
+                    _courses[index] = _toAdminCourse(saved);
+                  }
                 });
-                Navigator.pop(context);
+                Navigator.pop(dialogContext);
+              } catch (error) {
+                if (dialogContext.mounted) {
+                  ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text('Could not save course: $error')));
+                }
               }
             },
             child: const Text('Save Course'),
           ),
         ],
-      ),
+      )),
     );
   }
 

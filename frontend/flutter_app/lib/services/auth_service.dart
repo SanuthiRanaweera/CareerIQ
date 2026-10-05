@@ -25,8 +25,9 @@ class AuthService {
       '/auth/register',
       body: payload,
     );
-    if (response['data'] == null)
+    if (response['data'] == null) {
       throw const ApiException('Registration did not complete');
+    }
   }
 
   Future<Student> login(String email, String password) async {
@@ -56,11 +57,13 @@ class AuthService {
       }
       rethrow;
     }
-    if (googleUser == null)
+    if (googleUser == null) {
       throw const ApiException('Google sign-in was cancelled');
+    }
     final idToken = (await googleUser.authentication).idToken;
-    if (idToken == null)
+    if (idToken == null) {
       throw const ApiException('Google did not return an ID token');
+    }
     final response = await _api.request(
       'POST',
       '/auth/google',
@@ -90,12 +93,22 @@ class AuthService {
 
   Future<String?> token() => _storage.read(key: 'career_iq_token');
 
-  Future<void> logout() => _storage.delete(key: 'career_iq_token');
+  Future<bool> isAdmin() async =>
+      await _storage.read(key: 'career_iq_role') == 'admin';
+
+  Future<void> logout() async {
+    await _storage.delete(key: 'career_iq_token');
+    await _storage.delete(key: 'career_iq_role');
+  }
 
   Future<void> _saveToken(Map<String, dynamic> response) async {
     await _storage.write(
       key: 'career_iq_token',
       value: response['data']['token'] as String,
+    );
+    await _storage.write(
+      key: 'career_iq_role',
+      value: response['data']['user']['role'] as String? ?? 'student',
     );
   }
 }

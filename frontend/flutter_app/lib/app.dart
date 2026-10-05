@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'features/chatbot/screens/chatbot_screen.dart';
 import 'features/authentication/login_page.dart';
 import 'features/authentication/register_page.dart';
+import 'features/admin/admin_dashboard_page.dart';
 import 'features/student/dashboard_page.dart';
+import 'features/student/courses/course_catalog_page.dart';
 import 'features/student/personality/personality_test_page.dart';
 import 'features/student/profile_page.dart';
 import 'models/student.dart';
@@ -119,6 +121,7 @@ class _AuthGateState extends State<AuthGate> {
   final _students = StudentService();
   Student? _student;
   String? _token;
+  bool _isAdmin = false;
   bool _loading = true;
   bool _registering = false;
 
@@ -131,7 +134,10 @@ class _AuthGateState extends State<AuthGate> {
   Future<void> _restoreSession() async {
     try {
       _token = await _auth.token();
-      if (_token != null) _student = await _students.getMe(_token!);
+      if (_token != null) {
+        _isAdmin = await _auth.isAdmin();
+        _student = await _students.getMe(_token!);
+      }
     } catch (_) {
       await _auth.logout();
       _token = null;
@@ -142,12 +148,14 @@ class _AuthGateState extends State<AuthGate> {
   Future<void> _login(String email, String password) async {
     _student = await _auth.login(email, password);
     _token = await _auth.token();
+    _isAdmin = await _auth.isAdmin();
     if (mounted) setState(() {});
   }
 
   Future<void> _googleLogin() async {
     _student = await _auth.googleLogin();
     _token = await _auth.token();
+    _isAdmin = false;
     if (mounted) setState(() {});
   }
 
@@ -162,11 +170,13 @@ class _AuthGateState extends State<AuthGate> {
 
   Future<void> _logout() async {
     await _auth.logout();
-    if (mounted)
+    if (mounted) {
       setState(() {
         _student = null;
         _token = null;
+        _isAdmin = false;
       });
+    }
   }
 
   Future<void> _refreshStudent() async {
@@ -183,8 +193,12 @@ class _AuthGateState extends State<AuthGate> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading)
+    if (_loading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+    if (_isAdmin && _token != null) {
+      return AdminDashboardPage(onLogout: _logout);
+    }
     if (_student != null && _token != null) {
       return DashboardPage(
         student: _student!,
@@ -193,8 +207,11 @@ class _AuthGateState extends State<AuthGate> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) =>
-                  ProfilePage(student: _student!, onSave: _saveStudent),
+              builder: (_) => ProfilePage(
+                student: _student!,
+                onSave: _saveStudent,
+                onLogout: _logout,
+              ),
             ),
           );
           await _refreshStudent();
@@ -212,6 +229,15 @@ class _AuthGateState extends State<AuthGate> {
           );
           await _refreshStudent();
         },
+        onCourses: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  CourseCatalogPage(initialStream: _student!.stream),
+            ),
+          );
+        },
         onChatbot: () async {
           await Navigator.push(
             context,
@@ -225,13 +251,14 @@ class _AuthGateState extends State<AuthGate> {
         },
       );
     }
-    if (_registering)
+    if (_registering) {
       return RegisterPage(
         onRegister: _register,
         onVerify: _verifyEmail,
         onResend: _resendVerificationEmail,
         onLogin: () => setState(() => _registering = false),
       );
+    }
     return LoginPage(
       onLogin: _login,
       onGoogleLogin: _googleLogin,
