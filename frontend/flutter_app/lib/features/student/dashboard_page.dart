@@ -54,12 +54,20 @@ class _DashboardPageState extends State<DashboardPage> {
                 IconButton(
                   onPressed: _showNotifications,
                   tooltip: 'Notifications',
-                  icon: const Icon(Icons.notifications_none_rounded),
+                  constraints: const BoxConstraints(
+                    minWidth: 48,
+                    minHeight: 48,
+                  ),
+                  icon: const Icon(Icons.notifications_none_rounded, size: 28),
                 ),
                 IconButton(
                   onPressed: widget.onProfile,
                   tooltip: 'Profile',
-                  icon: const Icon(Icons.account_circle_outlined),
+                  constraints: const BoxConstraints(
+                    minWidth: 48,
+                    minHeight: 48,
+                  ),
+                  icon: const Icon(Icons.account_circle_outlined, size: 28),
                 ),
               ],
             )

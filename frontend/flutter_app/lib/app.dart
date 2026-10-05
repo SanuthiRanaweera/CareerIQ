@@ -124,6 +124,7 @@ class _AuthGateState extends State<AuthGate> {
   bool _isAdmin = false;
   bool _loading = true;
   bool _registering = false;
+  bool _adminPortal = false;
 
   @override
   void initState() {
@@ -149,6 +150,12 @@ class _AuthGateState extends State<AuthGate> {
     _student = await _auth.login(email, password);
     _token = await _auth.token();
     _isAdmin = await _auth.isAdmin();
+    if (_adminPortal && !_isAdmin) {
+      await _auth.logout();
+      _student = null;
+      _token = null;
+      throw StateError('This account does not have administrator access.');
+    }
     if (mounted) setState(() {});
   }
 
@@ -263,6 +270,8 @@ class _AuthGateState extends State<AuthGate> {
       onLogin: _login,
       onGoogleLogin: _googleLogin,
       onRegister: () => setState(() => _registering = true),
+      isAdminPortal: _adminPortal,
+      onAdminPortalToggle: () => setState(() => _adminPortal = !_adminPortal),
     );
   }
 }
