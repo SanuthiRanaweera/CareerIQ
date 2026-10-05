@@ -11,6 +11,7 @@ import 'features/authentication/register_page.dart';
 import 'features/admin/admin_dashboard_page.dart';
 import 'features/student/dashboard_page.dart';
 import 'features/student/courses/course_catalog_page.dart';
+import 'features/university/university_login_page.dart';
 import 'features/student/personality/personality_test_page.dart';
 import 'features/student/profile_page.dart';
 import 'models/career.dart';
@@ -333,6 +334,12 @@ class _AuthGateState extends State<AuthGate> {
       onRegister: () => setState(() => _registering = true),
       isAdminPortal: _adminPortal,
       onAdminPortalToggle: () => setState(() => _adminPortal = !_adminPortal),
+      onUniversityLogin: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const UniversityLoginPage()),
+        );
+      },
     );
   }
 }

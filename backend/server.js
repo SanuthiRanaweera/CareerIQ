@@ -5,6 +5,7 @@ const cors = require('cors');
 const { connectDatabase, getDatabaseStatus } = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
+const universityRoutes = require('./routes/universityRoutes');
 const personalityRoutes = require('./routes/personalityRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
 const careerRoutes = require('./routes/careerRoutes');
@@ -39,6 +40,8 @@ app.use('/api', (_req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/universities', universityRoutes);
+app.use('/api/university', universityRoutes);
 app.use('/api/personality', personalityRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/careers', careerRoutes);

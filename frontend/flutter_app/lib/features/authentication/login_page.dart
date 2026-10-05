@@ -8,12 +8,14 @@ class LoginPage extends StatefulWidget {
     required this.onRegister,
     required this.isAdminPortal,
     required this.onAdminPortalToggle,
+    this.onUniversityLogin,
   });
   final Future<void> Function(String email, String password) onLogin;
   final Future<void> Function() onGoogleLogin;
   final VoidCallback onRegister;
   final bool isAdminPortal;
   final VoidCallback onAdminPortalToggle;
+  final VoidCallback? onUniversityLogin;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -161,6 +163,12 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ],
                 const SizedBox(height: 8),
+                if (widget.onUniversityLogin != null) ...[
+                  TextButton(
+                    onPressed: _loading ? null : widget.onUniversityLogin,
+                    child: const Text('University Login'),
+                  ),
+                ],
                 TextButton.icon(
                   onPressed: _loading ? null : widget.onAdminPortalToggle,
                   icon: Icon(

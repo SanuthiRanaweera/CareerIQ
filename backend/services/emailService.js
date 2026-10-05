@@ -80,4 +80,72 @@ async function sendVerificationEmail({ email, fullName, otp }) {
 	}
 }
 
-module.exports = { sendVerificationEmail };
+async function sendUniversityOtpEmail({ universityName, email, otp }) {
+	const username = process.env.GMAIL_USER;
+	const password = process.env.GMAIL_APP_PASSWORD;
+	if (!username || !password) throw new Error('GMAIL_USER and GMAIL_APP_PASSWORD are required in backend/.env');
+
+	const socket = tls.connect({ host: 'smtp.gmail.com', port: 465, servername: 'smtp.gmail.com', timeout: 15000 });
+	try {
+		await readResponse(socket);
+		await command(socket, 'EHLO careeriq.local');
+		await command(socket, 'AUTH LOGIN', [334]);
+		await command(socket, Buffer.from(username).toString('base64'), [334]);
+		await command(socket, Buffer.from(password.replace(/\s/g, '')).toString('base64'), [235]);
+		await command(socket, `MAIL FROM:<${username}>`);
+		await command(socket, `RCPT TO:<${email}>`);
+		await command(socket, 'DATA', [354]);
+		const message = [
+			`From: CareerIQ <${username}>`,
+			`To: ${email}`,
+			'Subject: CareerIQ University Login Verification Code',
+			'MIME-Version: 1.0',
+			'Content-Type: text/html; charset=UTF-8',
+			'',
+			`<div style="font-family:Arial,sans-serif;max-width:520px;padding:24px;color:#172323"><h2>Hello ${universityName},</h2><p>Your CareerIQ verification code is:</p><h1 style="letter-spacing:8px;color:#0B6E69">${otp}</h1><p>This code will expire in 5 minutes.</p><p>If you did not request this code, please contact the CareerIQ administrator.</p></div>`,
+		].join('\r\n');
+		socket.write(`${message}\r\n.\r\n`);
+		const sent = await readResponse(socket);
+		if (sent.code !== 250) throw new Error(`Gmail SMTP error ${sent.code}: ${sent.text}`);
+		await command(socket, 'QUIT', [221]);
+	} finally {
+		socket.setTimeout(0);
+		socket.end();
+	}
+}
+
+async function sendUniversityAccountCreatedEmail({ email, universityName, password }) {
+	const username = process.env.GMAIL_USER;
+	const passwordEnv = process.env.GMAIL_APP_PASSWORD;
+	if (!username || !passwordEnv) throw new Error('GMAIL_USER and GMAIL_APP_PASSWORD are required in backend/.env');
+
+	const socket = tls.connect({ host: 'smtp.gmail.com', port: 465, servername: 'smtp.gmail.com', timeout: 15000 });
+	try {
+		await readResponse(socket);
+		await command(socket, 'EHLO careeriq.local');
+		await command(socket, 'AUTH LOGIN', [334]);
+		await command(socket, Buffer.from(username).toString('base64'), [334]);
+		await command(socket, Buffer.from(passwordEnv.replace(/\s/g, '')).toString('base64'), [235]);
+		await command(socket, `MAIL FROM:<${username}>`);
+		await command(socket, `RCPT TO:<${email}>`);
+		await command(socket, 'DATA', [354]);
+		const message = [
+			`From: CareerIQ <${username}>`,
+			`To: ${email}`,
+			'Subject: CareerIQ Account Created',
+			'MIME-Version: 1.0',
+			'Content-Type: text/html; charset=UTF-8',
+			'',
+			`<div style="font-family:Arial,sans-serif;max-width:520px;padding:24px;color:#172323"><h2>University account created successfully</h2><p>Your CareerIQ account has been created.</p><p><strong>Email:</strong> ${email}</p><p><strong>Temporary Password:</strong> ${password}</p><p>Please log in and complete the verification flow to set a secure password.</p></div>`,
+		].join('\r\n');
+		socket.write(`${message}\r\n.\r\n`);
+		const sent = await readResponse(socket);
+		if (sent.code !== 250) throw new Error(`Gmail SMTP error ${sent.code}: ${sent.text}`);
+		await command(socket, 'QUIT', [221]);
+	} finally {
+		socket.setTimeout(0);
+		socket.end();
+	}
+}
+
+module.exports = { sendVerificationEmail, sendUniversityOtpEmail, sendUniversityAccountCreatedEmail };
