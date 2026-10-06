@@ -43,16 +43,24 @@ Career careerFixture({
 
 /// Three careers across three categories, enough to exercise lists, filters
 /// and singular/plural wording.
+/// Descriptions and skills are deliberately distinct per career: sharing one
+/// default description would make every search match everything, and a search
+/// test would then pass without proving anything.
 List<Career> sampleCareers() => [
       careerFixture(
         id: 'id-se',
         title: 'Software Engineer',
         category: 'Information Technology',
+        description: 'Designs, builds and maintains software systems.',
+        requiredSkills: const ['Programming', 'Databases'],
       ),
       careerFixture(
         id: 'id-md',
         title: 'Medical Doctor',
         category: 'Healthcare & Medicine',
+        description: 'Diagnoses and treats illness and cares for patients.',
+        requiredSkills: const ['Clinical knowledge', 'Empathy'],
+        recommendedStreams: const ['Science'],
         salaryMin: 150000,
         salaryMax: 600000,
       ),
@@ -60,6 +68,9 @@ List<Career> sampleCareers() => [
         id: 'id-ao',
         title: 'Agricultural Officer',
         category: 'Agriculture & Environment',
+        description: 'Supports farmers with crop science and soil management.',
+        requiredSkills: const ['Crop science', 'Field research'],
+        recommendedStreams: const ['Science'],
         salaryMin: 70000,
         salaryMax: 220000,
         jobOutlook: 'Medium',
@@ -97,7 +108,9 @@ class FakeCareerService implements CareerService {
   CareerRecommendationResult? recommendation;
 
   /// Small delay so tests can observe the loading state before data arrives.
-  final Duration responseDelay;
+  /// Mutable so a test can make one response slower than the next and check
+  /// that a stale reply cannot overwrite newer results.
+  Duration responseDelay;
 
   // --- Recorded calls, for assertions ---
   int getCareersCallCount = 0;
