@@ -6,10 +6,14 @@ class LoginPage extends StatefulWidget {
     required this.onLogin,
     required this.onGoogleLogin,
     required this.onRegister,
+    required this.isAdminPortal,
+    required this.onAdminPortalToggle,
   });
   final Future<void> Function(String email, String password) onLogin;
   final Future<void> Function() onGoogleLogin;
   final VoidCallback onRegister;
+  final bool isAdminPortal;
+  final VoidCallback onAdminPortalToggle;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -79,14 +83,16 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  'Welcome back',
+                  widget.isAdminPortal ? 'Admin Portal' : 'Welcome back',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Continue building your career path.',
+                  widget.isAdminPortal
+                      ? 'Sign in with your administrator account.'
+                      : 'Continue building your career path.',
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 32),
@@ -125,32 +131,48 @@ class _LoginPageState extends State<LoginPage> {
                   onPressed: _loading ? null : _submit,
                   child: _loading
                       ? const CircularProgressIndicator()
-                      : const Text('Log in'),
+                      : Text(widget.isAdminPortal ? 'Admin sign in' : 'Log in'),
                 ),
-                const SizedBox(height: 12),
-                OutlinedButton.icon(
-                  onPressed: _loading ? null : _googleSubmit,
-                  icon: const Icon(Icons.account_circle_outlined),
-                  label: const Text('Continue with Google'),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const Expanded(child: Divider()),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Text(
-                        'new here?',
-                        style: Theme.of(context).textTheme.bodySmall,
+                if (!widget.isAdminPortal) ...[
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                    onPressed: _loading ? null : _googleSubmit,
+                    icon: const Icon(Icons.account_circle_outlined),
+                    label: const Text('Continue with Google'),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Expanded(child: Divider()),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'new here?',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       ),
-                    ),
-                    const Expanded(child: Divider()),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                TextButton(
-                  onPressed: widget.onRegister,
-                  child: const Text('Create a student account'),
+                      const Expanded(child: Divider()),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  TextButton(
+                    onPressed: widget.onRegister,
+                    child: const Text('Create a student account'),
+                  ),
+                ],
+                const SizedBox(height: 8),
+                TextButton.icon(
+                  onPressed: _loading ? null : widget.onAdminPortalToggle,
+                  icon: Icon(
+                    widget.isAdminPortal
+                        ? Icons.arrow_back_rounded
+                        : Icons.admin_panel_settings_outlined,
+                  ),
+                  label: Text(
+                    widget.isAdminPortal
+                        ? 'Back to student sign in'
+                        : 'Admin Portal',
+                  ),
                 ),
               ],
             ),

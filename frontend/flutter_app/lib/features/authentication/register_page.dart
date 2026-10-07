@@ -106,10 +106,11 @@ class _RegisterPageState extends State<RegisterPage> {
     });
     try {
       await widget.onResend(_email.text.trim());
-      if (mounted)
+      if (mounted) {
         setState(
           () => _error = 'A new verification code was sent to your Gmail.',
         );
+      }
     } catch (error) {
       if (mounted) setState(() => _error = error.toString());
     } finally {

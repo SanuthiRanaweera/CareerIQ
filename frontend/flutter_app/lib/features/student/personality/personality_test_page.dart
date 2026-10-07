@@ -128,7 +128,7 @@ class _PersonalityTestPageState extends State<PersonalityTestPage> {
                   const Icon(
                     Icons.error_outline,
                     size: 48,
-                    color: const Color(0xFFEF4444),
+                    color: Color(0xFFEF4444),
                   ),
                   const SizedBox(height: 12),
                   Text(

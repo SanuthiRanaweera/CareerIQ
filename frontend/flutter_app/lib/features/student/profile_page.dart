@@ -3,9 +3,15 @@ import 'package:flutter/material.dart';
 import '../../models/student.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key, required this.student, required this.onSave});
+  const ProfilePage({
+    super.key,
+    required this.student,
+    required this.onSave,
+    required this.onLogout,
+  });
   final Student student;
   final Future<void> Function(Student student) onSave;
+  final Future<void> Function() onLogout;
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -52,10 +58,11 @@ class _ProfilePageState extends State<ProfilePage> {
     widget.student.alResults = _results;
     try {
       await widget.onSave(widget.student);
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Profile saved to MongoDB')),
         );
+      }
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -107,6 +114,33 @@ class _ProfilePageState extends State<ProfilePage> {
     name.dispose();
     grade.dispose();
     if (added == true && mounted) setState(() {});
+  }
+
+  Future<void> _confirmLogout() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Log out?'),
+        content: const Text(
+          'You will need to sign in again to access your profile.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            icon: const Icon(Icons.logout_rounded),
+            label: const Text('Log out'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    final logout = widget.onLogout;
+    Navigator.pop(context);
+    await logout();
   }
 
   @override
@@ -252,6 +286,16 @@ class _ProfilePageState extends State<ProfilePage> {
                 )
               : const Icon(Icons.save_outlined),
           label: Text(_saving ? 'Saving...' : 'Save changes'),
+        ),
+        const SizedBox(height: 12),
+        OutlinedButton.icon(
+          onPressed: _confirmLogout,
+          icon: const Icon(Icons.logout_rounded),
+          label: const Text('Log out'),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: const Color(0xFFB42318),
+            side: const BorderSide(color: Color(0xFFFDA29B)),
+          ),
         ),
       ],
     ),
