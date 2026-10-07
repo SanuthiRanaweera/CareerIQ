@@ -4,6 +4,9 @@ import '../../app.dart';
 import '../../services/auth_service.dart';
 import '../../models/course.dart';
 import '../../services/course_service.dart';
+import '../../models/career.dart';
+import '../career/screens/admin_career_form_page.dart';
+import '../career/screens/admin_manage_careers_page.dart';
 import 'admin_notifications_page.dart';
 import 'models/admin_models.dart';
 
@@ -51,9 +54,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   final TextEditingController _uniSearchController = TextEditingController();
   final TextEditingController _courseSearchController = TextEditingController();
-  final TextEditingController _careerSearchController = TextEditingController();
   final _courseService = CourseService();
   bool _coursesLoading = false;
+
+  /// Auth token for the Career module's admin screens, read once.
+  late final Future<String?> _careerAdminToken = AuthService().token();
 
   @override
   void initState() {
@@ -71,7 +76,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     _studentSearchController.dispose();
     _uniSearchController.dispose();
     _courseSearchController.dispose();
-    _careerSearchController.dispose();
     super.dispose();
   }
 
@@ -1671,191 +1675,54 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   // ---------------------------------------------------------------------------
   // 5. CAREERS MANAGEMENT TAB
   // ---------------------------------------------------------------------------
+  /// The Career module's own admin screen, which reads and writes the real
+  /// /api/careers endpoints instead of a local mock list.
+  ///
+  /// Shown embedded so this dashboard's header stays the only one on screen.
+  /// The token is read from secure storage the same way the courses tab does.
   Widget _buildCareersTab() {
-    final query = _careerSearchController.text.trim().toLowerCase();
-    final filtered = _careers.where((c) {
-      return query.isEmpty ||
-          c.title.toLowerCase().contains(query) ||
-          c.category.toLowerCase().contains(query) ||
-          c.personalityMatch.toLowerCase().contains(query);
-    }).toList();
+    return FutureBuilder<String?>(
+      future: _careerAdminToken,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-          color: Colors.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '💼 Careers Management',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      Text(
-                        '${_careers.length} career pathways mapped to personality test results',
-                        style: const TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                  FilledButton.icon(
-                    onPressed: () => _showAddCareerDialog(context),
-                    icon: const Icon(Icons.add_rounded, size: 18),
-                    label: const Text('Add Career'),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(130, 44),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _careerSearchController,
-                onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(
-                  hintText:
-                      'Search careers by title, industry, or personality match...',
-                  prefixIcon: Icon(Icons.search_rounded),
-                  fillColor: Color(0xFFF1F5F9),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Divider(height: 1),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: filtered.length,
-            itemBuilder: (context, index) {
-              final career = filtered[index];
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  side: const BorderSide(color: Color(0xFFE2E8F0)),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Text(
-                              career.title,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 3,
-                            ),
-                            decoration: BoxDecoration(
-                              color: career.demandLevel == 'Very High'
-                                  ? const Color(0xFFDCFCE7)
-                                  : const Color(0xFFFEF3C7),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '${career.demandLevel} Demand',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                color: career.demandLevel == 'Very High'
-                                    ? const Color(0xFF16A34A)
-                                    : const Color(0xFFB45309),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        career.category,
-                        style: const TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.psychology_rounded,
-                            size: 16,
-                            color: Color(0xFF8B5CF6),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            'Matches: ${career.personalityMatch}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF7C3AED),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.payments_outlined,
-                            size: 16,
-                            color: Color(0xFF10B981),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            career.salaryRange,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF059669),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+        final token = snapshot.data;
+        if (token == null) {
+          return const Center(
+            child: Text('Please sign in again to manage careers.'),
+          );
+        }
+
+        return AdminManageCareersPage(
+          token: token,
+          embedded: true,
+          onAddCareer: () => _openCareerForm(context, token),
+          onEditCareer: (career) =>
+              _openCareerForm(context, token, career: career),
+        );
+      },
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // 6. SETTINGS TAB
-  // ---------------------------------------------------------------------------
+  /// Opens the career add/edit form, closing it once a save succeeds.
+  void _openCareerForm(
+    BuildContext context,
+    String token, {
+    Career? career,
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => AdminCareerFormPage(
+          token: token,
+          career: career,
+          onSaved: (_) => Navigator.pop(context),
+        ),
+      ),
+    );
+  }
   Widget _buildSettingsTab() {
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -2491,67 +2358,4 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     );
   }
 
-  void _showAddCareerDialog(BuildContext context) {
-    final titleCtrl = TextEditingController();
-    final catCtrl = TextEditingController();
-    final personalityCtrl = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add Career Pathway'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: titleCtrl,
-              decoration: const InputDecoration(labelText: 'Career Title'),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: catCtrl,
-              decoration: const InputDecoration(
-                labelText: 'Industry / Category',
-              ),
-            ),
-            const SizedBox(height: 10),
-            TextField(
-              controller: personalityCtrl,
-              decoration: const InputDecoration(labelText: 'Personality Fit'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (titleCtrl.text.isNotEmpty) {
-                setState(() {
-                  _careers.add(
-                    AdminCareer(
-                      id: 'car_${DateTime.now().millisecondsSinceEpoch}',
-                      title: titleCtrl.text.trim(),
-                      category: catCtrl.text.trim().isEmpty
-                          ? 'General'
-                          : catCtrl.text.trim(),
-                      personalityMatch: personalityCtrl.text.trim().isEmpty
-                          ? 'Analytical'
-                          : personalityCtrl.text.trim(),
-                      demandLevel: 'High',
-                      salaryRange: 'LKR 150K - 400K/mo',
-                    ),
-                  );
-                });
-                Navigator.pop(context);
-              }
-            },
-            child: const Text('Save Career'),
-          ),
-        ],
-      ),
-    );
-  }
 }

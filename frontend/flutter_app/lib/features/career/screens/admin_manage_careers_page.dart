@@ -24,9 +24,16 @@ class AdminManageCareersPage extends StatefulWidget {
     this.onAddCareer,
     this.onEditCareer,
     this.careerService,
+    this.embedded = false,
   });
 
   final String token;
+
+  /// True when this screen is shown inside another page's content area, such
+  /// as a tab of the admin dashboard. The app bar is then left out so the
+  /// host page's own header is the only one on screen; the refresh action
+  /// lives in the body header, so nothing is lost.
+  final bool embedded;
 
   /// Opens the create form. Null until that screen is wired up.
   final VoidCallback? onAddCareer;
@@ -190,16 +197,9 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Manage careers'),
-        actions: [
-          IconButton(
-            tooltip: 'Refresh',
-            onPressed: _loadCareers,
-            icon: const Icon(Icons.refresh_rounded),
-          ),
-        ],
-      ),
+      appBar: widget.embedded
+          ? null
+          : AppBar(title: const Text('Manage careers')),
       floatingActionButton: widget.onAddCareer == null
           ? null
           : FloatingActionButton.extended(
@@ -250,7 +250,21 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
             ),
           ),
           const SizedBox(height: 6),
-          Text('Career records', style: theme.textTheme.headlineMedium),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Career records',
+                  style: theme.textTheme.headlineMedium,
+                ),
+              ),
+              IconButton(
+                tooltip: 'Refresh',
+                onPressed: _loadCareers,
+                icon: const Icon(Icons.refresh_rounded),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
           TextField(
             controller: _searchController,
