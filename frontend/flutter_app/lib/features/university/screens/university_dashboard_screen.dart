@@ -10,6 +10,8 @@ import 'edit_university_profile_screen.dart';
 import 'university_courses_screen.dart';
 import 'university_notifications_screen.dart';
 import 'university_profile_screen.dart';
+import 'university_analytics_screen.dart';
+import '../../scholarship/university/university_scholarships_screen.dart';
 
 class UniversityDashboardScreen extends StatefulWidget {
   const UniversityDashboardScreen({
@@ -147,6 +149,26 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
       MaterialPageRoute(
         builder: (_) => UniversityNotificationsScreen(
           notifications: _dashboardData!.notifications,
+        ),
+      ),
+    );
+  }
+
+  void _navigateToScholarships() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const UniversityScholarshipsScreen(),
+      ),
+    );
+  }
+
+  void _navigateToAnalytics() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => UniversityAnalyticsScreen(
+          universityName: _dashboardData?.university.universityName,
         ),
       ),
     );
@@ -473,6 +495,24 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
         ),
         const SizedBox(height: 12),
         _buildActionTile(
+          icon: Icons.workspace_premium_rounded,
+          title: 'Scholarships & Grants',
+          subtitle: 'Create scholarships & review applications',
+          color: const Color(0xFF10B981),
+          bgColor: const Color(0xFFECFDF5),
+          onTap: _navigateToScholarships,
+        ),
+        const SizedBox(height: 12),
+        _buildActionTile(
+          icon: Icons.insights_rounded,
+          title: 'University Analytics',
+          subtitle: 'Profile views, course engagement & application trends',
+          color: const Color(0xFF6366F1),
+          bgColor: const Color(0xFFEEF2FF),
+          onTap: _navigateToAnalytics,
+        ),
+        const SizedBox(height: 12),
+        _buildActionTile(
           icon: Icons.notifications_none_rounded,
           title: 'Notifications & Notices',
           subtitle: 'Account updates & CareerIQ alerts',
@@ -725,9 +765,17 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
                                 .statistics.profileCompletion,
                             courseCount:
                                 _dashboardData!.statistics.courseCount,
+                            scholarshipCount:
+                                _dashboardData!.statistics.scholarshipCount,
+                            applicationCount:
+                                _dashboardData!.statistics.applicationCount,
+                            profileViews:
+                                _dashboardData!.statistics.profileViews,
                             status: _dashboardData!.university.status,
                             onCoursesTap: _navigateToCourses,
                             onProfileTap: _navigateToProfile,
+                            onScholarshipsTap: _navigateToScholarships,
+                            onAnalyticsTap: _navigateToAnalytics,
                           ),
                           const SizedBox(height: 20),
                           _buildUniversityInfoCard(

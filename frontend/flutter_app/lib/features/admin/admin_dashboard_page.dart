@@ -11,6 +11,7 @@ import 'admin_notifications_page.dart';
 import 'models/admin_models.dart';
 import 'university/screens/university_list_screen.dart';
 import 'university/services/university_admin_service.dart';
+import 'university/models/admin_university_model.dart';
 
 enum AdminNavSection {
   overview,
@@ -44,6 +45,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   late List<AdminStudent> _students;
   int _universityCount = 0;
+  List<AdminUniversityModel> _adminUniversities = [];
   late List<AdminCourse> _courses;
   late List<AdminCareer> _careers;
   final Map<String, Course> _courseRecords = {};
@@ -93,7 +95,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     try {
       final list = await UniversityAdminService().getUniversities();
       if (mounted) {
-        setState(() => _universityCount = list.length);
+        setState(() {
+          _adminUniversities = list;
+          _universityCount = list.length;
+        });
       }
     } catch (_) {}
   }
@@ -1973,6 +1978,28 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         ? course!.stream
         : 'Mathematics';
 
+    String? selectedUniId = _courseRecords[course?.id]?.universityId;
+    if (selectedUniId == null && course != null && _adminUniversities.isNotEmpty) {
+      final match = _adminUniversities.firstWhere(
+        (u) =>
+            u.universityName.toLowerCase().trim() ==
+            course.university.toLowerCase().trim(),
+        orElse: () => const AdminUniversityModel(
+          id: '',
+          userId: '',
+          universityName: '',
+          location: '',
+          officialEmail: '',
+          address: '',
+          contactNumber: '',
+          representativeName: '',
+          representativeContactNumber: '',
+          status: '',
+        ),
+      );
+      if (match.id.isNotEmpty) selectedUniId = match.id;
+    }
+
     showDialog(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -1980,71 +2007,121 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           title: Text(
             course == null ? 'Add Academic Course' : 'Edit Academic Course',
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: titleCtrl,
-                decoration: const InputDecoration(labelText: 'Degree Title'),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: uniCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Awarding University',
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextField(
+                  controller: titleCtrl,
+                  decoration: const InputDecoration(labelText: 'Degree Title'),
                 ),
-              ),
-              const SizedBox(height: 10),
-              DropdownButtonFormField<String>(
-                initialValue: stream,
-                decoration: const InputDecoration(labelText: 'A/L stream'),
-                items:
-                    const [
-                          'Mathematics',
-                          'Science',
-                          'Technology',
-                          'Commerce',
-                          'Arts',
-                          'Any',
-                        ]
-                        .map(
-                          (value) => DropdownMenuItem(
-                            value: value,
-                            child: Text(value),
+                const SizedBox(height: 10),
+                if (_adminUniversities.isNotEmpty) ...[
+                  DropdownButtonFormField<String?>(
+                    initialValue: _adminUniversities.any((u) => u.id == selectedUniId)
+                        ? selectedUniId
+                        : null,
+                    isExpanded: true,
+                    decoration: const InputDecoration(
+                      labelText: 'Assign University (from Database)',
+                    ),
+                    hint: const Text('Select registered university'),
+                    items: [
+                      const DropdownMenuItem<String?>(
+                        value: null,
+                        child: Text('Custom / Manual Entry'),
+                      ),
+                      ..._adminUniversities.map(
+                        (u) => DropdownMenuItem<String?>(
+                          value: u.id,
+                          child: Text(
+                            u.universityName,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                        )
-                        .toList(),
-                onChanged: (value) =>
-                    setDialogState(() => stream = value ?? stream),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: durationCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  labelText: 'Duration (years)',
+                        ),
+                      ),
+                    ],
+                    onChanged: (val) {
+                      setDialogState(() {
+                        selectedUniId = val;
+                        if (val != null) {
+                          final found =
+                              _adminUniversities.firstWhere((u) => u.id == val);
+                          uniCtrl.text = found.universityName;
+                        }
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                ],
+                TextField(
+                  controller: uniCtrl,
+                  decoration: const InputDecoration(
+                    labelText: 'Awarding University Name',
+                  ),
+                  onChanged: (text) {
+                    if (selectedUniId != null) {
+                      final found = _adminUniversities
+                          .where((u) => u.id == selectedUniId)
+                          .toList();
+                      if (found.isEmpty || found.first.universityName != text) {
+                        setDialogState(() => selectedUniId = null);
+                      }
+                    }
+                  },
                 ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: zScoreCtrl,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  initialValue: stream,
+                  decoration: const InputDecoration(labelText: 'A/L stream'),
+                  items:
+                      const [
+                            'Mathematics',
+                            'Science',
+                            'Technology',
+                            'Commerce',
+                            'Arts',
+                            'Any',
+                          ]
+                          .map(
+                            (value) => DropdownMenuItem(
+                              value: value,
+                              child: Text(value),
+                            ),
+                          )
+                          .toList(),
+                  onChanged: (value) =>
+                      setDialogState(() => stream = value ?? stream),
                 ),
-                decoration: const InputDecoration(
-                  labelText: 'Minimum Z-Score (optional)',
+                const SizedBox(height: 10),
+                TextField(
+                  controller: durationCtrl,
+                  keyboardType: TextInputType.number,
+                  decoration: const InputDecoration(
+                    labelText: 'Duration (years)',
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: descriptionCtrl,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'Description (optional)',
+                const SizedBox(height: 10),
+                TextField(
+                  controller: zScoreCtrl,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: const InputDecoration(
+                    labelText: 'Minimum Z-Score (optional)',
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 10),
+                TextField(
+                  controller: descriptionCtrl,
+                  maxLines: 3,
+                  decoration: const InputDecoration(
+                    labelText: 'Description (optional)',
+                  ),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -2073,6 +2150,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   final values = {
                     'title': titleCtrl.text.trim(),
                     'university': uniCtrl.text.trim(),
+                    if (selectedUniId != null && selectedUniId!.isNotEmpty)
+                      'universityId': selectedUniId,
                     'stream': stream,
                     'durationYears': duration,
                     'minZScore': zScoreCtrl.text.trim().isEmpty

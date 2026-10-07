@@ -11,6 +11,8 @@ class SubjectResult {
   String name;
   String grade;
 
+  String get subject => name;
+
   Map<String, dynamic> toJson() => {'name': name, 'grade': grade};
 }
 
@@ -28,6 +30,7 @@ class Student {
     this.profileCompletion = 0,
     this.personalityCategory,
     this.favoriteUniversities = const [],
+    this.zScore,
   });
 
   factory Student.fromJson(Map<String, dynamic> json) {
@@ -50,6 +53,8 @@ class Student {
           .map((item) => item is Map ? (item['_id'] ?? item['id'] ?? '').toString() : item.toString())
           .where((id) => id.isNotEmpty)
           .toList(),
+      zScore: (json['zScore'] as num?)?.toDouble() ??
+          (json['alZScore'] as num?)?.toDouble(),
     );
   }
 
@@ -65,6 +70,7 @@ class Student {
   int profileCompletion;
   String? personalityCategory;
   List<String> favoriteUniversities;
+  final double? zScore;
 
   Map<String, dynamic> toJson() => {
         'fullName': fullName,

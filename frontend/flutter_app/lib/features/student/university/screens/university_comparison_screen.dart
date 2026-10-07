@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../models/student.dart';
+import '../../courses/widgets/course_details_modal.dart';
 import '../models/university_comparison_model.dart';
 import '../services/student_university_service.dart';
 
@@ -1170,92 +1171,114 @@ class _UniversityComparisonScreenState
                     (c.stream.toLowerCase() == studentStream.toLowerCase() ||
                         c.stream.toLowerCase() == 'any');
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF8FAFC),
+                final courseObj = c.toCourse(
+                  universityName: uni.universityName,
+                  universityId: uni.id,
+                );
+
+                return Material(
+                  color: Colors.transparent,
+                  child: InkWell(
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                    onTap: () => showCourseDetailsModal(
+                      context,
+                      courseObj,
+                      student: widget.student,
+                    ),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: const Color(0xFFE2E8F0)),
+                      ),
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Text(
-                              c.title,
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: Color(0xFF1E293B),
-                              ),
-                            ),
-                          ),
-                          if (matches)
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFECFDF5),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                'Matches Stream',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF059669),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  c.title,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF1E293B),
+                                  ),
                                 ),
                               ),
-                            ),
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-                      Wrap(
-                        spacing: 10,
-                        runSpacing: 4,
-                        children: [
-                          Text(
-                            'Stream: ${c.stream}',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF475569),
-                            ),
+                              if (matches)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFECFDF5),
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                  child: const Text(
+                                    'Matches Stream',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF059669),
+                                    ),
+                                  ),
+                                ),
+                              const SizedBox(width: 4),
+                              const Icon(
+                                Icons.chevron_right_rounded,
+                                size: 16,
+                                color: Color(0xFF94A3B8),
+                              ),
+                            ],
                           ),
-                          Text(
-                            'Duration: ${c.durationYears.toInt()} Yrs',
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF475569),
-                            ),
+                          const SizedBox(height: 6),
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 4,
+                            children: [
+                              Text(
+                                'Stream: ${c.stream}',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF475569),
+                                ),
+                              ),
+                              Text(
+                                'Duration: ${c.durationYears.toInt()} Yrs',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF475569),
+                                ),
+                              ),
+                              if (c.minZScore != null)
+                                Text(
+                                  'Min Z: ${c.minZScore!.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF2563EB),
+                                  ),
+                                ),
+                            ],
                           ),
-                          if (c.minZScore != null)
+                          if (c.subjects.isNotEmpty) ...[
+                            const SizedBox(height: 4),
                             Text(
-                              'Min Z: ${c.minZScore!.toStringAsFixed(2)}',
+                              'Subjects: ${c.subjects.join(", ")}',
                               style: const TextStyle(
                                 fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF2563EB),
+                                color: Color(0xFF64748B),
                               ),
                             ),
+                          ],
                         ],
                       ),
-                      if (c.subjects.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          'Subjects: ${c.subjects.join(", ")}',
-                          style: const TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF64748B),
-                          ),
-                        ),
-                      ],
-                    ],
+                    ),
                   ),
                 );
               }),

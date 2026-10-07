@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/university_dashboard_data.dart';
 import '../services/university_service.dart';
+import '../../student/courses/widgets/course_details_modal.dart';
 
 class UniversityCoursesScreen extends StatefulWidget {
   const UniversityCoursesScreen({
@@ -119,107 +120,127 @@ class _UniversityCoursesScreenState extends State<UniversityCoursesScreen> {
         borderRadius: BorderRadius.circular(16),
         side: const BorderSide(color: Color(0xFFE2E8F0)),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    course.title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF0F172A),
-                    ),
-                  ),
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFEFF6FF),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: const Color(0xFFBFDBFE)),
-                  ),
-                  child: Text(
-                    course.stream,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF1D4ED8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              course.degreeType,
-              style: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: Color(0xFF64748B),
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Divider(height: 1, color: Color(0xFFF1F5F9)),
-            const SizedBox(height: 10),
-            Wrap(
-              spacing: 16,
-              runSpacing: 6,
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.schedule_rounded,
-                        size: 14, color: Color(0xFF64748B)),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${course.durationYears.toStringAsFixed(1)} Years',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => showCourseDetailsModal(context, course.toCourse()),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      course.title,
                       style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF475569),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F172A),
                       ),
                     ),
-                  ],
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFEFF6FF),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: const Color(0xFFBFDBFE)),
+                    ),
+                    child: Text(
+                      course.stream,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1D4ED8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                course.degreeType,
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF64748B),
                 ),
-                if (course.minZScore != null)
+              ),
+              const SizedBox(height: 10),
+              const Divider(height: 1, color: Color(0xFFF1F5F9)),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 16,
+                runSpacing: 6,
+                children: [
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.analytics_outlined,
-                          size: 14, color: Color(0xFF2563EB)),
+                      const Icon(Icons.schedule_rounded,
+                          size: 14, color: Color(0xFF64748B)),
                       const SizedBox(width: 4),
                       Text(
-                        'Min Z-Score: ${course.minZScore!.toStringAsFixed(2)}',
+                        '${course.durationYears.toStringAsFixed(1)} Years',
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: Color(0xFF2563EB),
+                          color: Color(0xFF475569),
                         ),
                       ),
                     ],
                   ),
-              ],
-            ),
-            if (course.description.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(
-                course.description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF64748B),
+                  if (course.minZScore != null)
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.analytics_outlined,
+                            size: 14, color: Color(0xFF2563EB)),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Min Z-Score: ${course.minZScore!.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2563EB),
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+              if (course.description.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text(
+                  course.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF64748B),
+                  ),
                 ),
+              ],
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton.icon(
+                    onPressed: () =>
+                        showCourseDetailsModal(context, course.toCourse()),
+                    icon: const Icon(Icons.visibility_outlined, size: 16),
+                    label: const Text('View Details'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color(0xFF2563EB),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ),
+                ],
               ),
             ],
-          ],
+          ),
         ),
       ),
     );

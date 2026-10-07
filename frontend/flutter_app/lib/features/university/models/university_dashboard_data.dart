@@ -1,3 +1,5 @@
+import '../../../../models/course.dart';
+
 class UniversityProfileModel {
   const UniversityProfileModel({
     required this.id,
@@ -16,6 +18,8 @@ class UniversityProfileModel {
     this.logo,
     required this.status,
     this.isEmailVerified = false,
+    this.courseCount = 0,
+    this.courses = const [],
     this.createdAt,
     this.updatedAt,
   });
@@ -36,6 +40,8 @@ class UniversityProfileModel {
   final String? logo;
   final String status;
   final bool isEmailVerified;
+  final int courseCount;
+  final List<UniversityCourseItem> courses;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -67,6 +73,10 @@ class UniversityProfileModel {
       logo: json['logo']?.toString().trim(),
       status: (json['status'] ?? 'active').toString().trim(),
       isEmailVerified: json['isEmailVerified'] == true || json['emailVerified'] == true,
+      courseCount: (json['courseCount'] as num?)?.toInt() ?? 0,
+      courses: (json['courses'] as List? ?? const [])
+          .map((c) => UniversityCourseItem.fromJson(c as Map<String, dynamic>))
+          .toList(),
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,
@@ -107,6 +117,8 @@ class UniversityProfileModel {
     String? website,
     String? description,
     String? logo,
+    int? courseCount,
+    List<UniversityCourseItem>? courses,
   }) {
     return UniversityProfileModel(
       id: id,
@@ -126,6 +138,8 @@ class UniversityProfileModel {
       logo: logo ?? this.logo,
       status: status,
       isEmailVerified: isEmailVerified,
+      courseCount: courseCount ?? this.courseCount,
+      courses: courses ?? this.courses,
       createdAt: createdAt,
       updatedAt: updatedAt,
     );
@@ -139,6 +153,10 @@ class UniversityStatisticsModel {
     this.completedFields = 0,
     this.totalFields = 11,
     this.status = 'active',
+    this.scholarshipCount = 0,
+    this.applicationCount = 0,
+    this.profileViews = 0,
+    this.favouriteCount = 0,
   });
 
   final int profileCompletion;
@@ -146,6 +164,10 @@ class UniversityStatisticsModel {
   final int completedFields;
   final int totalFields;
   final String status;
+  final int scholarshipCount;
+  final int applicationCount;
+  final int profileViews;
+  final int favouriteCount;
 
   factory UniversityStatisticsModel.fromJson(Map<String, dynamic> json) {
     return UniversityStatisticsModel(
@@ -154,6 +176,10 @@ class UniversityStatisticsModel {
       completedFields: (json['completedFields'] as num?)?.toInt() ?? 0,
       totalFields: (json['totalFields'] as num?)?.toInt() ?? 11,
       status: (json['status'] ?? 'active').toString(),
+      scholarshipCount: (json['scholarshipCount'] as num?)?.toInt() ?? 0,
+      applicationCount: (json['applicationCount'] as num?)?.toInt() ?? 0,
+      profileViews: (json['profileViews'] as num?)?.toInt() ?? 0,
+      favouriteCount: (json['favouriteCount'] as num?)?.toInt() ?? 0,
     );
   }
 }
@@ -235,6 +261,24 @@ class UniversityCourseItem {
   final double? minZScore;
   final String? website;
   final bool isActive;
+
+  Course toCourse({String? universityId}) {
+    return Course(
+      id: id,
+      title: title,
+      university: university,
+      universityId: universityId,
+      stream: stream,
+      degreeType: degreeType,
+      description: description,
+      durationYears: durationYears,
+      minZScore: minZScore,
+      subjects: const [],
+      careerPaths: const [],
+      website: website ?? '',
+      applicationUrl: '',
+    );
+  }
 
   factory UniversityCourseItem.fromJson(Map<String, dynamic> json) {
     return UniversityCourseItem(

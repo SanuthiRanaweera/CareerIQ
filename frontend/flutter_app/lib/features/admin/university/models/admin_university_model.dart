@@ -16,6 +16,7 @@ class AdminUniversityModel {
     this.logo,
     required this.status,
     this.isEmailVerified = false,
+    this.courseCount = 0,
     this.createdAt,
     this.updatedAt,
   });
@@ -36,6 +37,7 @@ class AdminUniversityModel {
   final String? logo;
   final String status;
   final bool isEmailVerified;
+  final int courseCount;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -78,6 +80,7 @@ class AdminUniversityModel {
       logo: json['logo']?.toString().trim(),
       status: (json['status'] ?? 'pending').toString().trim(),
       isEmailVerified: emailVerified,
+      courseCount: (json['courseCount'] as num?)?.toInt() ?? 0,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,

@@ -11,6 +11,11 @@ const chatbotRoutes = require('./routes/chatbotRoutes');
 const careerRoutes = require('./routes/careerRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const scholarshipRoutes = require('./routes/scholarshipRoutes');
+const universityScholarshipRoutes = require('./routes/universityScholarshipRoutes');
+const universityApplicationRoutes = require('./routes/universityApplicationRoutes');
+const studentScholarshipRoutes = require('./routes/studentScholarshipRoutes');
+const analyticsRoutes = require('./routes/analyticsRoutes');
 const errorHandler = require('./middleware/errorMiddleware');
 
 const app = express();
@@ -40,6 +45,10 @@ app.use('/api', (_req, res, next) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
+app.use('/api/student', studentRoutes);
+// Specific university sub-routes must be mounted before generic /api/university
+app.use('/api/university/scholarships', universityScholarshipRoutes);
+app.use('/api/university/applications', universityApplicationRoutes);
 app.use('/api/universities', universityRoutes);
 app.use('/api/university', universityRoutes);
 app.get('/api/admin/university-statistics', require('./middleware/authMiddleware').protect, require('./middleware/adminMiddleware').adminOnly, require('./controllers/universityController').getUniversityStatistics);
@@ -48,6 +57,15 @@ app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/careers', careerRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/notifications', notificationRoutes);
+
+// Scholarship routes
+app.use('/api/scholarships', scholarshipRoutes);
+app.use('/api/student/scholarship-applications', studentScholarshipRoutes);
+app.get('/api/admin/scholarships', require('./middleware/authMiddleware').protect, require('./middleware/adminMiddleware').adminOnly, require('./controllers/scholarshipController').listAdminScholarships);
+
+// Analytics routes
+app.use('/api/analytics', analyticsRoutes);
+
 
 app.use((_req, res) => {
   res.status(404).json({ success: false, message: 'Route not found' });

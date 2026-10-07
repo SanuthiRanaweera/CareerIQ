@@ -1,3 +1,5 @@
+import '../../../../models/course.dart';
+
 class UniversityCourseInfo {
   const UniversityCourseInfo({
     required this.id,
@@ -22,6 +24,24 @@ class UniversityCourseInfo {
   final List<String> careerPaths;
   final String website;
   final String applicationUrl;
+
+  Course toCourse({required String universityName, String? universityId}) {
+    return Course(
+      id: id,
+      title: title,
+      university: universityName,
+      universityId: universityId,
+      stream: stream,
+      degreeType: degreeType,
+      description: '',
+      durationYears: durationYears,
+      minZScore: minZScore,
+      subjects: subjects,
+      careerPaths: careerPaths,
+      website: website,
+      applicationUrl: applicationUrl,
+    );
+  }
 
   factory UniversityCourseInfo.fromJson(Map<String, dynamic> json) =>
       UniversityCourseInfo(

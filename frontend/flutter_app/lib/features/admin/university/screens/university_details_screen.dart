@@ -346,6 +346,10 @@ class _UniversityDetailsScreenState extends State<UniversityDetailsScreen> {
                           _university.universityType!.isNotEmpty)
                         _buildDetailRow(
                             'University Type', _university.universityType!),
+                      _buildDetailRow(
+                          'Offered Courses',
+                          '${_university.courseCount} ${_university.courseCount == 1 ? "Program" : "Programs"}',
+                          icon: Icons.school_outlined),
                     ],
                   ),
 

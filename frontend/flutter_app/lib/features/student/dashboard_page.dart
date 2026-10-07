@@ -9,6 +9,7 @@ import '../../services/notification_service.dart';
 import '../career/screens/career_details_page.dart';
 import '../career/screens/career_pathway_page.dart';
 import '../career/screens/careers_list_page.dart';
+import '../scholarship/screens/scholarship_list_screen.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({
@@ -322,6 +323,23 @@ class _DashboardPageState extends State<DashboardPage> {
           value: 'Compare up to 3 universities',
           subtitle: 'Side-by-side degree, Z-score & criteria comparison',
           onTap: () => setState(() => _selectedTab = 1),
+        ),
+        _InfoCard(
+          icon: Icons.workspace_premium_outlined,
+          title: 'Scholarships & Grants',
+          value: 'Browse & apply',
+          subtitle: 'Merit, need-based, sports & academic funding',
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ScholarshipListScreen(
+                  student: widget.student,
+                  token: widget.token,
+                ),
+              ),
+            );
+          },
         ),
         _InfoCard(
           icon: Icons.menu_book_outlined,

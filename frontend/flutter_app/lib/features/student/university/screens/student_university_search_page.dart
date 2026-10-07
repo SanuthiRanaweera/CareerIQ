@@ -9,6 +9,7 @@ import '../widgets/compare_selection_bar.dart';
 import '../widgets/student_university_card.dart';
 import 'student_university_details_page.dart';
 import 'university_comparison_screen.dart';
+import '../../../university/services/university_service.dart';
 
 class StudentUniversitySearchPage extends StatefulWidget {
   const StudentUniversitySearchPage({
@@ -139,6 +140,10 @@ class _StudentUniversitySearchPageState
       setState(() {
         _selectedForCompare.add(uni);
       });
+      UniversityService().trackEvent(
+        eventType: 'comparison',
+        universityId: uni.id,
+      );
     }
   }
 

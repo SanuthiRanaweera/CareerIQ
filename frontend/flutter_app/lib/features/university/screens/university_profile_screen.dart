@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import '../models/university_dashboard_data.dart';
 import '../services/university_service.dart';
 import '../widgets/university_status_badge.dart';
+import '../../student/courses/widgets/course_details_modal.dart';
 import 'edit_university_profile_screen.dart';
+import 'university_courses_screen.dart';
 
 class UniversityProfileScreen extends StatefulWidget {
   const UniversityProfileScreen({
@@ -95,6 +97,162 @@ class _UniversityProfileScreenState extends State<UniversityProfileScreen> {
             const Divider(height: 1, color: Color(0xFFF1F5F9)),
             const SizedBox(height: 8),
             ...children,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCoursesOfferedSection() {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: const BorderSide(color: Color(0xFFE2E8F0)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.school_outlined,
+                        size: 18, color: Color(0xFF2563EB)),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'COURSES OFFERED',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF1E293B),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEFF6FF),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFBFDBFE)),
+                  ),
+                  child: Text(
+                    '${_profile.courseCount} ${_profile.courseCount == 1 ? "Course" : "Courses"}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF1D4ED8),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            const Divider(height: 1, color: Color(0xFFF1F5F9)),
+            const SizedBox(height: 10),
+            if (_profile.courses.isEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    const Icon(Icons.info_outline_rounded,
+                        size: 18, color: Color(0xFF94A3B8)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'No degree programs are currently linked to ${_profile.universityName} in MongoDB.',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF64748B),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ] else ...[
+              ..._profile.courses.take(4).map((c) {
+                return InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => showCourseDetailsModal(context, c.toCourse()),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 4, right: 8),
+                          child: Icon(Icons.circle,
+                              size: 7, color: Color(0xFF2563EB)),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                c.title,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 13,
+                                  color: Color(0xFF0F172A),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${c.degreeType}  •  ${c.stream}  •  ${c.durationYears.toStringAsFixed(c.durationYears == c.durationYears.roundToDouble() ? 0 : 1)} Yrs',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF64748B),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right_rounded,
+                            size: 18, color: Color(0xFF94A3B8)),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ],
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => UniversityCoursesScreen(
+                        universityName: _profile.universityName,
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.menu_book_rounded, size: 16),
+                label: Text(
+                  _profile.courseCount > 4
+                      ? 'View All Courses (${_profile.courseCount})'
+                      : 'View Courses Directory',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF2563EB),
+                  side: const BorderSide(color: Color(0xFFBFDBFE)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -331,6 +489,9 @@ class _UniversityProfileScreenState extends State<UniversityProfileScreen> {
                   ),
                 ],
               ),
+
+              // Courses Offered
+              _buildCoursesOfferedSection(),
 
               // Account Status & Verification
               _buildSection(

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../../models/student.dart';
+import '../../courses/widgets/course_details_modal.dart';
 import '../models/university_comparison_model.dart';
 import '../services/student_university_service.dart';
+import '../../../university/services/university_service.dart';
 
 class StudentUniversityDetailsPage extends StatefulWidget {
   const StudentUniversityDetailsPage({
@@ -38,13 +40,43 @@ class _StudentUniversityDetailsPageState
   late bool _isFavorite;
   bool _loading = true;
 
+  final TextEditingController _courseSearchController = TextEditingController();
+  String _selectedCourseStream = 'All';
+
   @override
   void initState() {
     super.initState();
     _university = widget.university;
     _isSelected = widget.isSelectedForCompare;
     _isFavorite = widget.isFavorite;
+    _trackUniversityView();
     _loadFullDetails();
+  }
+
+  void _trackUniversityView() {
+    UniversityService().trackEvent(
+      eventType: 'university_view',
+      universityId: widget.university.id,
+    );
+  }
+
+  @override
+  void dispose() {
+    _courseSearchController.dispose();
+    super.dispose();
+  }
+
+  List<UniversityCourseInfo> get _filteredCourses {
+    final query = _courseSearchController.text.trim().toLowerCase();
+    return _university.courses.where((c) {
+      final matchesStream = _selectedCourseStream == 'All' ||
+          c.stream.toLowerCase() == _selectedCourseStream.toLowerCase();
+      final matchesQuery = query.isEmpty ||
+          c.title.toLowerCase().contains(query) ||
+          c.stream.toLowerCase().contains(query) ||
+          c.degreeType.toLowerCase().contains(query);
+      return matchesStream && matchesQuery;
+    }).toList();
   }
 
   Future<void> _loadFullDetails() async {
@@ -338,7 +370,7 @@ class _StudentUniversityDetailsPageState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'OFFERED COURSES (${_university.courses.length})',
+                      'COURSES OFFERED (${_university.courses.length})',
                       style: theme.textTheme.labelLarge?.copyWith(
                         letterSpacing: 1.1,
                         fontWeight: FontWeight.w800,
@@ -380,109 +412,251 @@ class _StudentUniversityDetailsPageState
                       ),
                     ),
                   )
-                else
-                  ..._university.courses.map((course) {
-                    final matches = studentStream != null &&
-                        studentStream.isNotEmpty &&
-                        (course.stream.toLowerCase() ==
-                                studentStream.toLowerCase() ||
-                            course.stream.toLowerCase() == 'any');
+                else ...[
+                  // Search courses field
+                  TextField(
+                    controller: _courseSearchController,
+                    onChanged: (_) => setState(() {}),
+                    decoration: InputDecoration(
+                      hintText: 'Search courses offered by ${_university.universityName}...',
+                      prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                      suffixIcon: _courseSearchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 18),
+                              onPressed: () {
+                                _courseSearchController.clear();
+                                setState(() {});
+                              },
+                            )
+                          : null,
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 12,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
 
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
+                  // Stream filter chips
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        'All',
+                        'Mathematics',
+                        'Science',
+                        'Technology',
+                        'Commerce',
+                        'Arts',
+                      ].map((stream) {
+                        final isSelected = _selectedCourseStream == stream;
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: ChoiceChip(
+                            label: Text(stream),
+                            selected: isSelected,
+                            onSelected: (val) {
+                              if (val) {
+                                setState(() => _selectedCourseStream = stream);
+                              }
+                            },
+                            selectedColor: const Color(0xFFDBEAFE),
+                            labelStyle: TextStyle(
+                              fontSize: 12,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color: isSelected
+                                  ? const Color(0xFF1D4ED8)
+                                  : const Color(0xFF64748B),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  if (_filteredCourses.isEmpty)
+                    Card(
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        course.title,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w700,
-                                          fontSize: 15,
-                                          color: Color(0xFF0F172A),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        course.degreeType,
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          color: Color(0xFF64748B),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                if (matches)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 3,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFECFDF5),
-                                      borderRadius: BorderRadius.circular(6),
-                                      border: Border.all(
-                                        color: const Color(0xFFA7F3D0),
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Stream Match',
-                                      style: TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF059669),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Wrap(
-                              spacing: 12,
-                              runSpacing: 6,
-                              children: [
-                                _CoursePill(
-                                  icon: Icons.layers_outlined,
-                                  label: 'Stream: ${course.stream}',
-                                ),
-                                _CoursePill(
-                                  icon: Icons.schedule_outlined,
-                                  label:
-                                      '${course.durationYears.toInt()} Years',
-                                ),
-                                if (course.minZScore != null)
-                                  _CoursePill(
-                                    icon: Icons.grade_outlined,
-                                    label:
-                                        'Min Z-Score: ${course.minZScore!.toStringAsFixed(2)}',
-                                  ),
-                              ],
-                            ),
-                            if (course.subjects.isNotEmpty) ...[
-                              const SizedBox(height: 10),
-                              Text(
-                                'Subject Requirements: ${course.subjects.join(', ')}',
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF475569),
+                        padding: const EdgeInsets.all(24),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              const Icon(
+                                Icons.search_off_rounded,
+                                size: 36,
+                                color: Color(0xFF94A3B8),
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'No matching courses found',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF64748B),
                                 ),
                               ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Try clearing your search query or choosing another stream filter.',
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.bodySmall,
+                              ),
                             ],
-                          ],
+                          ),
                         ),
                       ),
-                    );
-                  }),
+                    )
+                  else
+                    ..._filteredCourses.map((course) {
+                      final matches = studentStream != null &&
+                          studentStream.isNotEmpty &&
+                          (course.stream.toLowerCase() ==
+                                  studentStream.toLowerCase() ||
+                              course.stream.toLowerCase() == 'any');
+
+                      final courseObj = course.toCourse(
+                        universityName: _university.universityName,
+                        universityId: _university.id,
+                      );
+
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16),
+                          onTap: () => showCourseDetailsModal(
+                            context,
+                            courseObj,
+                            student: widget.student,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            course.title,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w700,
+                                              fontSize: 15,
+                                              color: Color(0xFF0F172A),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            course.degreeType,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Color(0xFF64748B),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    if (matches)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFECFDF5),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: const Color(0xFFA7F3D0),
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Stream Match',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFF059669),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Wrap(
+                                  spacing: 12,
+                                  runSpacing: 6,
+                                  children: [
+                                    _CoursePill(
+                                      icon: Icons.layers_outlined,
+                                      label: 'Stream: ${course.stream}',
+                                    ),
+                                    _CoursePill(
+                                      icon: Icons.schedule_outlined,
+                                      label:
+                                          '${course.durationYears.toInt()} Years',
+                                    ),
+                                    if (course.minZScore != null)
+                                      _CoursePill(
+                                        icon: Icons.grade_outlined,
+                                        label:
+                                            'Min Z-Score: ${course.minZScore!.toStringAsFixed(2)}',
+                                      ),
+                                  ],
+                                ),
+                                if (course.subjects.isNotEmpty) ...[
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    'Subject Requirements: ${course.subjects.join(', ')}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF475569),
+                                    ),
+                                  ),
+                                ],
+                                const SizedBox(height: 12),
+                                const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    TextButton.icon(
+                                      onPressed: () => showCourseDetailsModal(
+                                        context,
+                                        courseObj,
+                                        student: widget.student,
+                                      ),
+                                      icon: const Icon(
+                                        Icons.visibility_outlined,
+                                        size: 16,
+                                      ),
+                                      label: const Text('View Course'),
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: const Color(0xFF2563EB),
+                                        visualDensity: VisualDensity.compact,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                ],
               ],
             ),
     );

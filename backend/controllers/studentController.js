@@ -63,6 +63,17 @@ async function toggleFavoriteUniversity(req, res, next) {
 			isFavorite = true;
 		}
 		await student.save();
+
+		if (isFavorite) {
+			const { trackEvent } = require('../services/analyticsService');
+			trackEvent({
+				eventType: 'university_favourite',
+				universityId,
+				studentId: student._id,
+				userId: req.user.userId,
+			}).catch((err) => console.error('Failed to track favourite event:', err.message));
+		}
+
 		return res.json({
 			success: true,
 			message: isFavorite ? 'Added to favorites' : 'Removed from favorites',

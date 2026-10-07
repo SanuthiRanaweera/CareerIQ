@@ -4,6 +4,12 @@ const courseSchema = new mongoose.Schema(
 	{
 		title: { type: String, required: true, trim: true, maxlength: 160 },
 		university: { type: String, required: true, trim: true, maxlength: 160 },
+		universityId: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'University',
+			index: true,
+			default: null,
+		},
 		stream: {
 			type: String,
 			required: true,
@@ -25,5 +31,6 @@ const courseSchema = new mongoose.Schema(
 
 courseSchema.index({ title: 'text', university: 'text', description: 'text' });
 courseSchema.index({ stream: 1, university: 1, isActive: 1 });
+courseSchema.index({ universityId: 1, isActive: 1 });
 
 module.exports = mongoose.model('Course', courseSchema);

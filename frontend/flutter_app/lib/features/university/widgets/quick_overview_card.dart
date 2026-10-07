@@ -5,54 +5,114 @@ class QuickOverviewCard extends StatelessWidget {
     super.key,
     required this.completionPercentage,
     required this.courseCount,
+    this.scholarshipCount = 0,
+    this.applicationCount = 0,
+    this.profileViews = 0,
     required this.status,
     required this.onCoursesTap,
     required this.onProfileTap,
+    this.onScholarshipsTap,
+    this.onAnalyticsTap,
   });
 
   final int completionPercentage;
   final int courseCount;
+  final int scholarshipCount;
+  final int applicationCount;
+  final int profileViews;
   final String status;
   final VoidCallback onCoursesTap;
   final VoidCallback onProfileTap;
+  final VoidCallback? onScholarshipsTap;
+  final VoidCallback? onAnalyticsTap;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Quick Overview',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF0F172A),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'Quick Overview',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF0F172A),
+              ),
+            ),
+            if (onAnalyticsTap != null)
+              TextButton.icon(
+                onPressed: onAnalyticsTap,
+                icon: const Icon(Icons.insights_rounded, size: 16),
+                label: const Text('View Analytics'),
+                style: TextButton.styleFrom(
+                  foregroundColor: const Color(0xFF2563EB),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  textStyle: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 12),
         Row(
           children: [
             Expanded(
               child: _buildMetricItem(
-                title: 'Profile',
-                value: '$completionPercentage%',
-                subtext: 'Completed',
-                icon: Icons.person_outline_rounded,
-                color: const Color(0xFF2563EB),
-                bgColor: const Color(0xFFEFF6FF),
-                onTap: onProfileTap,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildMetricItem(
                 title: 'Courses',
-                value: courseCount > 0 ? '$courseCount' : '0',
+                value: '$courseCount',
                 subtext: courseCount > 0 ? 'Associated' : 'None yet',
                 icon: Icons.menu_book_rounded,
                 color: const Color(0xFF0EA5E9),
                 bgColor: const Color(0xFFF0F9FF),
                 onTap: onCoursesTap,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildMetricItem(
+                title: 'Scholarships',
+                value: '$scholarshipCount',
+                subtext: scholarshipCount > 0 ? 'Active programs' : 'None yet',
+                icon: Icons.workspace_premium_rounded,
+                color: const Color(0xFF10B981),
+                bgColor: const Color(0xFFECFDF5),
+                onTap: onScholarshipsTap ?? onAnalyticsTap ?? () {},
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildMetricItem(
+                title: 'Applications',
+                value: '$applicationCount',
+                subtext: applicationCount > 0 ? 'Submissions' : '0 received',
+                icon: Icons.description_outlined,
+                color: const Color(0xFF8B5CF6),
+                bgColor: const Color(0xFFF5F3FF),
+                onTap: onScholarshipsTap ?? onAnalyticsTap ?? () {},
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildMetricItem(
+                title: 'Profile Views',
+                value: '$profileViews',
+                subtext: profileViews > 0 ? 'Live views' : '0 views',
+                icon: Icons.visibility_outlined,
+                color: const Color(0xFF2563EB),
+                bgColor: const Color(0xFFEFF6FF),
+                onTap: onAnalyticsTap ?? onProfileTap,
               ),
             ),
           ],
@@ -130,4 +190,3 @@ class QuickOverviewCard extends StatelessWidget {
     );
   }
 }
-

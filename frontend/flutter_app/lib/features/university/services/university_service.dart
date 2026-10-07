@@ -1,6 +1,7 @@
 import 'package:flutter_app/services/api_service.dart';
 import 'package:flutter_app/services/auth_service.dart';
 
+import '../models/university_analytics_model.dart';
 import '../models/university_dashboard_data.dart';
 
 class UniversityService {
@@ -70,6 +71,47 @@ class UniversityService {
     return list
         .map((c) => UniversityCourseItem.fromJson(c as Map<String, dynamic>))
         .toList();
+  }
+
+  /// Get university analytics and insights with date range
+  Future<UniversityAnalyticsData> getUniversityAnalytics({
+    String range = '30d',
+  }) async {
+    final token = await _getToken();
+    final response = await _api.request(
+      'GET',
+      '/university/analytics?range=$range',
+      token: token,
+    );
+    final data = response['data'] as Map<String, dynamic>? ?? {};
+    return UniversityAnalyticsData.fromJson(data);
+  }
+
+  /// Track a user analytics event (university_view, course_view, comparison, etc.)
+  Future<void> trackEvent({
+    required String eventType,
+    required String universityId,
+    String? courseId,
+    String? scholarshipId,
+    Map<String, dynamic>? metadata,
+  }) async {
+    try {
+      final token = await _auth.token();
+      await _api.request(
+        'POST',
+        '/analytics/track',
+        token: token,
+        body: {
+          'eventType': eventType,
+          'universityId': universityId,
+          if (courseId case final id?) 'courseId': id,
+          if (scholarshipId case final sId?) 'scholarshipId': sId,
+          if (metadata case final meta?) 'metadata': meta,
+        },
+      );
+    } catch (_) {
+      // Analytics tracking failure should not disrupt user experience
+    }
   }
 
   /// University login (initiates OTP flow if enabled)

@@ -237,6 +237,22 @@ class UniversityCard extends StatelessWidget {
                         ),
                       ],
                     ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.menu_book_rounded,
+                          size: 13, color: Color(0xFF059669)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${university.courseCount} ${university.courseCount == 1 ? "Course" : "Courses"}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF059669),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ],

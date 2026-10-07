@@ -2,9 +2,14 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const University = require('../models/University');
 const Course = require('../models/Course');
+const Scholarship = require('../models/Scholarship');
+const ScholarshipApplication = require('../models/ScholarshipApplication');
+const Student = require('../models/Student');
+const AnalyticsEvent = require('../models/AnalyticsEvent');
 const OtpVerification = require('../models/OtpVerification');
 const { createOtpRecord, verifyOtp, canResendOtp } = require('../services/otpService');
 const { sendUniversityRegistrationOtpEmail } = require('../services/emailService');
+const analyticsService = require('../services/analyticsService');
 
 function validateEmail(email) {
   return /^\S+@\S+\.\S+$/.test(email);
@@ -329,10 +334,28 @@ async function listUniversities(req, res, next) {
       .sort({ createdAt: -1 })
       .lean();
 
+    const withCourses = await Promise.all(
+      universities.map(async (u) => {
+        const courseRegex = new RegExp(`^${escapeRegex(u.universityName.trim())}$`, 'i');
+        const count = await Course.countDocuments({
+          $or: [
+            { universityId: u._id },
+            { university: courseRegex },
+          ],
+          isActive: true,
+        });
+        return {
+          ...u,
+          id: u._id.toString(),
+          courseCount: count,
+        };
+      })
+    );
+
     return res.json({
       success: true,
-      count: universities.length,
-      data: universities,
+      count: withCourses.length,
+      data: withCourses,
     });
   } catch (error) {
     return next(error);
@@ -390,7 +413,10 @@ async function getCompareUniversities(req, res, next) {
       universities.map(async (u) => {
         const courseRegex = new RegExp(`^${escapeRegex(u.universityName.trim())}$`, 'i');
         const courses = await Course.find({
-          university: courseRegex,
+          $or: [
+            { universityId: u._id },
+            { university: courseRegex },
+          ],
           isActive: true,
         }).lean();
 
@@ -475,7 +501,10 @@ async function getUniversity(req, res, next) {
 
     const courseRegex = new RegExp(`^${escapeRegex(university.universityName.trim())}$`, 'i');
     const courses = await Course.find({
-      university: courseRegex,
+      $or: [
+        { universityId: university._id },
+        { university: courseRegex },
+      ],
       isActive: true,
     }).lean();
 
@@ -661,7 +690,10 @@ async function getUniversityDashboard(req, res, next) {
 
     const courseRegex = new RegExp(`^${escapeRegex(university.universityName.trim())}$`, 'i');
     const courseCount = await Course.countDocuments({
-      university: courseRegex,
+      $or: [
+        { universityId: university._id },
+        { university: courseRegex },
+      ],
       isActive: true,
     });
 
@@ -702,6 +734,13 @@ async function getUniversityDashboard(req, res, next) {
       });
     }
 
+    const [scholarshipCount, applicationCount, profileViews, favouriteCount] = await Promise.all([
+      Scholarship.countDocuments({ universityId: university._id }),
+      ScholarshipApplication.countDocuments({ universityId: university._id }),
+      AnalyticsEvent.countDocuments({ universityId: university._id, eventType: 'university_view' }),
+      Student.countDocuments({ favoriteUniversities: university._id }),
+    ]);
+
     return res.json({
       success: true,
       data: {
@@ -730,6 +769,10 @@ async function getUniversityDashboard(req, res, next) {
           completedFields: completion.completed,
           totalFields: completion.total,
           courseCount: courseCount,
+          scholarshipCount,
+          applicationCount,
+          profileViews,
+          favouriteCount,
           status: university.status,
         },
         notifications,
@@ -754,6 +797,15 @@ async function getUniversityProfile(req, res, next) {
     const user = await User.findById(req.user.userId).lean();
     const completion = calculateProfileCompletion(university);
 
+    const courseRegex = new RegExp(`^${escapeRegex(university.universityName.trim())}$`, 'i');
+    const courses = await Course.find({
+      $or: [
+        { universityId: university._id },
+        { university: courseRegex },
+      ],
+      isActive: true,
+    }).sort({ title: 1 }).lean();
+
     return res.json({
       success: true,
       data: {
@@ -761,6 +813,20 @@ async function getUniversityProfile(req, res, next) {
         id: university._id,
         isEmailVerified: user ? user.isEmailVerified : false,
         profileCompletion: completion.percentage,
+        courseCount: courses.length,
+        courses: courses.map((c) => ({
+          id: c._id.toString(),
+          _id: c._id.toString(),
+          title: c.title,
+          stream: c.stream,
+          degreeType: c.degreeType || "Bachelor's Degree",
+          durationYears: c.durationYears,
+          minZScore: c.minZScore,
+          subjects: c.subjects || [],
+          careerPaths: c.careerPaths || [],
+          website: c.website || '',
+          applicationUrl: c.applicationUrl || '',
+        })),
       },
     });
   } catch (error) {
@@ -845,14 +911,97 @@ async function getUniversityCourses(req, res, next) {
 
     const courseRegex = new RegExp(`^${escapeRegex(university.universityName.trim())}$`, 'i');
     const courses = await Course.find({
-      university: courseRegex,
+      $or: [
+        { universityId: university._id },
+        { university: courseRegex },
+      ],
       isActive: true,
-    }).sort({ createdAt: -1 }).lean();
+    }).sort({ title: 1 }).lean();
 
     return res.json({
       success: true,
       data: courses,
       count: courses.length,
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// 14. GET COURSES OF A SPECIFIC UNIVERSITY (By ID - for student / details view)
+async function getUniversityCoursesById(req, res, next) {
+  try {
+    const university = await University.findById(req.params.id).lean();
+    if (!university) {
+      return res.status(404).json({ success: false, message: 'University not found' });
+    }
+
+    const { search, stream } = req.query;
+    const courseRegex = new RegExp(`^${escapeRegex(university.universityName.trim())}$`, 'i');
+    const filter = {
+      $or: [
+        { universityId: university._id },
+        { university: courseRegex },
+      ],
+      isActive: true,
+    };
+
+    if (stream && stream !== 'All') {
+      filter.stream = stream;
+    }
+
+    if (search && String(search).trim()) {
+      const q = new RegExp(escapeRegex(String(search).trim()), 'i');
+      filter.$and = [
+        {
+          $or: [
+            { title: q },
+            { description: q },
+            { careerPaths: q },
+            { degreeType: q },
+          ],
+        },
+      ];
+    }
+
+    const courses = await Course.find(filter).sort({ title: 1 }).lean();
+
+    return res.json({
+      success: true,
+      data: courses,
+      count: courses.length,
+      university: {
+        id: university._id.toString(),
+        universityName: university.universityName,
+      },
+    });
+  } catch (error) {
+    return next(error);
+  }
+}
+
+// 15. UNIVERSITY ANALYTICS & INSIGHTS (University Only)
+async function getUniversityAnalytics(req, res, next) {
+  try {
+    if (req.user?.role !== 'university') {
+      return res.status(403).json({ success: false, message: 'University access required' });
+    }
+    const university = await University.findOne({ userId: req.user.userId });
+    if (!university) {
+      return res.status(404).json({ success: false, message: 'University profile not found' });
+    }
+
+    const { range } = req.query;
+    const analyticsData = await analyticsService.getUniversityAnalytics({
+      universityId: university._id,
+      universityName: university.universityName,
+      range: range || '30d',
+    });
+
+    return res.json({
+      success: true,
+      message: 'University analytics retrieved successfully',
+      data: analyticsData,
     });
   } catch (error) {
     return next(error);
@@ -874,4 +1023,7 @@ module.exports = {
   getUniversityProfile,
   updateUniversityProfile,
   getUniversityCourses,
+  getUniversityCoursesById,
+  getUniversityAnalytics,
 };
+

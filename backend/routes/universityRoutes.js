@@ -12,6 +12,7 @@ router.get('/dashboard', controller.getUniversityDashboard);
 router.get('/profile', controller.getUniversityProfile);
 router.put('/profile', controller.updateUniversityProfile);
 router.get('/courses', controller.getUniversityCourses);
+router.get('/analytics', controller.getUniversityAnalytics);
 
 // University comparison route (Accessible to authenticated users/students)
 router.get('/compare', controller.getCompareUniversities);
@@ -22,6 +23,7 @@ router.get('/statistics', adminOnly, controller.getUniversityStatistics);
 // University listing & details (Accessible to authenticated users/students and admins)
 router.get('/', controller.listUniversities);
 router.get('/:id', controller.getUniversity);
+router.get('/:id/courses', controller.getUniversityCoursesById);
 
 // Admin-only University Management modification routes
 router.post('/', adminOnly, controller.createUniversity);
