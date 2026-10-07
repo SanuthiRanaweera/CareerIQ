@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'features/career/screens/career_details_page.dart';
+import 'features/career/screens/career_pathway_page.dart';
+import 'features/career/screens/career_recommendation_form_page.dart';
+import 'features/career/screens/career_recommendation_results_page.dart';
+import 'features/career/screens/careers_list_page.dart';
 import 'features/chatbot/screens/chatbot_screen.dart';
 import 'features/authentication/login_page.dart';
 import 'features/authentication/register_page.dart';
@@ -8,6 +13,7 @@ import 'features/student/dashboard_page.dart';
 import 'features/student/courses/course_catalog_page.dart';
 import 'features/student/personality/personality_test_page.dart';
 import 'features/student/profile_page.dart';
+import 'models/career.dart';
 import 'models/student.dart';
 import 'services/auth_service.dart';
 import 'services/student_service.dart';
@@ -198,6 +204,58 @@ class _AuthGateState extends State<AuthGate> {
     if (mounted) setState(() {});
   }
 
+  // --- Career module navigation ---
+
+  void _openCareerDetails(BuildContext context, Career career) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CareerDetailsPage(
+          token: _token!,
+          careerId: career.id,
+          onViewPathway: (loaded) => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => CareerPathwayPage(career: loaded)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openCareers(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CareersListPage(
+          token: _token!,
+          onCareerSelected: (career) => _openCareerDetails(context, career),
+        ),
+      ),
+    );
+  }
+
+  void _openCareerRecommendations(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CareerRecommendationFormPage(
+          onSubmit: (answers) => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CareerRecommendationResultsPage(
+                token: _token!,
+                answers: answers,
+                onCareerSelected: (career) =>
+                    _openCareerDetails(context, career),
+                onEditAnswers: () => Navigator.pop(context),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_loading) {
@@ -211,6 +269,8 @@ class _AuthGateState extends State<AuthGate> {
         student: _student!,
         token: _token!,
         onLogout: _logout,
+        onBrowseCareers: () => _openCareers(context),
+        onCareerRecommendations: () => _openCareerRecommendations(context),
         onProfile: () async {
           await Navigator.push(
             context,

@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const personalityRoutes = require('./routes/personalityRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
+const careerRoutes = require('./routes/careerRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const errorHandler = require('./middleware/errorMiddleware');
@@ -40,6 +41,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/personality', personalityRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/careers', careerRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/notifications', notificationRoutes);
 

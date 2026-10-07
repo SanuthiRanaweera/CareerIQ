@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'courses/course_catalog_page.dart';
 import 'notifications/student_notifications_sheet.dart';
+import '../../models/career.dart';
 import '../../models/student.dart';
 import '../../services/notification_service.dart';
+import '../career/screens/career_details_page.dart';
+import '../career/screens/career_pathway_page.dart';
+import '../career/screens/careers_list_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({
@@ -15,6 +19,8 @@ class DashboardPage extends StatefulWidget {
     required this.onPersonalityTest,
     required this.onCourses,
     required this.onChatbot,
+    required this.onBrowseCareers,
+    required this.onCareerRecommendations,
   });
   final Student student;
   final String token;
@@ -23,6 +29,8 @@ class DashboardPage extends StatefulWidget {
   final VoidCallback onPersonalityTest;
   final VoidCallback onCourses;
   final VoidCallback onChatbot;
+  final VoidCallback onBrowseCareers;
+  final VoidCallback onCareerRecommendations;
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
@@ -48,6 +56,26 @@ class _DashboardPageState extends State<DashboardPage> {
             .length,
       );
     } catch (_) {}
+  }
+
+  /// Opens the career details screen, and from there the pathway timeline, so
+  /// the Careers tab leads all the way through the Career module.
+  void _openCareerDetails(Career career) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CareerDetailsPage(
+          token: widget.token,
+          careerId: career.id,
+          onViewPathway: (loaded) => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => CareerPathwayPage(career: loaded),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -123,11 +151,9 @@ class _DashboardPageState extends State<DashboardPage> {
             icon: Icons.account_balance_outlined,
           ),
           CourseCatalogPage(initialStream: student.stream),
-          const _StudentModulePlaceholder(
-            title: 'Careers',
-            description:
-                'Career pathways will appear here when that module is connected.',
-            icon: Icons.star_outline_rounded,
+          CareersListPage(
+            token: widget.token,
+            onCareerSelected: _openCareerDetails,
           ),
         ],
       ),
@@ -287,8 +313,9 @@ class _DashboardPageState extends State<DashboardPage> {
         _InfoCard(
           icon: Icons.auto_awesome_outlined,
           title: 'Career recommendations',
-          value: 'Coming soon',
-          subtitle: 'Your matched careers will appear here',
+          value: 'Find your match',
+          subtitle: 'Answer a few questions to see ranked careers',
+          onTap: widget.onCareerRecommendations,
         ),
         _InfoCard(
           icon: Icons.menu_book_outlined,
