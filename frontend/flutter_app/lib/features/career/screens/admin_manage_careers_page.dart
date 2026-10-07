@@ -55,6 +55,11 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
   int _requestId = 0;
 
   List<Career> _careers = const [];
+
+  /// Id of the career currently being deleted, so that row can show progress
+  /// and its controls can be disabled while the request is in flight.
+  String? _deletingId;
+
   bool _initialLoading = true;
   bool _filtering = false;
   String? _error;
@@ -122,6 +127,76 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
     _searchController.clear();
     setState(() {});
     _loadCareers();
+  }
+
+  /// Asks for confirmation before deleting, then deletes.
+  ///
+  /// Deleting a career cannot be undone, so the dialog names the career being
+  /// removed rather than asking a generic "are you sure". Cancel is the
+  /// default-looking action and the destructive one is coloured red.
+  Future<void> _confirmAndDelete(Career career) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Delete career?'),
+        content: Text(
+          'Delete "${career.title}"? This cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFDC2626),
+              minimumSize: const Size(100, 44),
+            ),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) return;
+    await _deleteCareer(career);
+  }
+
+  Future<void> _deleteCareer(Career career) async {
+    setState(() => _deletingId = career.id);
+
+    try {
+      await _careerService.deleteCareer(widget.token, career.id);
+      if (!mounted) return;
+      setState(() => _deletingId = null);
+      _showMessage('${career.title} deleted', success: true);
+      // Reload rather than removing locally, so the list matches the server.
+      await _loadCareers();
+    } on ApiException catch (error) {
+      if (!mounted) return;
+      setState(() => _deletingId = null);
+      _showMessage(error.message);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _deletingId = null);
+      _showMessage(
+        'Could not reach the server. Check your connection and try again.',
+      );
+    }
+  }
+
+  void _showMessage(String message, {bool success = false}) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor:
+              success ? const Color(0xFF15803D) : const Color(0xFF1F2937),
+        ),
+      );
   }
 
   @override
@@ -252,9 +327,11 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
         ..._careers.map(
           (career) => _AdminCareerRow(
             career: career,
+            deleting: _deletingId == career.id,
             onEdit: widget.onEditCareer == null
                 ? null
                 : () => widget.onEditCareer!(career),
+            onDelete: () => _confirmAndDelete(career),
           ),
         ),
       ],
@@ -264,10 +341,19 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
 
 /// One career row in the admin list, with its management actions.
 class _AdminCareerRow extends StatelessWidget {
-  const _AdminCareerRow({required this.career, this.onEdit});
+  const _AdminCareerRow({
+    required this.career,
+    this.onEdit,
+    this.onDelete,
+    this.deleting = false,
+  });
 
   final Career career;
   final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  /// True while this career's delete request is running.
+  final bool deleting;
 
   @override
   Widget build(BuildContext context) {
@@ -278,8 +364,9 @@ class _AdminCareerRow extends StatelessWidget {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         // Tapping the row opens the same editor as the pencil, so the whole
-        // card is a usable target rather than just the small icon.
-        onTap: onEdit,
+        // card is a usable target rather than just the small icon. Disabled
+        // mid-delete so the record cannot be edited while it is going away.
+        onTap: deleting ? null : onEdit,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(18, 14, 10, 14),
           child: Row(
@@ -315,14 +402,32 @@ class _AdminCareerRow extends StatelessWidget {
                   ],
                 ),
               ),
-              if (onEdit != null)
-                IconButton(
-                  // 48x48 minimum, so the action is comfortable to hit.
-                  tooltip: 'Edit ${career.title}',
-                  onPressed: onEdit,
-                  icon: const Icon(Icons.edit_outlined),
-                  color: const Color(0xFF3B82F6),
-                ),
+              if (deleting)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 14),
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                )
+              else ...[
+                if (onEdit != null)
+                  IconButton(
+                    // 48x48 minimum, so the action is comfortable to hit.
+                    tooltip: 'Edit ${career.title}',
+                    onPressed: onEdit,
+                    icon: const Icon(Icons.edit_outlined),
+                    color: const Color(0xFF3B82F6),
+                  ),
+                if (onDelete != null)
+                  IconButton(
+                    tooltip: 'Delete ${career.title}',
+                    onPressed: onDelete,
+                    icon: const Icon(Icons.delete_outline_rounded),
+                    color: const Color(0xFFDC2626),
+                  ),
+              ],
             ],
           ),
         ),

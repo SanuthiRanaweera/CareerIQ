@@ -266,4 +266,172 @@ void main() {
       expect(find.text('3 careers'), findsOneWidget);
     });
   });
+
+  group('AdminManageCareersPage delete', () {
+    testWidgets('asks for confirmation naming the career', (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminManageCareersPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Delete Medical Doctor'));
+      await tester.pumpAndSettle();
+
+      // Naming the record is the point: a generic "are you sure" is easy to
+      // confirm on the wrong row.
+      expect(find.text('Delete career?'), findsOneWidget);
+      expect(
+        find.text('Delete "Medical Doctor"? This cannot be undone.'),
+        findsOneWidget,
+      );
+      expect(find.text('Cancel'), findsOneWidget);
+      expect(find.text('Delete'), findsOneWidget);
+
+      // Nothing is deleted until the dialog is confirmed.
+      expect(service.lastDeletedId, isNull);
+    });
+
+    testWidgets('cancelling deletes nothing', (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminManageCareersPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Delete Medical Doctor'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(service.lastDeletedId, isNull);
+      expect(find.text('Medical Doctor'), findsOneWidget);
+      expect(find.text('3 careers'), findsOneWidget);
+    });
+
+    testWidgets('confirming deletes the right career', (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminManageCareersPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Delete Medical Doctor'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+
+      expect(service.lastDeletedId, 'id-md');
+    });
+
+    testWidgets('confirms the deletion and refreshes the list',
+        (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminManageCareersPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+      final callsBefore = service.getCareersCallCount;
+
+      await tester.tap(find.byTooltip('Delete Medical Doctor'));
+      await tester.pumpAndSettle();
+
+      // The fake stores careers in a list, so remove it there too in order to
+      // mimic the backend state after a successful delete.
+      service.careers = service.careers
+          .where((career) => career.id != 'id-md')
+          .toList();
+
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Medical Doctor deleted'), findsOneWidget);
+      // Reloaded from the server rather than removed locally.
+      expect(service.getCareersCallCount, callsBefore + 1);
+      expect(find.text('2 careers'), findsOneWidget);
+      expect(find.text('Medical Doctor'), findsNothing);
+    });
+
+    testWidgets('shows progress on the row being deleted', (tester) async {
+      final service = FakeCareerService(
+        responseDelay: const Duration(milliseconds: 300),
+      );
+      await tester.pumpWidget(
+        wrap(AdminManageCareersPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Delete Medical Doctor'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // That row swaps its controls for a spinner while the request runs, so
+      // the same career cannot be deleted or edited twice.
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byTooltip('Delete Medical Doctor'), findsNothing);
+      expect(find.byTooltip('Edit Medical Doctor'), findsNothing);
+      // Other rows stay usable.
+      expect(find.byTooltip('Delete Software Engineer'), findsOneWidget);
+
+      await tester.pumpAndSettle();
+    });
+
+    testWidgets('reports a server refusal and keeps the career',
+        (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminManageCareersPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Delete Medical Doctor'));
+      await tester.pumpAndSettle();
+
+      service.error = const ApiException(
+        'Admin access is required for this action',
+      );
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('Admin access is required for this action'),
+        findsOneWidget,
+      );
+      // The row is still there, since nothing was removed.
+      expect(find.text('Medical Doctor'), findsOneWidget);
+    });
+
+    testWidgets('falls back to a friendly message for a non-API failure',
+        (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminManageCareersPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byTooltip('Delete Medical Doctor'));
+      await tester.pumpAndSettle();
+
+      service.error = Exception('socket closed');
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text(
+          'Could not reach the server. Check your connection and try again.',
+        ),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('every row offers a delete action', (tester) async {
+      await tester.pumpWidget(wrap(
+        AdminManageCareersPage(token: 't', careerService: FakeCareerService()),
+      ));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.delete_outline_rounded), findsNWidgets(3));
+    });
+  });
 }
