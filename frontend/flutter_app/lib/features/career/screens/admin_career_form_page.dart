@@ -5,6 +5,7 @@ import '../../../models/recommendation_input.dart'
     show alStreams, personalityTypes, workStyles;
 import '../../../services/api_service.dart';
 import '../../../services/career_service.dart';
+import '../widgets/career_state_views.dart';
 import '../widgets/editable_string_list.dart';
 import '../widgets/pathway_step_editor.dart';
 
@@ -22,8 +23,11 @@ const List<String> jobOutlooks = ['Very High', 'High', 'Medium', 'Low'];
 /// form always passes server-side validation: title, category, description,
 /// salary range, demand level, recommended A/L streams, day-to-day
 /// responsibilities and required skills. The optional fields - industry
-/// opportunities, pathway steps and matching tags - are added separately and
-/// are preserved untouched when editing.
+/// opportunities, pathway steps and matching tags - follow below them.
+///
+/// `relatedCourseKeywords` is the one field this form never edits: course data
+/// belongs to the Course module, so whatever the career already carries is
+/// sent back untouched.
 class AdminCareerFormPage extends StatefulWidget {
   const AdminCareerFormPage({
     super.key,
@@ -181,7 +185,7 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
     if (_missingFields.isNotEmpty) {
       // Also runs the Form so any mounted field shows its inline message.
       _formKey.currentState?.validate();
-      _showMessage(_problemMessage);
+      showCareerMessage(context, _problemMessage);
       return;
     }
 
@@ -223,7 +227,8 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
 
       if (!mounted) return;
       setState(() => _saving = false);
-      _showMessage(
+      showCareerMessage(
+        context,
         _isEditing
             ? '${saved.title} updated successfully'
             : '${saved.title} created successfully',
@@ -235,27 +240,15 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
       // title comes back as "A career with this title already exists".
       if (!mounted) return;
       setState(() => _saving = false);
-      _showMessage(error.message);
+      showCareerMessage(context, error.message);
     } catch (_) {
       if (!mounted) return;
       setState(() => _saving = false);
-      _showMessage(
+      showCareerMessage(
+        context,
         'Could not reach the server. Check your connection and try again.',
       );
     }
-  }
-
-  void _showMessage(String message, {bool success = false}) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor:
-              success ? const Color(0xFF15803D) : const Color(0xFF1F2937),
-        ),
-      );
   }
 
   @override

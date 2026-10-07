@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/recommendation_input.dart';
+import '../widgets/career_state_views.dart';
 
 /// Career recommendations - input form.
 ///
@@ -62,14 +63,7 @@ class _CareerRecommendationFormPageState
         if (_personalityError != null) 'personality',
       ].join(', ');
 
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          SnackBar(
-            content: Text('Please complete: $missing'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+      showCareerMessage(context, 'Please complete: $missing');
       return;
     }
 

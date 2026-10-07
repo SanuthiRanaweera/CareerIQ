@@ -8,6 +8,30 @@ import 'package:flutter/material.dart';
 // message when there is simply nothing to show. Keeping them in one file stops
 // the screens from drifting apart visually.
 
+/// Shows a short confirmation or problem message.
+///
+/// Every screen in the Career module reports outcomes through this one
+/// function, so feedback looks and behaves the same everywhere: floating above
+/// the content, green when something succeeded and dark neutral when it did
+/// not. Any message already on screen is dismissed first, so a quick second
+/// action does not queue up behind a stale one.
+void showCareerMessage(
+  BuildContext context,
+  String message, {
+  bool success = false,
+}) {
+  ScaffoldMessenger.of(context)
+    ..hideCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor:
+            success ? const Color(0xFF15803D) : const Color(0xFF1F2937),
+      ),
+    );
+}
+
 /// Centred spinner with a short label, so the wait is explained rather than
 /// leaving the student looking at a bare circle.
 class CareerLoadingView extends StatelessWidget {

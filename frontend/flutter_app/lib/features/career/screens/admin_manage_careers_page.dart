@@ -170,33 +170,21 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
       await _careerService.deleteCareer(widget.token, career.id);
       if (!mounted) return;
       setState(() => _deletingId = null);
-      _showMessage('${career.title} deleted', success: true);
+      showCareerMessage(context, '${career.title} deleted', success: true);
       // Reload rather than removing locally, so the list matches the server.
       await _loadCareers();
     } on ApiException catch (error) {
       if (!mounted) return;
       setState(() => _deletingId = null);
-      _showMessage(error.message);
+      showCareerMessage(context, error.message);
     } catch (_) {
       if (!mounted) return;
       setState(() => _deletingId = null);
-      _showMessage(
+      showCareerMessage(
+        context,
         'Could not reach the server. Check your connection and try again.',
       );
     }
-  }
-
-  void _showMessage(String message, {bool success = false}) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor:
-              success ? const Color(0xFF15803D) : const Color(0xFF1F2937),
-        ),
-      );
   }
 
   @override

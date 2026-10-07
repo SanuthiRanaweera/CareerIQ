@@ -10,12 +10,16 @@ class DashboardPage extends StatelessWidget {
     required this.onLogout,
     required this.onPersonalityTest,
     required this.onChatbot,
+    required this.onBrowseCareers,
+    required this.onCareerRecommendations,
   });
   final Student student;
   final VoidCallback onProfile;
   final VoidCallback onLogout;
   final VoidCallback onPersonalityTest;
   final VoidCallback onChatbot;
+  final VoidCallback onBrowseCareers;
+  final VoidCallback onCareerRecommendations;
 
   @override
   Widget build(BuildContext context) {
@@ -165,8 +169,16 @@ class DashboardPage extends StatelessWidget {
             _InfoCard(
               icon: Icons.auto_awesome_outlined,
               title: 'Career recommendations',
-              value: 'Coming soon',
-              subtitle: 'Your matched careers will appear here',
+              value: 'Find your match',
+              subtitle: 'Answer a few questions to see ranked careers',
+              onTap: onCareerRecommendations,
+            ),
+            _InfoCard(
+              icon: Icons.work_outline_rounded,
+              title: 'Explore careers',
+              value: '${student.stream ?? 'All'} stream and beyond',
+              subtitle: 'Browse salaries, skills and career pathways',
+              onTap: onBrowseCareers,
             ),
             _InfoCard(
               icon: Icons.menu_book_outlined,
