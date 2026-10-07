@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/career.dart';
-import '../../../models/recommendation_input.dart' show alStreams;
+import '../../../models/recommendation_input.dart'
+    show alStreams, personalityTypes, workStyles;
 import '../../../services/api_service.dart';
 import '../../../services/career_service.dart';
 import '../widgets/editable_string_list.dart';
+import '../widgets/pathway_step_editor.dart';
 
 /// Demand levels a career can be given, mirroring JOB_OUTLOOKS in
 /// backend/data/careerOptions.js. The backend validates the value, so an
@@ -64,6 +66,15 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
   late List<String> _whatYouDo;
   late List<String> _requiredSkills;
 
+  // Optional fields. None of these block a save; they enrich the career
+  // details and pathway screens and feed the recommendation scoring.
+  late List<String> _opportunities;
+  late List<CareerPathwayStep> _pathway;
+  late List<String> _interestTags;
+  late List<String> _alSubjects;
+  late List<String> _personalityTypes;
+  late List<String> _workStyles;
+
   /// Validation messages for the non-text inputs only appear after a save
   /// attempt, so the form does not flag fields before they are reached.
   bool _submitted = false;
@@ -90,6 +101,13 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
     _streams = [...?career?.recommendedStreams];
     _whatYouDo = [...?career?.whatYouDo];
     _requiredSkills = [...?career?.requiredSkills];
+
+    _opportunities = [...?career?.industryOpportunities];
+    _pathway = [...?career?.orderedPathway];
+    _interestTags = [...?career?.interestTags];
+    _alSubjects = [...?career?.alSubjects];
+    _personalityTypes = [...?career?.personalityTypes];
+    _workStyles = [...?career?.workStyles];
   }
 
   @override
@@ -169,8 +187,6 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
 
     setState(() => _saving = true);
 
-    // Optional fields are carried over unchanged when editing, so saving the
-    // core fields never discards a pathway or tags set elsewhere.
     final existing = widget.career;
     final career = Career(
       id: existing?.id ?? '',
@@ -185,12 +201,14 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
       whatYouDo: _whatYouDo,
       requiredSkills: _requiredSkills,
       recommendedStreams: _streams,
-      industryOpportunities: existing?.industryOpportunities ?? const [],
-      pathway: existing?.pathway ?? const [],
-      interestTags: existing?.interestTags ?? const [],
-      alSubjects: existing?.alSubjects ?? const [],
-      personalityTypes: existing?.personalityTypes ?? const [],
-      workStyles: existing?.workStyles ?? const [],
+      industryOpportunities: _opportunities,
+      pathway: _pathway,
+      interestTags: _interestTags,
+      alSubjects: _alSubjects,
+      personalityTypes: _personalityTypes,
+      workStyles: _workStyles,
+      // Owned by the Course module, so this form never changes it: whatever
+      // the career already carries is sent back untouched.
       relatedCourseKeywords: existing?.relatedCourseKeywords ?? const [],
     );
 
@@ -409,6 +427,91 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
                     errorText: _submitted ? _skillsError : null,
                     onChanged: (values) =>
                         setState(() => _requiredSkills = values),
+                  ),
+                ],
+              ),
+
+              _FormCard(
+                title: '',
+                children: [
+                  EditableStringList(
+                    label: 'Industry opportunities',
+                    helperText: 'Where someone in this career can work.',
+                    values: _opportunities,
+                    hintText: 'e.g. Banking IT divisions',
+                    onChanged: (values) =>
+                        setState(() => _opportunities = values),
+                  ),
+                ],
+              ),
+
+              _FormCard(
+                title: '',
+                children: [
+                  PathwayStepEditor(
+                    steps: _pathway,
+                    onChanged: (steps) => setState(() => _pathway = steps),
+                  ),
+                ],
+              ),
+
+              _FormCard(
+                title: 'Matching tags',
+                children: [
+                  Text(
+                    'These are what the recommendation scoring compares the '
+                    'answers from a student against.',
+                    style: theme.textTheme.bodyLarge?.copyWith(fontSize: 14),
+                  ),
+                  const SizedBox(height: 18),
+                  EditableStringList(
+                    label: 'Interest tags',
+                    helperText:
+                        'Lower-case words matching what students pick, e.g. technology.',
+                    values: _interestTags,
+                    hintText: 'e.g. problem solving',
+                    maxLength: 40,
+                    onChanged: (values) =>
+                        setState(() => _interestTags = values),
+                  ),
+                  const SizedBox(height: 22),
+                  EditableStringList(
+                    label: 'Relevant A/L subjects',
+                    helperText: 'Subjects that count towards this career.',
+                    values: _alSubjects,
+                    hintText: 'e.g. Combined Mathematics',
+                    maxLength: 60,
+                    onChanged: (values) =>
+                        setState(() => _alSubjects = values),
+                  ),
+                  const SizedBox(height: 22),
+                  Text(
+                    'Personality types',
+                    style: theme.textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: 12),
+                  _MultiChoiceRow(
+                    options: personalityTypes,
+                    selected: _personalityTypes,
+                    onToggle: (value) => setState(() {
+                      _personalityTypes = _personalityTypes.contains(value)
+                          ? _personalityTypes
+                              .where((item) => item != value)
+                              .toList()
+                          : [..._personalityTypes, value];
+                    }),
+                  ),
+                  const SizedBox(height: 22),
+                  Text('Work styles', style: theme.textTheme.titleLarge),
+                  const SizedBox(height: 12),
+                  _MultiChoiceRow(
+                    options: workStyles,
+                    selected: _workStyles,
+                    onToggle: (value) => setState(() {
+                      _workStyles = _workStyles.contains(value)
+                          ? _workStyles.where((item) => item != value).toList()
+                          : [..._workStyles, value];
+                    }),
                   ),
                 ],
               ),

@@ -339,7 +339,8 @@ void main() {
       );
     });
 
-    testWidgets('keeps fields this form does not edit', (tester) async {
+    testWidgets('keeps every field when only the title is changed',
+        (tester) async {
       final service = FakeCareerService();
       await tester.pumpWidget(wrap(AdminCareerFormPage(
         token: 't',
@@ -351,12 +352,12 @@ void main() {
       await typeIn(tester, 'Career title *', 'Renamed Career');
       await save(tester, editing: true);
 
-      // Editing the core fields must not wipe the pathway, opportunities or
-      // course keywords that are managed elsewhere.
       final sent = service.lastUpdated!;
       expect(sent.pathway.length, 1);
       expect(sent.pathway.first.stage, 'A/L Stream');
       expect(sent.industryOpportunities, ['Software export companies']);
+      // Course keywords belong to the Course module and this form never
+      // edits them, so they must survive a save untouched.
       expect(sent.relatedCourseKeywords, ['software engineering']);
     });
 
