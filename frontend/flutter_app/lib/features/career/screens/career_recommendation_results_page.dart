@@ -102,6 +102,17 @@ class _CareerRecommendationResultsPageState
     if (_loading) {
       return const CareerLoadingView(message: 'Finding your best matches...');
     }
+
+    // Every non-loading state shares one RefreshIndicator, so the results can
+    // be re-scored by pulling down whether they arrived or not. Matches the
+    // careers list, where the error and empty states refresh the same way.
+    return RefreshIndicator(
+      onRefresh: _loadRecommendations,
+      child: _buildContent(context),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
     if (_error != null) {
       return CareerErrorView(message: _error!, onRetry: _loadRecommendations);
     }
@@ -124,34 +135,31 @@ class _CareerRecommendationResultsPageState
       );
     }
 
-    return RefreshIndicator(
-      onRefresh: _loadRecommendations,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-        children: [
-          const SizedBox(height: 8),
-          _buildHeader(context, result, matches.length),
-          const SizedBox(height: 20),
-          ...matches.asMap().entries.map(
-                (entry) => _MatchCard(
-                  rank: entry.key + 1,
-                  match: entry.value,
-                  onTap: widget.onCareerSelected == null
-                      ? null
-                      : () => widget.onCareerSelected!(entry.value.career),
-                ),
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+      children: [
+        const SizedBox(height: 8),
+        _buildHeader(context, result, matches.length),
+        const SizedBox(height: 20),
+        ...matches.asMap().entries.map(
+              (entry) => _MatchCard(
+                rank: entry.key + 1,
+                match: entry.value,
+                onTap: widget.onCareerSelected == null
+                    ? null
+                    : () => widget.onCareerSelected!(entry.value.career),
               ),
-          if (widget.onEditAnswers != null) ...[
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: widget.onEditAnswers,
-              icon: const Icon(Icons.tune_rounded),
-              label: const Text('Change my answers'),
             ),
-          ],
+        if (widget.onEditAnswers != null) ...[
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: widget.onEditAnswers,
+            icon: const Icon(Icons.tune_rounded),
+            label: const Text('Change my answers'),
+          ),
         ],
-      ),
+      ],
     );
   }
 

@@ -333,5 +333,30 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('the error state can be pulled down to re-score',
+        (tester) async {
+      final service = FakeCareerService(
+        recommendation: resultOf([match('Medical Doctor', 100)]),
+        error: const ApiException('Request failed'),
+      );
+      await tester.pumpWidget(wrap(CareerRecommendationResultsPage(
+        token: 't',
+        answers: answers,
+        careerService: service,
+      )));
+      await tester.pumpAndSettle();
+      expect(find.text('Something went wrong'), findsOneWidget);
+
+      service.error = null;
+      await tester.fling(
+        find.text('Something went wrong'),
+        const Offset(0, 300),
+        1000,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Medical Doctor'), findsOneWidget);
+    });
   });
 }

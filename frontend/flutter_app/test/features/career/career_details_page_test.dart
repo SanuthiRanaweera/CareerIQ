@@ -265,5 +265,32 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets('the error state can be pulled down to retry', (tester) async {
+      final service = FakeCareerService(
+        careers: [fullCareer()],
+        error: const ApiException('Career not found'),
+      );
+      await tester.pumpWidget(wrap(CareerDetailsPage(
+        token: 't',
+        careerId: 'id-se',
+        careerService: service,
+      )));
+      await tester.pumpAndSettle();
+      expect(find.text('Something went wrong'), findsOneWidget);
+
+      // Pull to refresh has to work in the error state too, not only when the
+      // career loaded: the retry button and the gesture are both offered.
+      service.error = null;
+      await tester.fling(
+        find.text('Something went wrong'),
+        const Offset(0, 300),
+        1000,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Something went wrong'), findsNothing);
+      expect(find.text('Typical salary'), findsOneWidget);
+    });
   });
 }

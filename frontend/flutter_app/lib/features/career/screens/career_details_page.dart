@@ -98,6 +98,17 @@ class _CareerDetailsPageState extends State<CareerDetailsPage> {
     if (_loading) {
       return const CareerLoadingView(message: 'Loading career details...');
     }
+
+    // Every non-loading state sits inside the same RefreshIndicator, so pull
+    // to refresh works whether the career loaded or not. The error and empty
+    // views are built scrollable for exactly this reason.
+    return RefreshIndicator(
+      onRefresh: _loadCareer,
+      child: _buildContent(context, career),
+    );
+  }
+
+  Widget _buildContent(BuildContext context, Career? career) {
     if (_error != null) {
       return CareerErrorView(message: _error!, onRetry: _loadCareer);
     }
@@ -115,94 +126,91 @@ class _CareerDetailsPageState extends State<CareerDetailsPage> {
   Widget _buildDetails(BuildContext context, Career career) {
     final theme = Theme.of(context);
 
-    return RefreshIndicator(
-      onRefresh: _loadCareer,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
-        children: [
-          const SizedBox(height: 8),
-          Text(
-            career.category.toUpperCase(),
-            style: theme.textTheme.labelLarge?.copyWith(
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF3B82F6),
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+      children: [
+        const SizedBox(height: 8),
+        Text(
+          career.category.toUpperCase(),
+          style: theme.textTheme.labelLarge?.copyWith(
+            letterSpacing: 1.2,
+            fontWeight: FontWeight.w800,
+            color: const Color(0xFF3B82F6),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(career.title, style: theme.textTheme.headlineMedium),
+        if (career.jobOutlook.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: DemandLevelBadge(jobOutlook: career.jobOutlook),
+          ),
+        ],
+        const SizedBox(height: 20),
+
+        // Salary gets its own highlighted card: it is the single fact most
+        // students look for first.
+        _SalaryCard(label: career.salaryLabel),
+
+        if (career.description.isNotEmpty)
+          _SectionCard(
+            icon: Icons.info_outline_rounded,
+            title: 'About this career',
+            child: Text(
+              career.description,
+              style: theme.textTheme.bodyLarge,
             ),
           ),
-          const SizedBox(height: 6),
-          Text(career.title, style: theme.textTheme.headlineMedium),
-          if (career.jobOutlook.isNotEmpty) ...[
-            const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: DemandLevelBadge(jobOutlook: career.jobOutlook),
+
+        if (career.whatYouDo.isNotEmpty)
+          _SectionCard(
+            icon: Icons.checklist_rounded,
+            title: "What you'd do",
+            child: _BulletList(items: career.whatYouDo),
+          ),
+
+        if (career.requiredSkills.isNotEmpty)
+          _SectionCard(
+            icon: Icons.psychology_outlined,
+            title: 'Skills you need',
+            child: _TagWrap(
+              values: career.requiredSkills,
+              background: Color(0xFFDBEAFE),
+              foreground: Color(0xFF1D4ED8),
             ),
-          ],
+          ),
+
+        if (career.recommendedStreams.isNotEmpty)
+          _SectionCard(
+            icon: Icons.school_outlined,
+            title: 'Recommended A/L streams',
+            child: _TagWrap(
+              values: career.recommendedStreams,
+              background: Color(0xFFDCFCE7),
+              foreground: Color(0xFF15803D),
+            ),
+          ),
+
+        if (career.industryOpportunities.isNotEmpty)
+          _SectionCard(
+            icon: Icons.business_center_outlined,
+            title: 'Where the opportunities are',
+            child: _BulletList(items: career.industryOpportunities),
+          ),
+
+        _RecommendedCoursesSection(keywords: career.relatedCourseKeywords),
+
+        if (widget.onViewPathway != null && career.pathway.isNotEmpty) ...[
           const SizedBox(height: 20),
-
-          // Salary gets its own highlighted card: it is the single fact most
-          // students look for first.
-          _SalaryCard(label: career.salaryLabel),
-
-          if (career.description.isNotEmpty)
-            _SectionCard(
-              icon: Icons.info_outline_rounded,
-              title: 'About this career',
-              child: Text(
-                career.description,
-                style: theme.textTheme.bodyLarge,
-              ),
-            ),
-
-          if (career.whatYouDo.isNotEmpty)
-            _SectionCard(
-              icon: Icons.checklist_rounded,
-              title: "What you'd do",
-              child: _BulletList(items: career.whatYouDo),
-            ),
-
-          if (career.requiredSkills.isNotEmpty)
-            _SectionCard(
-              icon: Icons.psychology_outlined,
-              title: 'Skills you need',
-              child: _TagWrap(
-                values: career.requiredSkills,
-                background: Color(0xFFDBEAFE),
-                foreground: Color(0xFF1D4ED8),
-              ),
-            ),
-
-          if (career.recommendedStreams.isNotEmpty)
-            _SectionCard(
-              icon: Icons.school_outlined,
-              title: 'Recommended A/L streams',
-              child: _TagWrap(
-                values: career.recommendedStreams,
-                background: Color(0xFFDCFCE7),
-                foreground: Color(0xFF15803D),
-              ),
-            ),
-
-          if (career.industryOpportunities.isNotEmpty)
-            _SectionCard(
-              icon: Icons.business_center_outlined,
-              title: 'Where the opportunities are',
-              child: _BulletList(items: career.industryOpportunities),
-            ),
-
-          _RecommendedCoursesSection(keywords: career.relatedCourseKeywords),
-
-          if (widget.onViewPathway != null && career.pathway.isNotEmpty) ...[
-            const SizedBox(height: 20),
-            FilledButton.icon(
-              onPressed: () => widget.onViewPathway!(career),
-              icon: const Icon(Icons.timeline_rounded),
-              label: const Text('View career pathway'),
-            ),
-          ],
+          FilledButton.icon(
+            onPressed: () => widget.onViewPathway!(career),
+            icon: const Icon(Icons.timeline_rounded),
+            label: const Text('View career pathway'),
+          ),
         ],
-      ),
+      ],
     );
   }
 }
