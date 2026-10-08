@@ -21,6 +21,9 @@ class _ProfilePageState extends State<ProfilePage> {
   late final TextEditingController _name = TextEditingController(
     text: widget.student.fullName,
   );
+  late final TextEditingController _profileImage = TextEditingController(
+    text: widget.student.profileImage ?? '',
+  );
   late final TextEditingController _school = TextEditingController(
     text: widget.student.school,
   );
@@ -42,7 +45,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
-    for (final controller in [_name, _school, _district, _year]) {
+    for (final controller in [
+      _name,
+      _profileImage,
+      _school,
+      _district,
+      _year,
+    ]) {
       controller.dispose();
     }
     super.dispose();
@@ -51,6 +60,9 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> _save() async {
     setState(() => _saving = true);
     widget.student.fullName = _name.text.trim();
+    widget.student.profileImage = _profileImage.text.trim().isEmpty
+        ? null
+        : _profileImage.text.trim();
     widget.student.school = _school.text.trim();
     widget.student.district = _district.text.trim();
     widget.student.alYear = int.tryParse(_year.text.trim());
@@ -67,6 +79,11 @@ class _ProfilePageState extends State<ProfilePage> {
       if (mounted) setState(() => _saving = false);
     }
   }
+
+  Widget _profileInitial() => Text(
+    _name.text.trim().isEmpty ? '?' : _name.text.trim()[0].toUpperCase(),
+    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+  );
 
   Future<void> _addSubject() async {
     final name = TextEditingController();
@@ -158,13 +175,17 @@ class _ProfilePageState extends State<ProfilePage> {
                   radius: 32,
                   backgroundColor: const Color(0xFFDBEAFE),
                   foregroundColor: const Color(0xFF3B82F6),
-                  child: Text(
-                    _name.text.isEmpty ? '?' : _name.text[0].toUpperCase(),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
+                  child: _profileImage.text.trim().isEmpty
+                      ? _profileInitial()
+                      : ClipOval(
+                          child: Image.network(
+                            _profileImage.text.trim(),
+                            width: 64,
+                            height: 64,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => _profileInitial(),
+                          ),
+                        ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -205,7 +226,20 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: 12),
         TextField(
           controller: _name,
+          onChanged: (_) => setState(() {}),
           decoration: const InputDecoration(labelText: 'Full name'),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _profileImage,
+          keyboardType: TextInputType.url,
+          onChanged: (_) => setState(() {}),
+          decoration: const InputDecoration(
+            labelText: 'Profile photo URL',
+            hintText: 'https://example.com/photo.jpg',
+            prefixIcon: Icon(Icons.image_outlined),
+            helperText: 'Use a direct HTTPS link to an image.',
+          ),
         ),
         const SizedBox(height: 12),
         TextField(

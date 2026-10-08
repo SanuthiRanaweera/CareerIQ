@@ -2,10 +2,10 @@ class SubjectResult {
   SubjectResult({required this.id, required this.name, required this.grade});
 
   factory SubjectResult.fromJson(Map<String, dynamic> json) => SubjectResult(
-        id: json['_id'] as String?,
-        name: json['name'] as String? ?? '',
-        grade: json['grade'] as String? ?? '',
-      );
+    id: json['_id'] as String?,
+    name: json['name'] as String? ?? '',
+    grade: json['grade'] as String? ?? '',
+  );
 
   String? id;
   String name;
@@ -19,6 +19,7 @@ class Student {
     required this.id,
     required this.fullName,
     required this.email,
+    this.profileImage,
     this.school = '',
     this.district = '',
     this.alYear,
@@ -35,6 +36,7 @@ class Student {
       id: json['_id'] as String,
       fullName: json['fullName'] as String? ?? '',
       email: json['email'] as String? ?? '',
+      profileImage: json['profileImage'] as String?,
       school: json['school'] as String? ?? '',
       district: json['district'] as String? ?? '',
       alYear: (json['alYear'] as num?)?.toInt(),
@@ -51,6 +53,7 @@ class Student {
   final String id;
   String fullName;
   final String email;
+  String? profileImage;
   String school;
   String district;
   int? alYear;
@@ -61,12 +64,13 @@ class Student {
   String? personalityCategory;
 
   Map<String, dynamic> toJson() => {
-        'fullName': fullName,
-        'school': school,
-        'district': district,
-        'alYear': alYear,
-        'stream': stream,
-        'dateOfBirth': dateOfBirth,
-        'alResults': alResults.map((result) => result.toJson()).toList(),
-      };
+    'fullName': fullName,
+    'profileImage': profileImage,
+    'school': school,
+    'district': district,
+    'alYear': alYear,
+    'stream': stream,
+    'dateOfBirth': dateOfBirth,
+    'alResults': alResults.map((result) => result.toJson()).toList(),
+  };
 }

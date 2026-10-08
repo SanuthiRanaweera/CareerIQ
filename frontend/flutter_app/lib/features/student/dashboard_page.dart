@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'courses/course_catalog_page.dart';
+import 'group_chat_page.dart';
 import 'notifications/student_notifications_sheet.dart';
 import '../../models/career.dart';
 import '../../models/student.dart';
@@ -119,6 +120,15 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 ),
                 IconButton(
+                  onPressed: _openGroupChat,
+                  tooltip: 'CareerIQ group chat',
+                  constraints: const BoxConstraints(
+                    minWidth: 48,
+                    minHeight: 48,
+                  ),
+                  icon: const Icon(Icons.forum_outlined, size: 27),
+                ),
+                IconButton(
                   onPressed: widget.onProfile,
                   tooltip: 'Profile',
                   constraints: const BoxConstraints(
@@ -202,6 +212,16 @@ class _DashboardPageState extends State<DashboardPage> {
     );
     await _refreshUnreadNotificationCount();
   }
+
+  Future<void> _openGroupChat() => Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => GroupChatPage(
+        token: widget.token,
+        currentUserId: widget.student.id,
+        currentUserName: widget.student.fullName,
+      ),
+    ),
+  );
 
   Widget _buildHome(BuildContext context, String firstName) => RefreshIndicator(
     onRefresh: () async => widget.onProfile(),
