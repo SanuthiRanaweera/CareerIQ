@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../app.dart';
 import '../../services/auth_service.dart';
 import '../../models/course.dart';
+import '../../services/career_service.dart';
 import '../../services/course_service.dart';
 import '../../models/career.dart';
 import '../career/screens/admin_career_form_page.dart';
@@ -43,7 +44,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   late List<AdminStudent> _students;
   late List<AdminUniversity> _universities;
   late List<AdminCourse> _courses;
-  late List<AdminCareer> _careers;
+  int _careerCount = 0;
   final Map<String, Course> _courseRecords = {};
 
   // Search & Filter controllers
@@ -67,8 +68,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     _students = AdminMockData.getInitialStudents();
     _universities = AdminMockData.getInitialUniversities();
     _courses = [];
-    _careers = AdminMockData.getInitialCareers();
     _loadAdminCourses();
+    _loadCareerCount();
   }
 
   @override
@@ -83,6 +84,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     setState(() => _currentSection = section);
     if (section == AdminNavSection.courses) _loadAdminCourses();
     Navigator.of(context).maybePop(); // Close drawer if open
+  }
+
+  /// Real career total for the sidebar badge and overview card, so they show
+  /// the count before the Careers tab is opened. The tab keeps it current.
+  Future<void> _loadCareerCount() async {
+    try {
+      final token = await _careerAdminToken;
+      if (token == null) return;
+      final careers = await CareerService().getCareers(token);
+      if (mounted) setState(() => _careerCount = careers.length);
+    } catch (_) {}
   }
 
   Future<void> _loadAdminCourses() async {
@@ -404,7 +416,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   section: AdminNavSection.careers,
                   icon: Icons.work_rounded,
                   label: '💼 Careers',
-                  badge: '${_careers.length}',
+                  badge: '$_careerCount',
                 ),
                 const Padding(
                   padding: EdgeInsets.fromLTRB(14, 20, 14, 8),
@@ -770,7 +782,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           title: '💼 Careers',
           subtitle:
               'Industry career pathways, future market demand & personality compatibility',
-          countLabel: '${_careers.length} Pathways',
+          countLabel: '$_careerCount Pathways',
           color: const Color(0xFF10B981),
           onTap: () => _selectSection(AdminNavSection.careers),
         ),
@@ -1698,6 +1710,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         return AdminManageCareersPage(
           token: token,
           embedded: true,
+          onCountChanged: (count) {
+            if (count != _careerCount) setState(() => _careerCount = count);
+          },
           onAddCareer: () => _openCareerForm(context, token),
           onEditCareer: (career) =>
               _openCareerForm(context, token, career: career),

@@ -25,6 +25,7 @@ class AdminManageCareersPage extends StatefulWidget {
     this.onEditCareer,
     this.careerService,
     this.embedded = false,
+    this.onCountChanged,
   });
 
   final String token;
@@ -34,6 +35,10 @@ class AdminManageCareersPage extends StatefulWidget {
   /// host page's own header is the only one on screen; the refresh action
   /// lives in the body header, so nothing is lost.
   final bool embedded;
+
+  /// Reports the total number of careers whenever an unfiltered list loads,
+  /// so a host page can show the real count. Searches are not reported.
+  final ValueChanged<int>? onCountChanged;
 
   /// Opens the create form. Null until that screen is wired up.
   final VoidCallback? onAddCareer;
@@ -105,6 +110,7 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
         _initialLoading = false;
         _filtering = false;
       });
+      if (!_isSearching) widget.onCountChanged?.call(careers.length);
     } on ApiException catch (error) {
       if (!mounted || requestId != _requestId) return;
       setState(() {
@@ -146,9 +152,7 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Delete career?'),
-        content: Text(
-          'Delete "${career.title}"? This cannot be undone.',
-        ),
+        content: Text('Delete "${career.title}"? This cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -317,8 +321,10 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
                       icon: const Icon(Icons.close_rounded),
                       onPressed: _clearSearch,
                     ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
           ),
         ],
@@ -366,6 +372,7 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
         ..._careers.map(
           (career) => _AdminCareerRow(
             career: career,
+            embedded: widget.embedded,
             deleting: _deletingId == career.id,
             onEdit: widget.onEditCareer == null
                 ? null
@@ -385,6 +392,7 @@ class _AdminCareerRow extends StatelessWidget {
     this.onEdit,
     this.onDelete,
     this.deleting = false,
+    this.embedded = false,
   });
 
   final Career career;
@@ -394,6 +402,41 @@ class _AdminCareerRow extends StatelessWidget {
   /// True while this career's delete request is running.
   final bool deleting;
 
+  /// True inside the admin dashboard, where the row copies the card styling of
+  /// the Students, Universities and Courses tabs instead of the student theme.
+  final bool embedded;
+
+  // Badge colours per demand level, the same palette as DemandLevelBadge.
+  static const Map<String, (Color, Color)> _demandColours = {
+    'Very High': (Color(0xFFDCFCE7), Color(0xFF15803D)),
+    'High': (Color(0xFFDBEAFE), Color(0xFF1D4ED8)),
+    'Medium': (Color(0xFFFEF3C7), Color(0xFFB45309)),
+    'Low': (Color(0xFFF1F5F9), Color(0xFF475569)),
+  };
+
+  /// Demand badge sized like the admin tabs' badges (11 / w700, radius 8).
+  Widget _adminDemandBadge() {
+    if (career.jobOutlook.isEmpty) return const SizedBox.shrink();
+    final colours =
+        _demandColours[career.jobOutlook] ??
+        const (Color(0xFFF1F5F9), Color(0xFF475569));
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: colours.$1,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        '${career.jobOutlook} demand',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: colours.$2,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -401,38 +444,68 @@ class _AdminCareerRow extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       clipBehavior: Clip.antiAlias,
+      elevation: embedded ? 0 : null,
+      shape: embedded
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: const BorderSide(color: Color(0xFFE2E8F0)),
+            )
+          : null,
       child: InkWell(
         // Tapping the row opens the same editor as the pencil, so the whole
         // card is a usable target rather than just the small icon. Disabled
         // mid-delete so the record cannot be edited while it is going away.
         onTap: deleting ? null : onEdit,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 14, 10, 14),
+          padding: embedded
+              ? const EdgeInsets.fromLTRB(16, 16, 10, 16)
+              : const EdgeInsets.fromLTRB(18, 14, 10, 14),
           child: Row(
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(career.title, style: theme.textTheme.titleLarge),
+                    Text(
+                      career.title,
+                      style: embedded
+                          ? const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            )
+                          : theme.textTheme.titleLarge,
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       career.category,
-                      style: theme.textTheme.bodyLarge?.copyWith(fontSize: 14),
+                      style: embedded
+                          ? const TextStyle(
+                              color: Color(0xFF64748B),
+                              fontSize: 14,
+                            )
+                          : theme.textTheme.bodyLarge?.copyWith(fontSize: 14),
                     ),
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        DemandLevelBadge(jobOutlook: career.jobOutlook),
+                        embedded
+                            ? _adminDemandBadge()
+                            : DemandLevelBadge(jobOutlook: career.jobOutlook),
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(
                             career.salaryLabel,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF1F2937),
-                            ),
+                            style: embedded
+                                ? const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF475569),
+                                  )
+                                : theme.textTheme.bodyLarge?.copyWith(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF1F2937),
+                                  ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
