@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../app.dart';
 import '../../services/auth_service.dart';
-import '../../models/course.dart';
 import '../../services/career_service.dart';
 import '../../services/course_service.dart';
 import 'courses/screens/admin_manage_courses_page.dart';
@@ -15,6 +14,8 @@ import 'models/admin_models.dart';
 import 'university/screens/university_list_screen.dart';
 import 'university/services/university_admin_service.dart';
 import 'university/models/admin_university_model.dart';
+import 'personality/screens/admin_personality_questions_screen.dart';
+import 'personality/services/admin_personality_service.dart';
 
 enum AdminNavSection {
   overview,
@@ -22,6 +23,7 @@ enum AdminNavSection {
   universities,
   courses,
   careers,
+  personalityQuestions,
   groupChat,
   notifications,
   settings,
@@ -52,6 +54,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   List<AdminUniversityModel> _adminUniversities = [];
   int _courseCount = 0;
   int _careerCount = 0;
+  int _personalityQuestionCount = 0;
 
   // Search & Filter controllers
   final TextEditingController _studentSearchController =
@@ -70,6 +73,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
     _loadCareerCount();
     _loadUniversityCount();
+    _loadPersonalityQuestionCount();
   }
 
   @override
@@ -82,8 +86,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     setState(() => _currentSection = section);
     // Courses are loaded within AdminManageCoursesPage
     if (section == AdminNavSection.universities ||
-        section == AdminNavSection.overview) {
+        section == AdminNavSection.overview ||
+        section == AdminNavSection.personalityQuestions) {
       _loadUniversityCount();
+      _loadPersonalityQuestionCount();
     }
     Navigator.of(context).maybePop(); // Close drawer if open
   }
@@ -96,6 +102,13 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       if (token == null) return;
       final careers = await CareerService().getCareers(token);
       if (mounted) setState(() => _careerCount = careers.length);
+    } catch (_) {}
+  }
+
+  Future<void> _loadPersonalityQuestionCount() async {
+    try {
+      final count = await AdminPersonalityService().getQuestionsCount();
+      if (mounted) setState(() => _personalityQuestionCount = count);
     } catch (_) {}
   }
 
@@ -390,6 +403,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   label: 'Careers',
                   badge: '$_careerCount',
                 ),
+                _buildNavItem(
+                  section: AdminNavSection.personalityQuestions,
+                  icon: Icons.psychology_rounded,
+                  label: 'Personality Test',
+                  badge: '$_personalityQuestionCount',
+                ),
                 const Padding(
                   padding: EdgeInsets.fromLTRB(14, 20, 14, 8),
                   child: Text(
@@ -528,6 +547,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         return _buildCoursesTab();
       case AdminNavSection.careers:
         return _buildCareersTab();
+      case AdminNavSection.personalityQuestions:
+        return AdminPersonalityQuestionsScreen(
+          onQuestionsUpdated: _loadPersonalityQuestionCount,
+        );
       case AdminNavSection.groupChat:
         return _buildGroupChatTab();
       case AdminNavSection.notifications:
@@ -670,7 +693,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       icon: Icons.psychology_rounded,
                       accentColor: const Color(0xFF8B5CF6),
                       bgColor: const Color(0xFFF5F3FF),
-                      onTap: () => _selectSection(AdminNavSection.students),
+                      onTap: () => _selectSection(AdminNavSection.personalityQuestions),
                     ),
                   ),
                 ],
@@ -705,7 +728,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     icon: Icons.psychology_rounded,
                     accentColor: const Color(0xFF8B5CF6),
                     bgColor: const Color(0xFFF5F3FF),
-                    onTap: () => _selectSection(AdminNavSection.students),
+                    onTap: () => _selectSection(AdminNavSection.personalityQuestions),
                   ),
                 ],
               );
@@ -764,6 +787,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           countLabel: '$_careerCount Pathways',
           color: const Color(0xFF10B981),
           onTap: () => _selectSection(AdminNavSection.careers),
+        ),
+        _buildManagementRow(
+          title: '🧠 Personality Test',
+          subtitle:
+              'Dynamic personality & interest questions, scoring rules, and student test management',
+          countLabel: '$_personalityQuestionCount Questions',
+          color: const Color(0xFF8B5CF6),
+          onTap: () => _selectSection(AdminNavSection.personalityQuestions),
         ),
         _buildManagementRow(
           title: '⚙ Settings',

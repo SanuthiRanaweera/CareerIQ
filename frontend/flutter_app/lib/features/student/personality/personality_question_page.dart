@@ -28,7 +28,15 @@ class PersonalityQuestionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progress = questionNumber / totalQuestions;
+    final progress = totalQuestions > 0 ? (questionNumber / totalQuestions) : 0.0;
+    final effectiveOptions =
+        question.options.isNotEmpty ? question.options : options;
+    final catColor = getCategoryColor(question.category);
+    final catLabel = getCategoryLabel(question.category);
+    final typeLabel = question.type.isNotEmpty
+        ? '${question.type[0].toUpperCase()}${question.type.substring(1)}'
+        : 'Personality';
+
     return Scaffold(
       appBar: AppBar(title: const Text('Personality & Interest Test')),
       body: SafeArea(
@@ -58,18 +66,78 @@ class PersonalityQuestionPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: LinearProgressIndicator(value: progress, minHeight: 10),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
               Expanded(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      // Category & Type Pills
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: catColor.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: catColor.withValues(alpha: 0.25),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.circle, size: 8, color: catColor),
+                                const SizedBox(width: 6),
+                                Text(
+                                  catLabel,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: catColor,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF1F5F9),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              typeLabel,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF64748B),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 14),
+
+                      // Question Statement
                       Text(
                         question.text,
-                        style: Theme.of(context).textTheme.headlineSmall,
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.w700, height: 1.3),
                       ),
                       const SizedBox(height: 24),
-                      ...options.map(
+
+                      // Options list
+                      ...effectiveOptions.map(
                         (option) => Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: _AnswerOptionTile(
@@ -132,8 +200,8 @@ class _AnswerOptionTile extends StatelessWidget {
         color: selected ? const Color(0xFFDBEAFE) : const Color(0xFFF8FAFC),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: selected ? const Color(0xFF3B82F6) : Colors.transparent,
-          width: 2,
+          color: selected ? const Color(0xFF3B82F6) : const Color(0xFFE2E8F0),
+          width: selected ? 2 : 1,
         ),
       ),
       child: Row(
@@ -143,11 +211,13 @@ class _AnswerOptionTile extends StatelessWidget {
             color: selected ? const Color(0xFF3B82F6) : const Color(0xFF64748B),
           ),
           const SizedBox(width: 14),
-          Text(
-            option.label,
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-              color: const Color(0xFF1F2937),
+          Expanded(
+            child: Text(
+              option.label,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: const Color(0xFF1F2937),
+              ),
             ),
           ),
         ],

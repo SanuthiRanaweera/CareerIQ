@@ -67,6 +67,17 @@ class _PersonalityTestPageState extends State<PersonalityTestPage> {
   }
 
   void _startTest() {
+    if (_questions.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No active test questions are currently available. Please check back later.',
+          ),
+          backgroundColor: Color(0xFFF59E0B),
+        ),
+      );
+      return;
+    }
     setState(() {
       _answers.clear();
       _currentIndex = 0;

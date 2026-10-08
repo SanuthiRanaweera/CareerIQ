@@ -18,6 +18,19 @@ const categoryScoreSchema = new mongoose.Schema(
 		practical: { type: Number, default: 0, min: 0, max: 100 },
 		organized: { type: Number, default: 0, min: 0, max: 100 },
 	},
+	{ _id: false, strict: false },
+);
+
+const testHistorySchema = new mongoose.Schema(
+	{
+		resultType: { type: String, required: true },
+		scores: { type: mongoose.Schema.Types.Mixed },
+		strengths: [{ type: String }],
+		careers: [{ type: String }],
+		recommendedCareers: [{ type: mongoose.Schema.Types.Mixed }],
+		recommendedCourses: [{ type: mongoose.Schema.Types.Mixed }],
+		completedDate: { type: Date, default: Date.now },
+	},
 	{ _id: false },
 );
 
@@ -29,7 +42,10 @@ const personalityTestSchema = new mongoose.Schema(
 		resultType: { type: String, required: true, trim: true },
 		strengths: [{ type: String, trim: true }],
 		careers: [{ type: String, trim: true }],
+		recommendedCareers: [{ type: mongoose.Schema.Types.Mixed, default: [] }],
+		recommendedCourses: [{ type: mongoose.Schema.Types.Mixed, default: [] }],
 		completedDate: { type: Date, default: Date.now },
+		history: { type: [testHistorySchema], default: [] },
 	},
 	{ timestamps: true },
 );
