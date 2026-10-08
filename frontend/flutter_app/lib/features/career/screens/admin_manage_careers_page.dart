@@ -200,15 +200,6 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
       appBar: widget.embedded
           ? null
           : AppBar(title: const Text('Manage careers')),
-      floatingActionButton: widget.onAddCareer == null
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: widget.onAddCareer,
-              backgroundColor: const Color(0xFF3B82F6),
-              foregroundColor: Colors.white,
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Add career'),
-            ),
       body: SafeArea(
         child: _initialLoading
             ? const CareerLoadingView(message: 'Loading careers...')
@@ -221,6 +212,7 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
                         ? const LinearProgressIndicator(minHeight: 3)
                         : null,
                   ),
+                  const Divider(height: 1),
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: _loadCareers,
@@ -233,29 +225,55 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
     );
   }
 
+  /// One header serves both modes, with a few conditional differences rather
+  /// than two separate layouts.
+  ///
+  /// Embedded in the admin dashboard it copies the pattern used by the
+  /// Students, Universities and Courses tabs: a white band, an emoji title at
+  /// 22/w800, a grey count line beneath it, the add action as a filled button
+  /// on the right, and their search-field styling. Standalone it keeps its
+  /// own heading, because the app bar already names the screen.
   Widget _buildHeader(BuildContext context) {
     final theme = Theme.of(context);
+    final embedded = widget.embedded;
+    final count = _careers.length;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+    return Container(
+      color: embedded ? Colors.white : null,
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'ADMIN',
-            style: theme.textTheme.labelLarge?.copyWith(
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF3B82F6),
-            ),
-          ),
-          const SizedBox(height: 6),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Text(
-                  'Career records',
-                  style: theme.textTheme.headlineMedium,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      embedded
+                          ? '\u{1F4BC} Careers Management'
+                          : 'Career records',
+                      style: embedded
+                          ? const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                            )
+                          : theme.textTheme.headlineMedium,
+                    ),
+                    // Embedded, the subtitle carries the record count the way
+                    // the other tabs do, so the body does not repeat it.
+                    if (embedded)
+                      Text(
+                        '$count career ${count == 1 ? 'pathway' : 'pathways'} '
+                        'mapped to personality test results',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                        ),
+                      ),
+                  ],
                 ),
               ),
               IconButton(
@@ -263,9 +281,23 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
                 onPressed: _loadCareers,
                 icon: const Icon(Icons.refresh_rounded),
               ),
+              if (widget.onAddCareer != null) ...[
+                const SizedBox(width: 4),
+                FilledButton.icon(
+                  onPressed: widget.onAddCareer,
+                  icon: const Icon(Icons.add_rounded, size: 18),
+                  label: const Text('Add career'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(130, 44),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           TextField(
             controller: _searchController,
             onChanged: _onSearchChanged,
@@ -275,8 +307,9 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
               _loadCareers();
             },
             decoration: InputDecoration(
-              hintText: 'Search careers by title or industry',
+              hintText: 'Search careers by title, industry, or demand level...',
               prefixIcon: const Icon(Icons.search_rounded),
+              fillColor: const Color(0xFFF1F5F9),
               suffixIcon: _searchController.text.isEmpty
                   ? null
                   : IconButton(
@@ -285,7 +318,7 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
                       onPressed: _clearSearch,
                     ),
               contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             ),
           ),
         ],
@@ -317,15 +350,19 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      // Extra bottom padding so the floating action button never covers the
-      // last row's actions.
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 96),
+      // Same list inset as the other admin tabs. No extra bottom padding is
+      // needed now that the add action sits in the header rather than in a
+      // floating button.
+      padding: const EdgeInsets.all(16),
       children: [
-        Text(
-          '${_careers.length} ${_careers.length == 1 ? 'career' : 'careers'}',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        const SizedBox(height: 14),
+        // Embedded, the header subtitle already states the count.
+        if (!widget.embedded) ...[
+          Text(
+            '${_careers.length} ${_careers.length == 1 ? 'career' : 'careers'}',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 14),
+        ],
         ..._careers.map(
           (career) => _AdminCareerRow(
             career: career,
