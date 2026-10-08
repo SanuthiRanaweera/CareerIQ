@@ -3,6 +3,7 @@ class Course {
     required this.id,
     required this.title,
     required this.university,
+    this.universityId,
     required this.stream,
     required this.degreeType,
     required this.description,
@@ -17,7 +18,12 @@ class Course {
   factory Course.fromJson(Map<String, dynamic> json) => Course(
     id: json['_id'] as String? ?? json['id'] as String? ?? '',
     title: json['title'] as String? ?? '',
-    university: json['university'] as String? ?? '',
+    university: json['university'] is Map
+        ? (json['university']['universityName'] ?? '')
+        : (json['university'] as String? ?? ''),
+    universityId: json['universityId'] is Map
+        ? (json['universityId']['_id'] ?? json['universityId']['id'] ?? '').toString()
+        : (json['universityId'] as String?),
     stream: json['stream'] as String? ?? 'Any',
     degreeType: json['degreeType'] as String? ?? "Bachelor's Degree",
     description: json['description'] as String? ?? '',
@@ -32,6 +38,7 @@ class Course {
   final String id;
   final String title;
   final String university;
+  final String? universityId;
   final String stream;
   final String degreeType;
   final String description;

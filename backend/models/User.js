@@ -7,10 +7,12 @@ const userSchema = new mongoose.Schema(
 		password: { type: String, minlength: 6, select: false },
 		googleId: { type: String, unique: true, sparse: true, select: false },
 		authProvider: { type: String, enum: ['password', 'google'], default: 'password' },
-		role: { type: String, enum: ['student', 'admin'], default: 'student' },
+		role: { type: String, enum: ['student', 'admin', 'university'], default: 'student' },
+		status: { type: String, enum: ['active', 'inactive', 'pending'], default: 'active' },
 		isEmailVerified: { type: Boolean, default: false },
 		emailVerificationOtpHash: { type: String, select: false },
 		emailVerificationOtpExpiresAt: { type: Date, select: false },
+		mustResetPassword: { type: Boolean, default: false },
 	},
 	{ timestamps: true },
 );

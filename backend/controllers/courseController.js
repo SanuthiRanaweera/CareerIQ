@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const Course = require('../models/Course');
+const University = require('../models/University');
 
 const editableFields = [
-	'title', 'university', 'stream', 'degreeType', 'description',
+	'title', 'university', 'universityId', 'stream', 'degreeType', 'description',
 	'durationYears', 'minZScore', 'subjects', 'careerPaths',
 	'website', 'applicationUrl', 'isActive',
 ];
@@ -12,11 +13,19 @@ function courseInput(body, partial = false) {
 	for (const field of editableFields) {
 		if (Object.hasOwn(body, field)) input[field] = body[field];
 	}
+	if (input.universityId === '' || input.universityId === 'null') {
+		input.universityId = null;
+	} else if (input.universityId && !mongoose.isValidObjectId(input.universityId)) {
+		throw Object.assign(new Error('Invalid university ID'), { statusCode: 400 });
+	}
 	if (!partial) {
-		for (const field of ['title', 'university', 'stream', 'durationYears']) {
+		for (const field of ['title', 'stream', 'durationYears']) {
 			if (input[field] === undefined || input[field] === '') {
 				throw Object.assign(new Error(`${field} is required`), { statusCode: 400 });
 			}
+		}
+		if ((input.university === undefined || input.university === '') && !input.universityId) {
+			throw Object.assign(new Error('university or universityId is required'), { statusCode: 400 });
 		}
 	}
 	if (input.durationYears !== undefined && (!Number.isFinite(Number(input.durationYears)) || Number(input.durationYears) <= 0)) {
@@ -40,19 +49,44 @@ function escapedRegex(value) {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+async function resolveUniversityAssociation(input) {
+	if (input.universityId && mongoose.isValidObjectId(input.universityId)) {
+		const uni = await University.findById(input.universityId).lean();
+		if (uni) {
+			input.university = uni.universityName;
+		}
+	} else if (input.university && typeof input.university === 'string' && input.university.trim().length > 0) {
+		const uni = await University.findOne({
+			universityName: new RegExp(`^${escapedRegex(input.university.trim())}$`, 'i'),
+		}).lean();
+		if (uni) {
+			input.universityId = uni._id;
+		}
+	}
+}
+
 async function listCourses(req, res, next) {
 	try {
 		const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
 		const limit = Math.min(50, Math.max(1, Number.parseInt(req.query.limit, 10) || 20));
 		const filter = req.includeInactive ? {} : { isActive: true };
 		if (req.query.stream && req.query.stream !== 'All') filter.stream = req.query.stream;
-		if (req.query.university) filter.university = new RegExp(escapedRegex(String(req.query.university)), 'i');
+		if (req.query.universityId && mongoose.isValidObjectId(req.query.universityId)) {
+			filter.universityId = req.query.universityId;
+		} else if (req.query.university) {
+			filter.university = new RegExp(escapedRegex(String(req.query.university)), 'i');
+		}
 		if (req.query.search) {
 			const search = new RegExp(escapedRegex(String(req.query.search)), 'i');
 			filter.$or = [{ title: search }, { university: search }, { description: search }, { careerPaths: search }];
 		}
 		const [courses, total] = await Promise.all([
-			Course.find(filter).sort({ university: 1, title: 1 }).skip((page - 1) * limit).limit(limit).lean(),
+			Course.find(filter)
+				.populate('universityId', 'universityName location universityType logo')
+				.sort({ university: 1, title: 1 })
+				.skip((page - 1) * limit)
+				.limit(limit)
+				.lean(),
 			Course.countDocuments(filter),
 		]);
 		res.json({ success: true, data: courses, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
@@ -64,7 +98,9 @@ async function getCourse(req, res, next) {
 		if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ success: false, message: 'Course not found' });
 		const filter = { _id: req.params.id };
 		if (!req.includeInactive) filter.isActive = true;
-		const course = await Course.findOne(filter).lean();
+		const course = await Course.findOne(filter)
+			.populate('universityId', 'universityName location universityType logo')
+			.lean();
 		if (!course) return res.status(404).json({ success: false, message: 'Course not found' });
 		res.json({ success: true, data: course });
 	} catch (error) { next(error); }
@@ -72,7 +108,9 @@ async function getCourse(req, res, next) {
 
 async function createCourse(req, res, next) {
 	try {
-		const course = await Course.create(courseInput(req.body));
+		const input = courseInput(req.body);
+		await resolveUniversityAssociation(input);
+		const course = await Course.create(input);
 		res.status(201).json({ success: true, data: course });
 	} catch (error) { next(error); }
 }
@@ -80,7 +118,11 @@ async function createCourse(req, res, next) {
 async function updateCourse(req, res, next) {
 	try {
 		if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ success: false, message: 'Course not found' });
-		const course = await Course.findByIdAndUpdate(req.params.id, courseInput(req.body, true), {
+		const input = courseInput(req.body, true);
+		if (input.universityId !== undefined || input.university !== undefined) {
+			await resolveUniversityAssociation(input);
+		}
+		const course = await Course.findByIdAndUpdate(req.params.id, input, {
 			new: true,
 			runValidators: true,
 		});

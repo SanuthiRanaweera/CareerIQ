@@ -11,7 +11,7 @@ async function getOwnedStudent(userId, studentId) {
 }
 
 async function updateOwnedStudent(userId, studentId, updates) {
-	const allowed = ['fullName', 'dateOfBirth', 'school', 'district', 'alYear', 'stream', 'profileImage', 'interests', 'alResults', 'personalityResult'];
+	const allowed = ['fullName', 'dateOfBirth', 'school', 'district', 'alYear', 'stream', 'profileImage', 'interests', 'alResults', 'personalityResult', 'favoriteUniversities'];
 	const safeUpdates = Object.fromEntries(Object.entries(updates).filter(([key]) => allowed.includes(key)));
 	return Student.findOneAndUpdate({ _id: studentId, userId }, safeUpdates, { new: true, runValidators: true });
 }

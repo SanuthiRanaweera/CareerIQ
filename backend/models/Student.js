@@ -36,6 +36,7 @@ const studentSchema = new mongoose.Schema(
 		},
 		favoriteCareers: [{ type: mongoose.Schema.Types.ObjectId }],
 		favoriteCourses: [{ type: mongoose.Schema.Types.ObjectId }],
+		favoriteUniversities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'University' }],
 	},
 	{ timestamps: true, toJSON: { virtuals: true } },
 );

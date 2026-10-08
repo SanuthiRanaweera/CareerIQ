@@ -4,7 +4,10 @@ const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
 const Student = require('../models/Student');
-const { sendVerificationEmail } = require('./emailService');
+const University = require('../models/University');
+const OtpVerification = require('../models/OtpVerification');
+const { sendVerificationEmail, sendUniversityOtpEmail, sendUniversityAccountCreatedEmail } = require('./emailService');
+const { createOtpRecord, verifyOtp, canResendOtp, OTP_COOLDOWN_MS } = require('./otpService');
 
 function createToken(user) {
 	const secret = process.env.JWT_SECRET;
@@ -13,7 +16,25 @@ function createToken(user) {
 }
 
 function publicUser(user) {
-	return { id: user._id, fullName: user.fullName, email: user.email, role: user.role, isEmailVerified: user.isEmailVerified };
+	return { id: user._id, fullName: user.fullName, email: user.email, role: user.role, status: user.status, isEmailVerified: user.isEmailVerified };
+}
+
+function generateTemporaryPassword() {
+	const upper = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+	const lower = 'abcdefghijkmnopqrstuvwxyz';
+	const numbers = '23456789';
+	const specials = '!@#$%^&*';
+	const pool = `${upper}${lower}${numbers}${specials}`;
+	let password = [
+		upper[Math.floor(Math.random() * upper.length)],
+		lower[Math.floor(Math.random() * lower.length)],
+		numbers[Math.floor(Math.random() * numbers.length)],
+		specials[Math.floor(Math.random() * specials.length)],
+	];
+	for (let i = 4; i < 12; i += 1) {
+		password.push(pool[Math.floor(Math.random() * pool.length)]);
+	}
+	return password.sort(() => Math.random() - 0.5).join('');
 }
 
 async function googleLogin(idToken) {
@@ -100,12 +121,52 @@ async function resendVerificationEmail(email) {
 }
 
 async function login({ email, password }) {
-	const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
+	const normalizedEmail = String(email).toLowerCase().trim();
+	const user = await User.findOne({ email: normalizedEmail }).select('+password');
 	if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
 		const error = new Error('Invalid email or password');
 		error.statusCode = 401;
 		throw error;
 	}
+
+	if (user.role === 'university') {
+		if (user.status === 'inactive') {
+			const error = new Error('Your university account is inactive. Please contact the administrator.');
+			error.statusCode = 403;
+			throw error;
+		}
+		if (user.status === 'pending') {
+			const error = new Error('Your university account is pending activation. Please contact the administrator.');
+			error.statusCode = 403;
+			throw error;
+		}
+		const university = await University.findOne({ userId: user._id });
+		const { allowed, retryAfterSeconds } = await canResendOtp({ userId: user._id, purpose: 'university_login' });
+		if (!allowed) {
+			const error = new Error(`Please wait ${retryAfterSeconds} seconds before requesting a new code.`);
+			error.statusCode = 429;
+			throw error;
+		}
+		const { otp, record } = await createOtpRecord({ userId: user._id, purpose: 'university_login' });
+		await OtpVerification.deleteMany({ userId: user._id, purpose: 'university_login', _id: { $ne: record._id } });
+		try {
+			await sendUniversityOtpEmail({
+				universityName: university?.universityName || user.fullName,
+				email: normalizedEmail,
+				otp,
+			});
+		} catch (error) {
+			throw Object.assign(new Error('Unable to send verification email. Please try again.'), { statusCode: 503, cause: error });
+		}
+		return {
+			pendingUniversityOtp: true,
+			token: null,
+			message: 'Verification code sent to your university email.',
+			user: publicUser(user),
+			retryAfterSeconds: Math.max(0, Math.ceil(OTP_COOLDOWN_MS / 1000)),
+		};
+	}
+
 	if (!user.isEmailVerified) {
 		const error = new Error('Please verify your email before logging in');
 		error.statusCode = 403;
@@ -113,6 +174,53 @@ async function login({ email, password }) {
 	}
 	const student = await Student.findOne({ userId: user._id });
 	return { token: createToken(user), user: publicUser(user), student };
+}
+
+async function verifyUniversityOtp(email, otp) {
+	const normalizedEmail = String(email).toLowerCase().trim();
+	const user = await User.findOne({ email: normalizedEmail }).select('+password');
+	if (!user || user.role !== 'university') {
+		const error = new Error('University account not found');
+		error.statusCode = 404;
+		throw error;
+	}
+	if (user.status === 'inactive') {
+		const error = new Error('Your university account is inactive. Please contact the administrator.');
+		error.statusCode = 403;
+		throw error;
+	}
+	if (user.status === 'pending') {
+		const error = new Error('Your university account is pending activation. Please contact the administrator.');
+		error.statusCode = 403;
+		throw error;
+	}
+	await verifyOtp({ userId: user._id, purpose: 'university_login', otp });
+	const university = await University.findOne({ userId: user._id });
+	return { token: createToken(user), user: publicUser(user), university };
+}
+
+async function resendUniversityOtp(email) {
+	const normalizedEmail = String(email).toLowerCase().trim();
+	const user = await User.findOne({ email: normalizedEmail }).select('+password');
+	if (!user || user.role !== 'university') {
+		const error = new Error('University account not found');
+		error.statusCode = 404;
+		throw error;
+	}
+	const { allowed, retryAfterSeconds } = await canResendOtp({ userId: user._id, purpose: 'university_login' });
+	if (!allowed) {
+		const error = new Error(`Please wait ${retryAfterSeconds} seconds before requesting a new code.`);
+		error.statusCode = 429;
+		throw error;
+	}
+	const university = await University.findOne({ userId: user._id });
+	const { otp } = await createOtpRecord({ userId: user._id, purpose: 'university_login' });
+	try {
+		await sendUniversityOtpEmail({ universityName: university?.universityName || user.fullName, email: normalizedEmail, otp });
+	} catch (error) {
+		throw Object.assign(new Error('Unable to send verification email. Please try again.'), { statusCode: 503, cause: error });
+	}
+	return { retryAfterSeconds: Math.max(0, Math.ceil(OTP_COOLDOWN_MS / 1000)) };
 }
 
 async function verifyEmail(email, otp) {
@@ -130,4 +238,55 @@ async function verifyEmail(email, otp) {
 	return user;
 }
 
-module.exports = { register, login, googleLogin, verifyEmail, resendVerificationEmail };
+async function createUniversityAccount({ universityName, officialEmail, contactNumber, address, city, district, country, universityType, website, description, logo, status = 'pending', password }) {
+	const normalizedEmail = String(officialEmail).toLowerCase().trim();
+	const existing = await User.findOne({ email: normalizedEmail });
+	if (existing) {
+		const error = new Error('A university account with this email already exists');
+		error.statusCode = 409;
+		throw error;
+	}
+	const tempPassword = password || generateTemporaryPassword();
+	const user = await User.create({
+		fullName: universityName,
+		email: normalizedEmail,
+		password: await bcrypt.hash(tempPassword, 12),
+		role: 'university',
+		status,
+		isEmailVerified: true,
+		mustResetPassword: Boolean(password === undefined || password === null),
+	});
+	try {
+		const university = await University.create({
+			userId: user._id,
+			universityName,
+			officialEmail: normalizedEmail,
+			contactNumber,
+			address,
+			city,
+			district,
+			country,
+			universityType,
+			website,
+			description,
+			logo,
+			status,
+		});
+		await sendUniversityAccountCreatedEmail({ email: normalizedEmail, universityName, password: tempPassword });
+		return { user: publicUser(user), university };
+	} catch (error) {
+		await User.deleteOne({ _id: user._id });
+		throw error;
+	}
+}
+
+module.exports = {
+	register,
+	login,
+	googleLogin,
+	verifyEmail,
+	resendVerificationEmail,
+	verifyUniversityOtp,
+	resendUniversityOtp,
+	createUniversityAccount,
+};
