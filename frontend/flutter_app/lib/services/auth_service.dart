@@ -96,6 +96,48 @@ class AuthService {
   Future<bool> isAdmin() async =>
       await _storage.read(key: 'career_iq_role') == 'admin';
 
+  Future<bool> isUniversity() async =>
+      await _storage.read(key: 'career_iq_role') == 'university';
+
+  Future<String?> role() => _storage.read(key: 'career_iq_role');
+
+  Future<Map<String, dynamic>> universityLogin(
+    String email,
+    String password,
+  ) async {
+    final response = await _api.request(
+      'POST',
+      '/auth/login',
+      body: {'email': email, 'password': password},
+    );
+    final data = response['data'] as Map<String, dynamic>? ?? {};
+    if (data['token'] != null) {
+      await _saveToken(response);
+    }
+    return data;
+  }
+
+  Future<Map<String, dynamic>> verifyUniversityLoginOtp(
+    String email,
+    String otp,
+  ) async {
+    final response = await _api.request(
+      'POST',
+      '/auth/university/verify-otp',
+      body: {'email': email, 'otp': otp},
+    );
+    await _saveToken(response);
+    return response['data'] as Map<String, dynamic>? ?? {};
+  }
+
+  Future<void> resendUniversityLoginOtp(String email) async {
+    await _api.request(
+      'POST',
+      '/auth/university/resend-otp',
+      body: {'email': email},
+    );
+  }
+
   Future<void> logout() async {
     await _storage.delete(key: 'career_iq_token');
     await _storage.delete(key: 'career_iq_role');

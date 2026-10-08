@@ -11,6 +11,7 @@ import 'features/authentication/register_page.dart';
 import 'features/admin/admin_dashboard_page.dart';
 import 'features/student/dashboard_page.dart';
 import 'features/student/courses/course_catalog_page.dart';
+import 'features/university/university_login_page.dart';
 import 'features/student/personality/personality_test_page.dart';
 import 'features/student/profile_page.dart';
 import 'models/career.dart';
@@ -128,6 +129,7 @@ class _AuthGateState extends State<AuthGate> {
   Student? _student;
   String? _token;
   bool _isAdmin = false;
+  bool _isUniversity = false;
   bool _loading = true;
   bool _registering = false;
   bool _adminPortal = false;
@@ -143,7 +145,10 @@ class _AuthGateState extends State<AuthGate> {
       _token = await _auth.token();
       if (_token != null) {
         _isAdmin = await _auth.isAdmin();
-        _student = await _students.getMe(_token!);
+        _isUniversity = await _auth.isUniversity();
+        if (!_isAdmin && !_isUniversity) {
+          _student = await _students.getMe(_token!);
+        }
       }
     } catch (_) {
       await _auth.logout();
@@ -188,6 +193,7 @@ class _AuthGateState extends State<AuthGate> {
         _student = null;
         _token = null;
         _isAdmin = false;
+        _isUniversity = false;
       });
     }
   }
@@ -264,6 +270,9 @@ class _AuthGateState extends State<AuthGate> {
     if (_isAdmin && _token != null) {
       return AdminDashboardPage(onLogout: _logout);
     }
+    if (_isUniversity && _token != null) {
+      return UniversityDashboardScreen(onLogout: _logout);
+    }
     if (_student != null && _token != null) {
       return DashboardPage(
         student: _student!,
@@ -333,6 +342,20 @@ class _AuthGateState extends State<AuthGate> {
       onRegister: () => setState(() => _registering = true),
       isAdminPortal: _adminPortal,
       onAdminPortalToggle: () => setState(() => _adminPortal = !_adminPortal),
+      onUniversityLogin: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => UniversityLoginPage(
+              onLoginSuccess: () async {
+                _token = await _auth.token();
+                _isUniversity = await _auth.isUniversity();
+                if (mounted) setState(() {});
+              },
+            ),
+          ),
+        );
+      },
     );
   }
 }
