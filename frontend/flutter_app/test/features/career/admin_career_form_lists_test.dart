@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_app/features/career/screens/admin_career_form_page.dart';
+import 'package:flutter_app/features/career/widgets/editable_string_list.dart';
 import 'package:flutter_app/models/career.dart';
 
 import 'career_test_fakes.dart';
@@ -95,6 +96,14 @@ void main() {
     }
     await tester.pumpAndSettle();
     await tester.tap(find.text('Add step'));
+    await tester.pumpAndSettle();
+  }
+
+  /// Taps a suggestion chip belonging to an [EditableStringList].
+  Future<void> tapSuggestion(WidgetTester tester, String value) async {
+    final chip = find.widgetWithText(ActionChip, value);
+    await scrollTo(tester, chip);
+    await tester.tap(chip);
     await tester.pumpAndSettle();
   }
 
@@ -457,6 +466,185 @@ void main() {
       expect(pathway.length, 3);
       expect(pathway.map((s) => s.order), [1, 2, 3]);
       expect(pathway.last.title, 'Intern role');
+    });
+  });
+
+  group('AdminCareerFormPage tag suggestions', () {
+    testWidgets('offers suggestions on the tag fields but not the free-form '
+        'ones', (tester) async {
+      await tester.pumpWidget(wrap(
+        AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
+      ));
+      await tester.pumpAndSettle();
+
+      /// Looks for a Suggestions label inside one field's own subtree.
+      Future<void> expectSuggestions(String label, bool expected) async {
+        await scrollTo(tester, find.text(label));
+        final field = find
+            .ancestor(
+              of: find.text(label),
+              matching: find.byType(EditableStringList),
+            )
+            .first;
+        expect(
+          find.descendant(of: field, matching: find.text('Suggestions')),
+          expected ? findsOneWidget : findsNothing,
+          reason: expected
+              ? '$label should offer suggestions'
+              : '$label should not offer suggestions',
+        );
+      }
+
+      await expectSuggestions('Interest tags', true);
+      await expectSuggestions('Relevant A/L subjects', true);
+      // Free-form sentences with no fixed vocabulary.
+      await expectSuggestions("What you'd do", false);
+      await expectSuggestions('Required skills', false);
+      await expectSuggestions('Industry opportunities', false);
+    });
+
+    testWidgets('tapping an interest suggestion adds it', (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminCareerFormPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await fillRequired(tester);
+      await tapSuggestion(tester, 'technology');
+      await tapSuggestion(tester, 'design');
+      await save(tester);
+
+      expect(service.lastCreated!.interestTags, ['technology', 'design']);
+    });
+
+    testWidgets('tapping an A/L subject suggestion adds it', (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminCareerFormPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await fillRequired(tester);
+      await tapSuggestion(tester, 'Biology');
+      await save(tester);
+
+      expect(service.lastCreated!.alSubjects, ['Biology']);
+    });
+
+    testWidgets('an added suggestion is disabled and cannot be added twice',
+        (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminCareerFormPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await fillRequired(tester);
+      await tapSuggestion(tester, 'technology');
+
+      // The chip stays on screen but is disabled, so a second tap is a no-op
+      // rather than storing the tag twice.
+      final chip = find.widgetWithText(ActionChip, 'technology');
+      await scrollTo(tester, chip);
+      expect(tester.widget<ActionChip>(chip).onPressed, isNull);
+
+      await tester.tap(chip, warnIfMissed: false);
+      await tester.pumpAndSettle();
+      await save(tester);
+
+      expect(service.lastCreated!.interestTags, ['technology']);
+    });
+
+    testWidgets('typing a value that is also a suggestion is not duplicated',
+        (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminCareerFormPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await fillRequired(tester);
+      await tapSuggestion(tester, 'technology');
+      // Different casing, same tag: the shared duplicate check rejects it.
+      await addToList(tester, 'Interest tags', 'Technology');
+      await save(tester);
+
+      expect(service.lastCreated!.interestTags, ['technology']);
+    });
+
+    testWidgets('free text still works for values outside the suggestions',
+        (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminCareerFormPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await fillRequired(tester);
+      // "infrastructure" and "Statistics" appear on seeded careers but are in
+      // neither suggestion list, so nothing already stored becomes
+      // unreachable.
+      await addToList(tester, 'Interest tags', 'infrastructure');
+      await addToList(tester, 'Relevant A/L subjects', 'Statistics');
+      await save(tester);
+
+      expect(service.lastCreated!.interestTags, ['infrastructure']);
+      expect(service.lastCreated!.alSubjects, ['Statistics']);
+    });
+
+    testWidgets('a suggested tag can be removed again with its x control',
+        (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(AdminCareerFormPage(token: 't', careerService: service)),
+      );
+      await tester.pumpAndSettle();
+
+      await fillRequired(tester);
+      await tapSuggestion(tester, 'technology');
+      await tapSuggestion(tester, 'design');
+
+      await scrollTo(tester, find.byTooltip('Remove technology'));
+      await tester.tap(find.byTooltip('Remove technology'));
+      await tester.pumpAndSettle();
+      await save(tester);
+
+      expect(service.lastCreated!.interestTags, ['design']);
+    });
+
+    testWidgets('editing a career shows its stored tags as already added',
+        (tester) async {
+      final existing = careerFixture(
+        id: 'id-se',
+        title: 'Software Engineer',
+      );
+      await tester.pumpWidget(wrap(AdminCareerFormPage(
+        token: 't',
+        career: Career(
+          id: existing.id,
+          title: existing.title,
+          category: existing.category,
+          description: existing.description,
+          salaryRange: existing.salaryRange,
+          jobOutlook: existing.jobOutlook,
+          whatYouDo: existing.whatYouDo,
+          requiredSkills: existing.requiredSkills,
+          recommendedStreams: existing.recommendedStreams,
+          interestTags: const ['technology'],
+        ),
+        careerService: FakeCareerService(),
+      )));
+      await tester.pumpAndSettle();
+
+      final chip = find.widgetWithText(ActionChip, 'technology');
+      await scrollTo(tester, chip);
+      expect(tester.widget<ActionChip>(chip).onPressed, isNull);
+
+      // One that is not stored stays tappable.
+      final other = find.widgetWithText(ActionChip, 'design');
+      await scrollTo(tester, other);
+      expect(tester.widget<ActionChip>(other).onPressed, isNotNull);
     });
   });
 }
