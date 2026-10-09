@@ -186,6 +186,15 @@ class _DashboardPageState extends State<DashboardPage> {
           CareersListPage(
             token: widget.token,
             onCareerSelected: _openCareerDetails,
+            onOpenShortlist: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => SavedCareersPage(
+                  token: widget.token,
+                  onCareerSelected: _openCareerDetails,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -401,21 +410,6 @@ class _DashboardPageState extends State<DashboardPage> {
           value: 'Find your match',
           subtitle: 'Answer a few questions to see ranked careers',
           onTap: widget.onCareerRecommendations,
-        ),
-        _InfoCard(
-          icon: Icons.bookmark_border_rounded,
-          title: 'My shortlist',
-          value: 'Your saved careers',
-          subtitle: 'Keep notes and priorities on careers you like',
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => SavedCareersPage(
-                token: widget.token,
-                onCareerSelected: _openCareerDetails,
-              ),
-            ),
-          ),
         ),
         _InfoCard(
           icon: Icons.account_balance_outlined,

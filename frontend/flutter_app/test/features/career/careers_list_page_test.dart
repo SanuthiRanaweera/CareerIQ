@@ -228,6 +228,69 @@ void main() {
     });
   });
 
+  group('CareersListPage shortlist chip', () {
+    testWidgets('opens the shortlist when tapped', (tester) async {
+      var opened = false;
+      await tester.pumpWidget(
+        wrap(
+          CareersListPage(
+            token: 't',
+            careerService: FakeCareerService(),
+            onOpenShortlist: () => opened = true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('My shortlist'));
+      await tester.pumpAndSettle();
+
+      expect(opened, isTrue);
+    });
+
+    testWidgets('is hidden when no handler is supplied', (tester) async {
+      await tester.pumpWidget(
+        wrap(CareersListPage(token: 't', careerService: FakeCareerService())),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('My shortlist'), findsNothing);
+    });
+
+    testWidgets('lays out under the real app button themes', (tester) async {
+      // Same infinite-minimum-width button themes as the app in lib/app.dart.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            useMaterial3: true,
+            filledButtonTheme: FilledButtonThemeData(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(54),
+                shape: const StadiumBorder(),
+              ),
+            ),
+            outlinedButtonTheme: OutlinedButtonThemeData(
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(52),
+                shape: const StadiumBorder(),
+              ),
+            ),
+          ),
+          home: CareersListPage(
+            token: 't',
+            careerService: FakeCareerService(),
+            onOpenShortlist: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('My shortlist'), findsOneWidget);
+      expect(find.text('Find your path'), findsOneWidget);
+    });
+  });
+
   group('CareersListPage search and category filter', () {
     testWidgets('shows a search field and a chip per category', (tester) async {
       await tester.pumpWidget(

@@ -25,6 +25,7 @@ class CareersListPage extends StatefulWidget {
     super.key,
     required this.token,
     this.onCareerSelected,
+    this.onOpenShortlist,
     this.careerService,
   });
 
@@ -33,6 +34,10 @@ class CareersListPage extends StatefulWidget {
   /// Called when a career card is tapped. Left null until the career details
   /// screen exists, in which case the cards are not tappable.
   final void Function(Career career)? onCareerSelected;
+
+  /// Opens the student's saved careers. When null the shortlist chip is
+  /// hidden rather than shown as a dead control.
+  final VoidCallback? onOpenShortlist;
 
   /// Injectable API client, mirroring how [CareerService] itself accepts an
   /// [ApiService]. The app leaves this null and gets the real service; tests
@@ -213,7 +218,24 @@ class _CareersListPageState extends State<CareersListPage> {
             ),
           ),
           const SizedBox(height: 6),
-          Text('Find your path', style: theme.textTheme.headlineMedium),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Find your path',
+                  style: theme.textTheme.headlineMedium,
+                ),
+              ),
+              // A chip rather than a button: the app theme gives every
+              // button an infinite minimum width, which cannot sit in a Row.
+              if (widget.onOpenShortlist != null)
+                ActionChip(
+                  avatar: const Icon(Icons.bookmark_border_rounded, size: 18),
+                  label: const Text('My shortlist'),
+                  onPressed: widget.onOpenShortlist,
+                ),
+            ],
+          ),
           const SizedBox(height: 16),
           TextField(
             controller: _searchController,
