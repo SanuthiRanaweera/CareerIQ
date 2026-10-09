@@ -25,6 +25,7 @@ class AdminManageCareersPage extends StatefulWidget {
     this.onEditCareer,
     this.careerService,
     this.embedded = false,
+    this.onCountChanged,
   });
 
   final String token;
@@ -34,6 +35,10 @@ class AdminManageCareersPage extends StatefulWidget {
   /// host page's own header is the only one on screen; the refresh action
   /// lives in the body header, so nothing is lost.
   final bool embedded;
+
+  /// Reports the total number of careers whenever an unfiltered list loads,
+  /// so a host page can show the real count. Searches are not reported.
+  final ValueChanged<int>? onCountChanged;
 
   /// Opens the create form. Null until that screen is wired up.
   final VoidCallback? onAddCareer;
@@ -105,6 +110,7 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
         _initialLoading = false;
         _filtering = false;
       });
+      if (!_isSearching) widget.onCountChanged?.call(careers.length);
     } on ApiException catch (error) {
       if (!mounted || requestId != _requestId) return;
       setState(() {
@@ -146,9 +152,7 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('Delete career?'),
-        content: Text(
-          'Delete "${career.title}"? This cannot be undone.',
-        ),
+        content: Text('Delete "${career.title}"? This cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
@@ -200,15 +204,6 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
       appBar: widget.embedded
           ? null
           : AppBar(title: const Text('Manage careers')),
-      floatingActionButton: widget.onAddCareer == null
-          ? null
-          : FloatingActionButton.extended(
-              onPressed: widget.onAddCareer,
-              backgroundColor: const Color(0xFF3B82F6),
-              foregroundColor: Colors.white,
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Add career'),
-            ),
       body: SafeArea(
         child: _initialLoading
             ? const CareerLoadingView(message: 'Loading careers...')
@@ -221,6 +216,7 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
                         ? const LinearProgressIndicator(minHeight: 3)
                         : null,
                   ),
+                  const Divider(height: 1),
                   Expanded(
                     child: RefreshIndicator(
                       onRefresh: _loadCareers,
@@ -233,29 +229,55 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
     );
   }
 
+  /// One header serves both modes, with a few conditional differences rather
+  /// than two separate layouts.
+  ///
+  /// Embedded in the admin dashboard it copies the pattern used by the
+  /// Students, Universities and Courses tabs: a white band, an emoji title at
+  /// 22/w800, a grey count line beneath it, the add action as a filled button
+  /// on the right, and their search-field styling. Standalone it keeps its
+  /// own heading, because the app bar already names the screen.
   Widget _buildHeader(BuildContext context) {
     final theme = Theme.of(context);
+    final embedded = widget.embedded;
+    final count = _careers.length;
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
+    return Container(
+      color: embedded ? Colors.white : null,
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'ADMIN',
-            style: theme.textTheme.labelLarge?.copyWith(
-              letterSpacing: 1.2,
-              fontWeight: FontWeight.w800,
-              color: const Color(0xFF3B82F6),
-            ),
-          ),
-          const SizedBox(height: 6),
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child: Text(
-                  'Career records',
-                  style: theme.textTheme.headlineMedium,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      embedded
+                          ? '\u{1F4BC} Careers Management'
+                          : 'Career records',
+                      style: embedded
+                          ? const TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w800,
+                            )
+                          : theme.textTheme.headlineMedium,
+                    ),
+                    // Embedded, the subtitle carries the record count the way
+                    // the other tabs do, so the body does not repeat it.
+                    if (embedded)
+                      Text(
+                        '$count career ${count == 1 ? 'pathway' : 'pathways'} '
+                        'mapped to personality test results',
+                        style: const TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                        ),
+                      ),
+                  ],
                 ),
               ),
               IconButton(
@@ -263,9 +285,23 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
                 onPressed: _loadCareers,
                 icon: const Icon(Icons.refresh_rounded),
               ),
+              if (widget.onAddCareer != null) ...[
+                const SizedBox(width: 4),
+                FilledButton.icon(
+                  onPressed: widget.onAddCareer,
+                  icon: const Icon(Icons.add_rounded, size: 18),
+                  label: const Text('Add career'),
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(130, 44),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           TextField(
             controller: _searchController,
             onChanged: _onSearchChanged,
@@ -275,8 +311,9 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
               _loadCareers();
             },
             decoration: InputDecoration(
-              hintText: 'Search careers by title or industry',
+              hintText: 'Search careers by title, industry, or demand level...',
               prefixIcon: const Icon(Icons.search_rounded),
+              fillColor: const Color(0xFFF1F5F9),
               suffixIcon: _searchController.text.isEmpty
                   ? null
                   : IconButton(
@@ -284,8 +321,10 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
                       icon: const Icon(Icons.close_rounded),
                       onPressed: _clearSearch,
                     ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
             ),
           ),
         ],
@@ -317,18 +356,23 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      // Extra bottom padding so the floating action button never covers the
-      // last row's actions.
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 96),
+      // Same list inset as the other admin tabs. No extra bottom padding is
+      // needed now that the add action sits in the header rather than in a
+      // floating button.
+      padding: const EdgeInsets.all(16),
       children: [
-        Text(
-          '${_careers.length} ${_careers.length == 1 ? 'career' : 'careers'}',
-          style: Theme.of(context).textTheme.bodyLarge,
-        ),
-        const SizedBox(height: 14),
+        // Embedded, the header subtitle already states the count.
+        if (!widget.embedded) ...[
+          Text(
+            '${_careers.length} ${_careers.length == 1 ? 'career' : 'careers'}',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 14),
+        ],
         ..._careers.map(
           (career) => _AdminCareerRow(
             career: career,
+            embedded: widget.embedded,
             deleting: _deletingId == career.id,
             onEdit: widget.onEditCareer == null
                 ? null
@@ -348,6 +392,7 @@ class _AdminCareerRow extends StatelessWidget {
     this.onEdit,
     this.onDelete,
     this.deleting = false,
+    this.embedded = false,
   });
 
   final Career career;
@@ -357,6 +402,41 @@ class _AdminCareerRow extends StatelessWidget {
   /// True while this career's delete request is running.
   final bool deleting;
 
+  /// True inside the admin dashboard, where the row copies the card styling of
+  /// the Students, Universities and Courses tabs instead of the student theme.
+  final bool embedded;
+
+  // Badge colours per demand level, the same palette as DemandLevelBadge.
+  static const Map<String, (Color, Color)> _demandColours = {
+    'Very High': (Color(0xFFDCFCE7), Color(0xFF15803D)),
+    'High': (Color(0xFFDBEAFE), Color(0xFF1D4ED8)),
+    'Medium': (Color(0xFFFEF3C7), Color(0xFFB45309)),
+    'Low': (Color(0xFFF1F5F9), Color(0xFF475569)),
+  };
+
+  /// Demand badge sized like the admin tabs' badges (11 / w700, radius 8).
+  Widget _adminDemandBadge() {
+    if (career.jobOutlook.isEmpty) return const SizedBox.shrink();
+    final colours =
+        _demandColours[career.jobOutlook] ??
+        const (Color(0xFFF1F5F9), Color(0xFF475569));
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: colours.$1,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        '${career.jobOutlook} demand',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: colours.$2,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -364,38 +444,68 @@ class _AdminCareerRow extends StatelessWidget {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       clipBehavior: Clip.antiAlias,
+      elevation: embedded ? 0 : null,
+      shape: embedded
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: const BorderSide(color: Color(0xFFE2E8F0)),
+            )
+          : null,
       child: InkWell(
         // Tapping the row opens the same editor as the pencil, so the whole
         // card is a usable target rather than just the small icon. Disabled
         // mid-delete so the record cannot be edited while it is going away.
         onTap: deleting ? null : onEdit,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(18, 14, 10, 14),
+          padding: embedded
+              ? const EdgeInsets.fromLTRB(16, 16, 10, 16)
+              : const EdgeInsets.fromLTRB(18, 14, 10, 14),
           child: Row(
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(career.title, style: theme.textTheme.titleLarge),
+                    Text(
+                      career.title,
+                      style: embedded
+                          ? const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 16,
+                            )
+                          : theme.textTheme.titleLarge,
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       career.category,
-                      style: theme.textTheme.bodyLarge?.copyWith(fontSize: 14),
+                      style: embedded
+                          ? const TextStyle(
+                              color: Color(0xFF64748B),
+                              fontSize: 14,
+                            )
+                          : theme.textTheme.bodyLarge?.copyWith(fontSize: 14),
                     ),
                     const SizedBox(height: 10),
                     Row(
                       children: [
-                        DemandLevelBadge(jobOutlook: career.jobOutlook),
+                        embedded
+                            ? _adminDemandBadge()
+                            : DemandLevelBadge(jobOutlook: career.jobOutlook),
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(
                             career.salaryLabel,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF1F2937),
-                            ),
+                            style: embedded
+                                ? const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF475569),
+                                  )
+                                : theme.textTheme.bodyLarge?.copyWith(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF1F2937),
+                                  ),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),

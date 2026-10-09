@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../../models/career.dart';
 import '../../../models/recommendation_input.dart'
-    show alStreams, personalityTypes, workStyles;
+    show
+        alStreams,
+        alSubjectOptions,
+        interestOptions,
+        personalityTypes,
+        workStyles;
 import '../../../services/api_service.dart';
 import '../../../services/career_service.dart';
 import '../widgets/career_state_views.dart';
@@ -457,6 +462,12 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
                     style: theme.textTheme.bodyLarge?.copyWith(fontSize: 14),
                   ),
                   const SizedBox(height: 18),
+                  // The interest suggestions are deliberately the same list
+                  // the student recommendation form offers. Scoring compares
+                  // a career's tags against the interests a student picks, so
+                  // choosing from here guarantees the tag is one the matching
+                  // will actually hit. Free text is still allowed for tags
+                  // outside the list, such as those on the seeded careers.
                   EditableStringList(
                     label: 'Interest tags',
                     helperText:
@@ -464,6 +475,7 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
                     values: _interestTags,
                     hintText: 'e.g. problem solving',
                     maxLength: 40,
+                    suggestions: interestOptions,
                     onChanged: (values) =>
                         setState(() => _interestTags = values),
                   ),
@@ -474,6 +486,7 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
                     values: _alSubjects,
                     hintText: 'e.g. Combined Mathematics',
                     maxLength: 60,
+                    suggestions: alSubjectOptions,
                     onChanged: (values) =>
                         setState(() => _alSubjects = values),
                   ),

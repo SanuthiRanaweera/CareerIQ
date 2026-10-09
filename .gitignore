@@ -1,3 +1,4 @@
 backend/.env
 atlas-credentials.env
 .env
+.DS_Store

@@ -18,6 +18,7 @@ class EditableStringList extends StatefulWidget {
     this.required = false,
     this.errorText,
     this.maxLength = 200,
+    this.suggestions = const [],
   });
 
   final String label;
@@ -28,6 +29,13 @@ class EditableStringList extends StatefulWidget {
   final bool required;
   final String? errorText;
   final int maxLength;
+
+  /// Known values offered as one-tap chips above the input.
+  ///
+  /// These are a shortcut, not a restriction: free text still works, which
+  /// matters because stored careers carry values outside these lists. Leave
+  /// empty for fields with no fixed vocabulary.
+  final List<String> suggestions;
 
   @override
   State<EditableStringList> createState() => _EditableStringListState();
@@ -42,17 +50,22 @@ class _EditableStringListState extends State<EditableStringList> {
     super.dispose();
   }
 
-  void _add() {
-    final value = _controller.text.trim();
-    if (value.isEmpty) return;
+  /// Case-insensitive, so "Technology" is not stored next to "technology".
+  bool _alreadyAdded(String value) => widget.values.any(
+        (existing) =>
+            existing.toLowerCase() == value.trim().toLowerCase(),
+      );
 
-    // Silently ignore an exact duplicate rather than storing it twice.
-    if (widget.values.any((existing) => existing.toLowerCase() == value.toLowerCase())) {
-      _controller.clear();
-      return;
-    }
-
+  /// Adds a value unless it is blank or already present. Used by both the
+  /// text input and the suggestion chips.
+  void _addValue(String raw) {
+    final value = raw.trim();
+    if (value.isEmpty || _alreadyAdded(value)) return;
     widget.onChanged([...widget.values, value]);
+  }
+
+  void _add() {
+    _addValue(_controller.text);
     _controller.clear();
   }
 
@@ -97,6 +110,58 @@ class _EditableStringListState extends State<EditableStringList> {
           Text(
             widget.helperText!,
             style: theme.textTheme.bodyLarge?.copyWith(fontSize: 14),
+          ),
+        ],
+        if (widget.suggestions.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          Text(
+            'Suggestions',
+            style: theme.textTheme.bodyLarge?.copyWith(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF64748B),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: widget.suggestions.map((suggestion) {
+              final added = _alreadyAdded(suggestion);
+
+              // Added suggestions stay visible but disabled, so the whole
+              // vocabulary remains readable and the row does not reflow
+              // every time one is picked.
+              return ActionChip(
+                label: Text(
+                  suggestion,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: added
+                        ? const Color(0xFF94A3B8)
+                        : const Color(0xFF1D4ED8),
+                  ),
+                ),
+                avatar: added
+                    ? const Icon(
+                        Icons.check_rounded,
+                        size: 14,
+                        color: Color(0xFF94A3B8),
+                      )
+                    : null,
+                onPressed: added ? null : () => _addValue(suggestion),
+                backgroundColor:
+                    added ? const Color(0xFFF1F5F9) : const Color(0xFFEFF6FF),
+                shape: StadiumBorder(
+                  side: BorderSide(
+                    color: added
+                        ? const Color(0xFFE2E8F0)
+                        : const Color(0xFFBFDBFE),
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ],
         const SizedBox(height: 12),
