@@ -274,6 +274,13 @@ class _AuthGateState extends State<AuthGate> {
       return UniversityDashboardScreen(onLogout: _logout);
     }
     if (_student != null && _token != null) {
+      if (_student!.personalityCategory == null) {
+        return PersonalityTestPage(
+          token: _token!,
+          studentId: _student!.id,
+          onCompleted: _refreshStudent,
+        );
+      }
       return DashboardPage(
         student: _student!,
         token: _token!,
@@ -300,7 +307,6 @@ class _AuthGateState extends State<AuthGate> {
               builder: (_) => PersonalityTestPage(
                 token: _token!,
                 studentId: _student!.id,
-                onCompleted: _refreshStudent,
               ),
             ),
           );
