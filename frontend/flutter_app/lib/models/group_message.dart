@@ -10,7 +10,7 @@ class GroupMessage {
   });
 
   factory GroupMessage.fromJson(Map<String, dynamic> json) => GroupMessage(
-    id: json['_id'] as String? ?? '',
+    id: json['_id'] as String? ?? json['id'] as String? ?? '',
     senderId: json['senderId'] as String? ?? '',
     senderStudentId: json['senderStudentId'] as String? ?? '',
     senderName: json['senderName'] as String? ?? 'CareerIQ user',
@@ -27,4 +27,28 @@ class GroupMessage {
   final String senderProfileImage;
   final String message;
   final DateTime createdAt;
+
+  Map<String, dynamic> toJson() => {
+    '_id': id,
+    'senderId': senderId,
+    'senderStudentId': senderStudentId,
+    'senderName': senderName,
+    'senderProfileImage': senderProfileImage,
+    'message': message,
+    'createdAt': createdAt.toIso8601String(),
+  };
+
+  GroupMessage copyWith({
+    String? message,
+    String? senderName,
+    String? senderProfileImage,
+  }) => GroupMessage(
+    id: id,
+    senderId: senderId,
+    senderStudentId: senderStudentId,
+    senderName: senderName ?? this.senderName,
+    senderProfileImage: senderProfileImage ?? this.senderProfileImage,
+    message: message ?? this.message,
+    createdAt: createdAt,
+  );
 }

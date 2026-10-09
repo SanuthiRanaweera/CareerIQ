@@ -50,18 +50,22 @@ async function googleLogin(idToken) {
 	if (user?.googleId && user.googleId !== payload.sub) throw Object.assign(new Error('This email is linked to a different Google account'), { statusCode: 409 });
 	if (!user) {
 		user = await User.create({ fullName: payload.name || email.split('@')[0], email, googleId: payload.sub, authProvider: 'google', isEmailVerified: true });
-		await Student.create({ userId: user._id, fullName: user.fullName, email });
+		await Student.create({ userId: user._id, fullName: user.fullName, email, profileImage: payload.picture });
 	} else if (!user.googleId) {
 		user.googleId = payload.sub;
 		user.authProvider = 'google';
 		user.isEmailVerified = true;
 		await user.save();
 	}
-	const student = await Student.findOne({ userId: user._id });
+	let student = await Student.findOne({ userId: user._id });
+	if (student && !student.profileImage && payload.picture) {
+		student.profileImage = payload.picture;
+		await student.save();
+	}
 	return { token: createToken(user), user: publicUser(user), student };
 }
 
-async function register({ fullName, email, password, dateOfBirth, school, district, alYear }) {
+async function register({ fullName, email, password, dateOfBirth, school, district, alYear, profileImage }) {
 	const normalizedEmail = email.toLowerCase().trim();
 	const existingUser = await User.findOne({ email: normalizedEmail });
 	if (existingUser?.isEmailVerified) {
@@ -70,7 +74,11 @@ async function register({ fullName, email, password, dateOfBirth, school, distri
 		throw error;
 	}
 	if (existingUser) {
-		const student = await Student.findOne({ userId: existingUser._id });
+		let student = await Student.findOne({ userId: existingUser._id });
+		if (student && profileImage) {
+			student.profileImage = typeof profileImage === 'string' ? profileImage.trim() : student.profileImage;
+			await student.save();
+		}
 		await resendVerificationEmail(normalizedEmail);
 		return { user: publicUser(existingUser), student };
 	}
@@ -82,7 +90,16 @@ async function register({ fullName, email, password, dateOfBirth, school, distri
 	});
 	let student;
 	try {
-		student = await Student.create({ userId: user._id, fullName, email: normalizedEmail, dateOfBirth, school, district, alYear });
+		student = await Student.create({
+			userId: user._id,
+			fullName,
+			email: normalizedEmail,
+			dateOfBirth,
+			school,
+			district,
+			alYear,
+			profileImage: typeof profileImage === 'string' && profileImage.trim() ? profileImage.trim() : undefined,
+		});
 		await sendVerificationEmail({ email: normalizedEmail, fullName, otp: verificationOtp });
 	} catch (error) {
 		await Student.deleteOne({ userId: user._id });

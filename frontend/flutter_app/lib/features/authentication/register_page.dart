@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -25,10 +26,20 @@ class _RegisterPageState extends State<RegisterPage> {
   final _school = TextEditingController();
   final _district = TextEditingController();
   final _year = TextEditingController();
+  final _profileImage = TextEditingController();
   final _otp = TextEditingController();
   bool _loading = false;
   bool _submitted = false;
   String? _error;
+
+  static const List<String> _presetAvatars = [
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=256&q=80',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=256&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80',
+  ];
 
   @override
   void dispose() {
@@ -40,11 +51,42 @@ class _RegisterPageState extends State<RegisterPage> {
       _school,
       _district,
       _year,
+      _profileImage,
       _otp,
     ]) {
       controller.dispose();
     }
     super.dispose();
+  }
+
+  Widget _buildAvatarImage(String source, double size) {
+    if (source.startsWith('data:image')) {
+      try {
+        final base64Data = source.split(',').last;
+        return Image.memory(
+          base64Decode(base64Data),
+          width: size,
+          height: size,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => Icon(
+            Icons.broken_image_outlined,
+            size: size * 0.4,
+            color: const Color(0xFFEF4444),
+          ),
+        );
+      } catch (_) {}
+    }
+    return Image.network(
+      source,
+      width: size,
+      height: size,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) => Icon(
+        Icons.broken_image_outlined,
+        size: size * 0.4,
+        color: const Color(0xFFEF4444),
+      ),
+    );
   }
 
   Future<void> _submit() async {
@@ -63,7 +105,7 @@ class _RegisterPageState extends State<RegisterPage> {
       _error = null;
     });
     try {
-      await widget.onRegister({
+      final payload = <String, dynamic>{
         'fullName': _name.text.trim(),
         'email': _email.text.trim(),
         'password': _password.text,
@@ -71,7 +113,12 @@ class _RegisterPageState extends State<RegisterPage> {
         'school': _school.text.trim(),
         'district': _district.text.trim(),
         'alYear': int.tryParse(_year.text.trim()),
-      });
+      };
+      final image = _profileImage.text.trim();
+      if (image.isNotEmpty) {
+        payload['profileImage'] = image;
+      }
+      await widget.onRegister(payload);
       if (mounted) setState(() => _submitted = true);
     } catch (error) {
       if (mounted) setState(() => _error = error.toString());
@@ -222,8 +269,147 @@ class _RegisterPageState extends State<RegisterPage> {
                         'Your profile will be saved securely to CareerIQ.',
                       ),
                       const SizedBox(height: 24),
+                      Center(
+                        child: Column(
+                          children: [
+                            Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 46,
+                                  backgroundColor: const Color(0xFFDBEAFE),
+                                  foregroundColor: const Color(0xFF3B82F6),
+                                  child: _profileImage.text.trim().isEmpty
+                                      ? Text(
+                                          _name.text.trim().isNotEmpty
+                                              ? _name.text.trim()[0].toUpperCase()
+                                              : '?',
+                                          style: const TextStyle(
+                                            fontSize: 34,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        )
+                                      : ClipOval(
+                                          child: _buildAvatarImage(
+                                            _profileImage.text.trim(),
+                                            92,
+                                          ),
+                                        ),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF3B82F6),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                      Icons.camera_alt_rounded,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'Profile photo (optional)',
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF1F2937),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Pick an avatar or enter an image URL',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                color: const Color(0xFF64748B),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  for (final avatarUrl in _presetAvatars)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(25),
+                                        onTap: () {
+                                          setState(() {
+                                            if (_profileImage.text == avatarUrl) {
+                                              _profileImage.clear();
+                                            } else {
+                                              _profileImage.text = avatarUrl;
+                                            }
+                                          });
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.all(2),
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                              color: _profileImage.text == avatarUrl
+                                                  ? const Color(0xFF3B82F6)
+                                                  : Colors.transparent,
+                                              width: 2.5,
+                                            ),
+                                          ),
+                                          child: CircleAvatar(
+                                            radius: 20,
+                                            backgroundColor: const Color(0xFFE2E8F0),
+                                            child: ClipOval(
+                                              child: Image.network(
+                                                avatarUrl,
+                                                width: 40,
+                                                height: 40,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _profileImage,
+                        keyboardType: TextInputType.url,
+                        onChanged: (_) => setState(() {}),
+                        decoration: InputDecoration(
+                          labelText: 'Profile photo URL',
+                          hintText: 'https://example.com/photo.jpg',
+                          prefixIcon: const Icon(Icons.image_outlined),
+                          suffixIcon: _profileImage.text.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.close_rounded, size: 20),
+                                  onPressed: () {
+                                    setState(() {
+                                      _profileImage.clear();
+                                    });
+                                  },
+                                )
+                              : null,
+                          helperText: 'Direct image link (JPG, PNG, WebP) or select an avatar above',
+                        ),
+                      ),
+                      const SizedBox(height: 12),
                       TextField(
                         controller: _name,
+                        onChanged: (_) => setState(() {}),
                         decoration: const InputDecoration(
                           labelText: 'Full name',
                         ),

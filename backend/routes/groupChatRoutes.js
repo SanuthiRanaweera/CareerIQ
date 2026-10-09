@@ -20,7 +20,15 @@ function limitMessages(req, res, next) {
 }
 
 router.use(protect);
+router.get('/', controller.listMessages);
+router.post('/', limitMessages, controller.sendMessage);
+router.put('/:id', controller.updateMessage);
+router.delete('/:id', controller.deleteMessage);
+
+// Also support /messages for robustness
 router.get('/messages', controller.listMessages);
 router.post('/messages', limitMessages, controller.sendMessage);
+router.put('/messages/:id', controller.updateMessage);
+router.delete('/messages/:id', controller.deleteMessage);
 
 module.exports = router;

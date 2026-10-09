@@ -85,7 +85,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 18),
                 Text(
-                  widget.isAdminPortal ? 'Admin Portal' : 'Welcome back',
+                  widget.isAdminPortal ? 'Admin Portal' : 'Welcome to CareerIQ ✨',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -94,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                 Text(
                   widget.isAdminPortal
                       ? 'Sign in with your administrator account.'
-                      : 'Continue building your career path.',
+                      : 'Continue building your career path with Antigravity.',
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
                 const SizedBox(height: 32),

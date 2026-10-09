@@ -1,52 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../models/student.dart';
-
-const _subjectsByStream = <String, List<String>>{
-  'Mathematics': [
-    'Combined Mathematics',
-    'Physics',
-    'Chemistry',
-    'Information & Communication Technology',
-    'Higher Mathematics',
-  ],
-  'Science': [
-    'Biology',
-    'Chemistry',
-    'Physics',
-    'Agricultural Science',
-    'Information & Communication Technology',
-  ],
-  'Commerce': [
-    'Accounting',
-    'Business Studies',
-    'Economics',
-    'Information & Communication Technology',
-    'Business Statistics',
-  ],
-  'Arts': [
-    'Sinhala',
-    'Geography',
-    'Political Science',
-    'Logic & Scientific Method',
-    'Economics',
-    'Communication & Media Studies',
-  ],
-  'Technology': [
-    'Engineering Technology',
-    'Science for Technology',
-    'Information & Communication Technology',
-    'Economics',
-    'Geography',
-  ],
-};
-
-class _SubjectBatch {
-  const _SubjectBatch({required this.stream, required this.results});
-
-  final String stream;
-  final List<SubjectResult> results;
-}
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({
@@ -64,6 +20,32 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  File? _pickedImage;
+  final ImagePicker _picker = ImagePicker();
+
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedFile = await _picker.pickImage(source: source);
+      if (pickedFile != null) {
+        setState(() {
+          _pickedImage = File(pickedFile.path);
+          _profileImage.clear();
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+    }
+  }
+
+  static const List<String> _presetAvatars = [
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80',
+    'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=256&q=80',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&q=80',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=256&q=80',
+    'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=256&q=80',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&q=80',
+  ];
+
   late final TextEditingController _name = TextEditingController(
     text: widget.student.fullName,
   );
@@ -132,193 +114,51 @@ class _ProfilePageState extends State<ProfilePage> {
   );
 
   Future<void> _addSubject() async {
-    var selectedStream = _stream ?? 'Mathematics';
-    final subjects = List<String?>.filled(3, null);
-    final grades = List<String?>.filled(3, null);
-    String? formError;
-
-    final batch = await showDialog<_SubjectBatch>(
+    final name = TextEditingController();
+    final grade = TextEditingController();
+    final added = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('Add A/L results'),
-          content: SizedBox(
-            width: 480,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedStream,
-                    decoration: const InputDecoration(
-                      labelText: 'Main A/L stream',
-                      prefixIcon: Icon(Icons.school_outlined),
-                    ),
-                    items: _subjectsByStream.keys
-                        .map(
-                          (stream) => DropdownMenuItem(
-                            value: stream,
-                            child: Text(stream),
-                          ),
-                        )
-                        .toList(),
-                    onChanged: (stream) {
-                      if (stream == null) return;
-                      setDialogState(() {
-                        selectedStream = stream;
-                        subjects.fillRange(0, subjects.length, null);
-                        grades.fillRange(0, grades.length, null);
-                        formError = null;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    'Select 3 subjects and enter each grade',
-                    style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  ...List.generate(3, (index) {
-                    final availableSubjects = _subjectsByStream[selectedStream]!
-                        .where(
-                          (subject) => !subjects.asMap().entries.any(
-                            (entry) =>
-                                entry.key != index && entry.value == subject,
-                          ),
-                        )
-                        .toList();
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
-                              initialValue: subjects[index],
-                              isExpanded: true,
-                              decoration: InputDecoration(
-                                labelText: 'Subject ${index + 1}',
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 12,
-                                ),
-                              ),
-                              items: availableSubjects
-                                  .map(
-                                    (subject) => DropdownMenuItem(
-                                      value: subject,
-                                      child: Text(
-                                        subject,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (subject) => setDialogState(
-                                () => subjects[index] = subject,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          SizedBox(
-                            width: 92,
-                            child: DropdownButtonFormField<String>(
-                              initialValue: grades[index],
-                              decoration: const InputDecoration(
-                                labelText: 'Grade',
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 12,
-                                ),
-                              ),
-                              items: const ['A', 'B', 'C', 'S', 'F']
-                                  .map(
-                                    (grade) => DropdownMenuItem(
-                                      value: grade,
-                                      child: Text(grade),
-                                    ),
-                                  )
-                                  .toList(),
-                              onChanged: (grade) =>
-                                  setDialogState(() => grades[index] = grade),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                  if (formError != null) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      formError!,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+      builder: (_) => AlertDialog(
+        title: const Text('Add subject'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: name,
+              decoration: const InputDecoration(labelText: 'Subject'),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
-            ),
-            FilledButton.icon(
-              onPressed: () {
-                final complete = List.generate(
-                  3,
-                  (index) => subjects[index] != null && grades[index] != null,
-                ).every((value) => value);
-                final alreadyAdded = subjects.whereType<String>().any(
-                  (subject) => _results.any(
-                    (result) =>
-                        result.name.toLowerCase() == subject.toLowerCase(),
-                  ),
-                );
-                if (!complete) {
-                  setDialogState(() {
-                    formError = 'Choose a subject and grade for all 3 rows.';
-                  });
-                  return;
-                }
-                if (alreadyAdded) {
-                  setDialogState(() {
-                    formError = 'One or more subjects have already been added.';
-                  });
-                  return;
-                }
-                Navigator.pop(
-                  dialogContext,
-                  _SubjectBatch(
-                    stream: selectedStream,
-                    results: List.generate(
-                      3,
-                      (index) => SubjectResult(
-                        id: null,
-                        name: subjects[index]!,
-                        grade: grades[index]!,
-                      ),
-                    ),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.add_rounded),
-              label: const Text('Add 3 subjects'),
+            TextField(
+              controller: grade,
+              decoration: const InputDecoration(labelText: 'Grade'),
             ),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (name.text.trim().isNotEmpty && grade.text.trim().isNotEmpty) {
+                _results.add(
+                  SubjectResult(
+                    id: null,
+                    name: name.text.trim(),
+                    grade: grade.text.trim(),
+                  ),
+                );
+                Navigator.pop(context, true);
+              }
+            },
+            child: const Text('Add'),
+          ),
+        ],
       ),
     );
-    if (batch != null && mounted) {
-      setState(() {
-        _stream = batch.stream;
-        _results.addAll(batch.results);
-      });
-    }
+    name.dispose();
+    grade.dispose();
+    if (added == true && mounted) setState(() {});
   }
 
   Future<void> _confirmLogout() async {
@@ -363,17 +203,26 @@ class _ProfilePageState extends State<ProfilePage> {
                   radius: 32,
                   backgroundColor: const Color(0xFFDBEAFE),
                   foregroundColor: const Color(0xFF3B82F6),
-                  child: _profileImage.text.trim().isEmpty
-                      ? _profileInitial()
-                      : ClipOval(
-                          child: Image.network(
-                            _profileImage.text.trim(),
+                  child: _pickedImage != null
+                      ? ClipOval(
+                          child: Image.file(
+                            _pickedImage!,
                             width: 64,
                             height: 64,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => _profileInitial(),
                           ),
-                        ),
+                        )
+                      : (_profileImage.text.trim().isEmpty
+                          ? _profileInitial()
+                          : ClipOval(
+                              child: Image.network(
+                                _profileImage.text.trim(),
+                                width: 64,
+                                height: 64,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => _profileInitial(),
+                              ),
+                            )),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -418,15 +267,93 @@ class _ProfilePageState extends State<ProfilePage> {
           decoration: const InputDecoration(labelText: 'Full name'),
         ),
         const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _pickImage(ImageSource.gallery),
+                icon: const Icon(Icons.photo_library),
+                label: const Text('Gallery'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _pickImage(ImageSource.camera),
+                icon: const Icon(Icons.camera_alt),
+                label: const Text('Camera'),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
         TextField(
           controller: _profileImage,
           keyboardType: TextInputType.url,
           onChanged: (_) => setState(() {}),
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             labelText: 'Profile photo URL',
             hintText: 'https://example.com/photo.jpg',
-            prefixIcon: Icon(Icons.image_outlined),
-            helperText: 'Use a direct HTTPS link to an image.',
+            prefixIcon: const Icon(Icons.image_outlined),
+            suffixIcon: _profileImage.text.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                    onPressed: () {
+                      setState(() {
+                        _profileImage.clear();
+                      });
+                    },
+                  )
+                : null,
+            helperText: 'Pick an avatar below or paste a direct image link.',
+          ),
+        ),
+        const SizedBox(height: 8),
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              for (final avatarUrl in _presetAvatars)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(25),
+                    onTap: () {
+                      setState(() {
+                        if (_profileImage.text == avatarUrl) {
+                          _profileImage.clear();
+                        } else {
+                          _profileImage.text = avatarUrl;
+                        }
+                      });
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: _profileImage.text == avatarUrl
+                              ? const Color(0xFF3B82F6)
+                              : Colors.transparent,
+                          width: 2.5,
+                        ),
+                      ),
+                      child: CircleAvatar(
+                        radius: 18,
+                        backgroundColor: const Color(0xFFE2E8F0),
+                        child: ClipOval(
+                          child: Image.network(
+                            avatarUrl,
+                            width: 36,
+                            height: 36,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
           ),
         ),
         const SizedBox(height: 12),

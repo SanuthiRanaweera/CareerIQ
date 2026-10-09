@@ -137,7 +137,25 @@ class _DashboardPageState extends State<DashboardPage> {
                     minWidth: 48,
                     minHeight: 48,
                   ),
-                  icon: const Icon(Icons.account_circle_outlined, size: 28),
+                  icon: widget.student.profileImage != null &&
+                          widget.student.profileImage!.trim().isNotEmpty
+                      ? CircleAvatar(
+                          radius: 15,
+                          backgroundColor: const Color(0xFFDBEAFE),
+                          child: ClipOval(
+                            child: Image.network(
+                              widget.student.profileImage!.trim(),
+                              width: 30,
+                              height: 30,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                Icons.account_circle_outlined,
+                                size: 28,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const Icon(Icons.account_circle_outlined, size: 28),
                 ),
               ],
             )
@@ -219,6 +237,7 @@ class _DashboardPageState extends State<DashboardPage> {
         token: widget.token,
         currentUserId: widget.student.id,
         currentUserName: widget.student.fullName,
+        currentUserProfileImage: widget.student.profileImage,
       ),
     ),
   );
@@ -229,11 +248,50 @@ class _DashboardPageState extends State<DashboardPage> {
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
       children: [
         const SizedBox(height: 8),
-        Text('Good morning,', style: Theme.of(context).textTheme.bodyLarge),
-        const SizedBox(height: 4),
-        Text(
-          'Hello, $firstName',
-          style: Theme.of(context).textTheme.headlineMedium,
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Good morning,', style: Theme.of(context).textTheme.bodyLarge),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Hello, $firstName',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  ),
+                ],
+              ),
+            ),
+            if (widget.student.profileImage != null &&
+                widget.student.profileImage!.trim().isNotEmpty)
+              InkWell(
+                onTap: widget.onProfile,
+                borderRadius: BorderRadius.circular(28),
+                child: CircleAvatar(
+                  radius: 26,
+                  backgroundColor: const Color(0xFFDBEAFE),
+                  child: ClipOval(
+                    child: Image.network(
+                      widget.student.profileImage!.trim(),
+                      width: 52,
+                      height: 52,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Text(
+                        widget.student.fullName.isNotEmpty
+                            ? widget.student.fullName[0].toUpperCase()
+                            : '?',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF3B82F6),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 6),
         Text(
