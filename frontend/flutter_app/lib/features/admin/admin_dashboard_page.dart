@@ -1321,12 +1321,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   /// Opens the career add/edit form, closing it once a save succeeds.
-  void _openCareerForm(
+  Future<void> _openCareerForm(
     BuildContext context,
     String token, {
     Career? career,
   }) {
-    Navigator.push(
+    return Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => AdminCareerFormPage(
