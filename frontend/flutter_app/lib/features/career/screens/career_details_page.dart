@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../models/career.dart';
 import '../../../services/api_service.dart';
 import '../../../services/career_service.dart';
+import '../../student/courses/course_catalog_page.dart';
 import '../widgets/career_card.dart' show DemandLevelBadge;
 import '../widgets/career_state_views.dart';
 
@@ -58,8 +59,10 @@ class _CareerDetailsPageState extends State<CareerDetailsPage> {
     });
 
     try {
-      final career =
-          await _careerService.getCareerById(widget.token, widget.careerId);
+      final career = await _careerService.getCareerById(
+        widget.token,
+        widget.careerId,
+      );
       if (!mounted) return;
       setState(() {
         _career = career;
@@ -158,10 +161,7 @@ class _CareerDetailsPageState extends State<CareerDetailsPage> {
           _SectionCard(
             icon: Icons.info_outline_rounded,
             title: 'About this career',
-            child: Text(
-              career.description,
-              style: theme.textTheme.bodyLarge,
-            ),
+            child: Text(career.description, style: theme.textTheme.bodyLarge),
           ),
 
         if (career.whatYouDo.isNotEmpty)
@@ -223,40 +223,37 @@ class _SalaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
-        margin: const EdgeInsets.only(bottom: 16),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
-              const CircleAvatar(
-                radius: 24,
-                backgroundColor: Color(0xFFDBEAFE),
-                foregroundColor: Color(0xFF3B82F6),
-                child: Icon(Icons.payments_outlined),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Typical salary',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontSize: 14,
-                          ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      label,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ],
-                ),
-              ),
-            ],
+    margin: const EdgeInsets.only(bottom: 16),
+    child: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          const CircleAvatar(
+            radius: 24,
+            backgroundColor: Color(0xFFDBEAFE),
+            foregroundColor: Color(0xFF3B82F6),
+            child: Icon(Icons.payments_outlined),
           ),
-        ),
-      );
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Typical salary',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyLarge?.copyWith(fontSize: 14),
+                ),
+                const SizedBox(height: 4),
+                Text(label, style: Theme.of(context).textTheme.titleLarge),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 /// A titled card, so every section on the screen looks the same.
@@ -273,30 +270,30 @@ class _SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
-        margin: const EdgeInsets.only(bottom: 16),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    margin: const EdgeInsets.only(bottom: 16),
+    child: Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Row(
-                children: [
-                  Icon(icon, size: 20, color: const Color(0xFF3B82F6)),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                  ),
-                ],
+              Icon(icon, size: 20, color: const Color(0xFF3B82F6)),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
               ),
-              const SizedBox(height: 14),
-              child,
             ],
           ),
-        ),
-      );
+          const SizedBox(height: 14),
+          child,
+        ],
+      ),
+    ),
+  );
 }
 
 /// Tick-marked list, matching the style already used on the personality
@@ -308,35 +305,35 @@ class _BulletList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: items
-            .map(
-              (item) => Padding(
-                padding: const EdgeInsets.only(bottom: 10),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 3),
-                      child: Icon(
-                        Icons.check_circle,
-                        color: Color(0xFF3B82F6),
-                        size: 18,
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        item,
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
-                    ),
-                  ],
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: items
+        .map(
+          (item) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(top: 3),
+                  child: Icon(
+                    Icons.check_circle,
+                    color: Color(0xFF3B82F6),
+                    size: 18,
+                  ),
                 ),
-              ),
-            )
-            .toList(),
-      );
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    item,
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )
+        .toList(),
+  );
 }
 
 /// Wrapped pills, used for skills and A/L streams.
@@ -345,24 +342,32 @@ class _TagWrap extends StatelessWidget {
     required this.values,
     required this.background,
     required this.foreground,
+    this.onTap,
   });
 
   final List<String> values;
   final Color background;
   final Color foreground;
 
+  /// When set, each tag is tappable and reports its own value.
+  final void Function(String value)? onTap;
+
   @override
   Widget build(BuildContext context) => Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: values
-            .map(
-              (value) => Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: background,
-                  borderRadius: BorderRadius.circular(999),
+    spacing: 8,
+    runSpacing: 8,
+    children: values
+        .map(
+          (value) => Material(
+            color: background,
+            borderRadius: BorderRadius.circular(999),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: onTap == null ? null : () => onTap!(value),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
                 ),
                 child: Text(
                   value,
@@ -373,17 +378,18 @@ class _TagWrap extends StatelessWidget {
                   ),
                 ),
               ),
-            )
-            .toList(),
-      );
+            ),
+          ),
+        )
+        .toList(),
+  );
 }
 
 /// Recommended courses.
 ///
-/// Course data is owned by the Course module, which is built separately. This
-/// career only stores keywords describing the kind of course that fits, so the
-/// section shows those keywords and says plainly that the course listings are
-/// still to come, rather than pretending to have data it does not have.
+/// This career stores keywords describing the kind of course that fits. Each
+/// keyword opens the Course module's finder with that keyword already typed
+/// into the search box, so the student sees the real matching degrees.
 class _RecommendedCoursesSection extends StatelessWidget {
   const _RecommendedCoursesSection({required this.keywords});
 
@@ -391,46 +397,54 @@ class _RecommendedCoursesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _SectionCard(
-        icon: Icons.menu_book_outlined,
-        title: 'Recommended courses',
-        child: Column(
+    icon: Icons.menu_book_outlined,
+    title: 'Recommended courses',
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Icon(
-                  Icons.hourglass_empty_rounded,
-                  size: 18,
-                  color: Color(0xFF64748B),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    'Course listings are coming soon.',
-                    style: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                ),
-              ],
+            const Icon(
+              Icons.hourglass_empty_rounded,
+              size: 18,
+              color: Color(0xFF64748B),
             ),
-            if (keywords.isNotEmpty) ...[
-              const SizedBox(height: 14),
-              Text(
-                'Look for courses in:',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF1F2937),
-                    ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                keywords.isEmpty
+                    ? 'No course topics have been added for this career yet.'
+                    : 'Tap a topic to find matching courses.',
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
-              const SizedBox(height: 10),
-              _TagWrap(
-                values: keywords,
-                background: const Color(0xFFF1F5F9),
-                foreground: const Color(0xFF475569),
-              ),
-            ],
+            ),
           ],
         ),
-      );
+        if (keywords.isNotEmpty) ...[
+          const SizedBox(height: 14),
+          Text(
+            'Course topics:',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF1F2937),
+            ),
+          ),
+          const SizedBox(height: 10),
+          _TagWrap(
+            values: keywords,
+            background: const Color(0xFFF1F5F9),
+            foreground: const Color(0xFF475569),
+            onTap: (keyword) => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CourseCatalogPage(initialSearch: keyword),
+              ),
+            ),
+          ),
+        ],
+      ],
+    ),
+  );
 }

@@ -26,44 +26,41 @@ void main() {
 
   /// A career with every section filled in.
   Career fullCareer() => careerFixture(
-        id: 'id-se',
-        title: 'Software Engineer',
-        category: 'Information Technology',
-        description: 'Designs, builds and maintains software systems.',
-        whatYouDo: const [
-          'Write and review code',
-          'Debug production issues',
-        ],
-        requiredSkills: const ['Programming', 'Databases'],
-        recommendedStreams: const ['Technology', 'Mathematics'],
-        industryOpportunities: const [
-          'Software export companies',
-          'Banking IT divisions',
-        ],
-        relatedCourseKeywords: const ['software engineering', 'computer science'],
-        pathway: const [
-          CareerPathwayStep(
-            order: 1,
-            stage: 'A/L Stream',
-            title: 'Technology stream',
-          ),
-        ],
+    id: 'id-se',
+    title: 'Software Engineer',
+    category: 'Information Technology',
+    description: 'Designs, builds and maintains software systems.',
+    whatYouDo: const ['Write and review code', 'Debug production issues'],
+    requiredSkills: const ['Programming', 'Databases'],
+    recommendedStreams: const ['Technology', 'Mathematics'],
+    industryOpportunities: const [
+      'Software export companies',
+      'Banking IT divisions',
+    ],
+    relatedCourseKeywords: const ['software engineering', 'computer science'],
+    pathway: const [
+      CareerPathwayStep(
+        order: 1,
+        stage: 'A/L Stream',
+        title: 'Technology stream',
+      ),
+    ],
+  );
+
+  Widget detailsFor(Career career, {void Function(Career)? onViewPathway}) =>
+      wrap(
+        CareerDetailsPage(
+          token: 't',
+          careerId: career.id,
+          onViewPathway: onViewPathway,
+          careerService: FakeCareerService(careers: [career]),
+        ),
       );
 
-  Widget detailsFor(
-    Career career, {
-    void Function(Career)? onViewPathway,
-  }) =>
-      wrap(CareerDetailsPage(
-        token: 't',
-        careerId: career.id,
-        onViewPathway: onViewPathway,
-        careerService: FakeCareerService(careers: [career]),
-      ));
-
   group('CareerDetailsPage', () {
-    testWidgets('shows a loading indicator while the career is fetched',
-        (tester) async {
+    testWidgets('shows a loading indicator while the career is fetched', (
+      tester,
+    ) async {
       await tester.pumpWidget(detailsFor(fullCareer()));
       await tester.pump();
 
@@ -75,8 +72,9 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('shows the heading, category, demand level and salary',
-        (tester) async {
+    testWidgets('shows the heading, category, demand level and salary', (
+      tester,
+    ) async {
       await tester.pumpWidget(detailsFor(fullCareer()));
       await tester.pumpAndSettle();
 
@@ -143,24 +141,23 @@ void main() {
     });
   });
 
-  group('CareerDetailsPage recommended courses placeholder', () {
-    testWidgets('says course listings are coming and lists the keywords',
-        (tester) async {
+  group('CareerDetailsPage recommended courses', () {
+    testWidgets('lists the keywords as tappable course topics', (tester) async {
       await tester.pumpWidget(detailsFor(fullCareer()));
       await tester.pumpAndSettle();
 
       await scrollTo(tester, find.text('Recommended courses'));
 
-      // Course data belongs to the Course module, so this section must be
-      // honest about not having it rather than showing invented courses.
-      expect(find.text('Course listings are coming soon.'), findsOneWidget);
-      expect(find.text('Look for courses in:'), findsOneWidget);
+      expect(
+        find.text('Tap a topic to find matching courses.'),
+        findsOneWidget,
+      );
+      expect(find.text('Course topics:'), findsOneWidget);
       expect(find.text('software engineering'), findsOneWidget);
       expect(find.text('computer science'), findsOneWidget);
     });
 
-    testWidgets('still shows the placeholder when there are no keywords',
-        (tester) async {
+    testWidgets('explains when there are no keywords', (tester) async {
       final career = careerFixture(
         id: 'no-keywords',
         relatedCourseKeywords: const [],
@@ -170,14 +167,35 @@ void main() {
 
       await scrollTo(tester, find.text('Recommended courses'));
 
-      expect(find.text('Course listings are coming soon.'), findsOneWidget);
-      expect(find.text('Look for courses in:'), findsNothing);
+      expect(
+        find.text('No course topics have been added for this career yet.'),
+        findsOneWidget,
+      );
+      expect(find.text('Course topics:'), findsNothing);
+    });
+
+    testWidgets('tapping a topic opens the course finder with it searched', (
+      tester,
+    ) async {
+      await tester.pumpWidget(detailsFor(fullCareer()));
+      await tester.pumpAndSettle();
+
+      await scrollTo(tester, find.text('software engineering'));
+      await tester.tap(find.text('software engineering'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Course finder'), findsOneWidget);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller?.text,
+        'software engineering',
+      );
     });
   });
 
   group('CareerDetailsPage pathway button', () {
-    testWidgets('reports the career when the pathway button is tapped',
-        (tester) async {
+    testWidgets('reports the career when the pathway button is tapped', (
+      tester,
+    ) async {
       Career? opened;
       final career = fullCareer();
       await tester.pumpWidget(
@@ -199,12 +217,11 @@ void main() {
       expect(find.text('View career pathway'), findsNothing);
     });
 
-    testWidgets('hides the button when the career has no pathway',
-        (tester) async {
+    testWidgets('hides the button when the career has no pathway', (
+      tester,
+    ) async {
       final career = careerFixture(id: 'no-path', pathway: const []);
-      await tester.pumpWidget(
-        detailsFor(career, onViewPathway: (_) {}),
-      );
+      await tester.pumpWidget(detailsFor(career, onViewPathway: (_) {}));
       await tester.pumpAndSettle();
 
       expect(find.text('View career pathway'), findsNothing);
@@ -216,11 +233,15 @@ void main() {
       final service = FakeCareerService(
         error: const ApiException('Career not found'),
       );
-      await tester.pumpWidget(wrap(CareerDetailsPage(
-        token: 't',
-        careerId: 'missing',
-        careerService: service,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          CareerDetailsPage(
+            token: 't',
+            careerId: 'missing',
+            careerService: service,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Something went wrong'), findsOneWidget);
@@ -233,11 +254,15 @@ void main() {
         careers: [fullCareer()],
         error: const ApiException('Career not found'),
       );
-      await tester.pumpWidget(wrap(CareerDetailsPage(
-        token: 't',
-        careerId: 'id-se',
-        careerService: service,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          CareerDetailsPage(
+            token: 't',
+            careerId: 'id-se',
+            careerService: service,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Something went wrong'), findsOneWidget);
 
@@ -249,13 +274,18 @@ void main() {
       expect(find.text('Typical salary'), findsOneWidget);
     });
 
-    testWidgets('falls back to a friendly message for a non-API failure',
-        (tester) async {
-      await tester.pumpWidget(wrap(CareerDetailsPage(
-        token: 't',
-        careerId: 'id-se',
-        careerService: FakeCareerService(error: Exception('socket closed')),
-      )));
+    testWidgets('falls back to a friendly message for a non-API failure', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          CareerDetailsPage(
+            token: 't',
+            careerId: 'id-se',
+            careerService: FakeCareerService(error: Exception('socket closed')),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(
@@ -271,11 +301,15 @@ void main() {
         careers: [fullCareer()],
         error: const ApiException('Career not found'),
       );
-      await tester.pumpWidget(wrap(CareerDetailsPage(
-        token: 't',
-        careerId: 'id-se',
-        careerService: service,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          CareerDetailsPage(
+            token: 't',
+            careerId: 'id-se',
+            careerService: service,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Something went wrong'), findsOneWidget);
 
