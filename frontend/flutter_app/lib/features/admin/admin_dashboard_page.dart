@@ -5,10 +5,12 @@ import '../../services/auth_service.dart';
 import '../../models/course.dart';
 import '../../services/career_service.dart';
 import '../../services/course_service.dart';
+import 'courses/screens/admin_manage_courses_page.dart';
 import '../../models/career.dart';
 import '../career/screens/admin_career_form_page.dart';
 import '../career/screens/admin_manage_careers_page.dart';
 import 'admin_notifications_page.dart';
+import '../student/group_chat_page.dart';
 import 'models/admin_models.dart';
 import 'university/screens/university_list_screen.dart';
 import 'university/services/university_admin_service.dart';
@@ -20,6 +22,7 @@ enum AdminNavSection {
   universities,
   courses,
   careers,
+  groupChat,
   notifications,
   settings,
 }
@@ -47,20 +50,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   late List<AdminStudent> _students;
   int _universityCount = 0;
   List<AdminUniversityModel> _adminUniversities = [];
-  late List<AdminCourse> _courses;
+  int _courseCount = 0;
   int _careerCount = 0;
-  final Map<String, Course> _courseRecords = {};
 
   // Search & Filter controllers
   final TextEditingController _studentSearchController =
       TextEditingController();
   String _selectedStreamFilter = 'All';
   String _selectedStatusFilter = 'All';
-
-  final TextEditingController _courseSearchController = TextEditingController();
-  final _courseService = CourseService();
-  bool _coursesLoading = false;
-
   /// Auth token for the Career module's admin screens, read once.
   late final Future<String?> _careerAdminToken = AuthService().token();
 
@@ -69,8 +66,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     super.initState();
     _currentSection = widget.initialSection;
     _students = AdminMockData.getInitialStudents();
-    _courses = [];
-    _loadAdminCourses();
+    _loadInitialCounts();
+
     _loadCareerCount();
     _loadUniversityCount();
   }
@@ -78,13 +75,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   @override
   void dispose() {
     _studentSearchController.dispose();
-    _courseSearchController.dispose();
     super.dispose();
   }
 
   void _selectSection(AdminNavSection section) {
     setState(() => _currentSection = section);
-    if (section == AdminNavSection.courses) _loadAdminCourses();
+    // Courses are loaded within AdminManageCoursesPage
     if (section == AdminNavSection.universities ||
         section == AdminNavSection.overview) {
       _loadUniversityCount();
@@ -115,56 +111,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     } catch (_) {}
   }
 
-  Future<void> _loadAdminCourses() async {
-    final token = await AuthService().token();
-    if (token == null) return;
-    if (mounted) setState(() => _coursesLoading = true);
-    try {
-      final courses = await _courseService.listAdmin(token);
-      if (!mounted) return;
-      setState(() {
-        _courseRecords
-          ..clear()
-          ..addEntries(courses.map((course) => MapEntry(course.id, course)));
-        _courses = courses.map(_toAdminCourse).toList();
-        _coursesLoading = false;
-      });
-    } catch (error) {
-      if (!mounted) return;
-      setState(() => _coursesLoading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Could not load courses: $error')));
-    }
-  }
-
-  AdminCourse _toAdminCourse(Course course) => AdminCourse(
-    id: course.id,
-    title: course.title,
-    university: course.university,
-    stream: course.stream,
-    durationYears: course.durationYears,
-    minZScore: course.minZScore ?? 0,
-  );
-
-  Future<void> _archiveCourse(AdminCourse course) async {
+  Future<void> _loadInitialCounts() async {
     final token = await AuthService().token();
     if (token == null) return;
     try {
-      await _courseService.archive(token, course.id);
-      await _loadAdminCourses();
-      if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Course archived')));
-      }
-    } catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Could not archive course: $error')),
-        );
-      }
-    }
+      final courseService = CourseService();
+      final courses = await courseService.listAdmin(token);
+      if (mounted) setState(() => _courseCount = courses.length);
+    } catch (_) {}
   }
 
   Future<void> _confirmLogout(BuildContext context) async {
@@ -415,25 +369,25 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 _buildNavItem(
                   section: AdminNavSection.students,
                   icon: Icons.school_rounded,
-                  label: '👨‍🎓 Students',
+                  label: 'Students',
                   badge: '${_stats.totalStudents}',
                 ),
                 _buildNavItem(
                   section: AdminNavSection.universities,
                   icon: Icons.account_balance_rounded,
-                  label: '🏫 Universities',
+                  label: 'Universities',
                   badge: '$_universityCount',
                 ),
                 _buildNavItem(
                   section: AdminNavSection.courses,
                   icon: Icons.menu_book_rounded,
-                  label: '📚 Courses',
-                  badge: '${_courses.length}',
+                  label: 'Courses',
+                  badge: '$_courseCount',
                 ),
                 _buildNavItem(
                   section: AdminNavSection.careers,
                   icon: Icons.work_rounded,
-                  label: '💼 Careers',
+                  label: 'Careers',
                   badge: '$_careerCount',
                 ),
                 const Padding(
@@ -449,6 +403,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   ),
                 ),
                 _buildNavItem(
+                  section: AdminNavSection.groupChat,
+                  icon: Icons.forum_rounded,
+                  label: 'Group Chat',
+                ),
+                _buildNavItem(
                   section: AdminNavSection.notifications,
                   icon: Icons.campaign_outlined,
                   label: 'Notifications',
@@ -456,7 +415,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 _buildNavItem(
                   section: AdminNavSection.settings,
                   icon: Icons.settings_rounded,
-                  label: '⚙ Settings',
+                  label: 'Settings',
                 ),
               ],
             ),
@@ -569,6 +528,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         return _buildCoursesTab();
       case AdminNavSection.careers:
         return _buildCareersTab();
+      case AdminNavSection.groupChat:
+        return _buildGroupChatTab();
       case AdminNavSection.notifications:
         return const AdminNotificationsPage();
       case AdminNavSection.settings:
@@ -782,7 +743,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         ),
         _buildManagementRow(
           title: '🏫 Universities',
-          subtitle: 'Higher education institutes & partner universities',
+          subtitle:
+              'Higher education institutes & partner universities',
           countLabel: '$_universityCount Registered',
           color: const Color(0xFF0EA5E9),
           onTap: () => _selectSection(AdminNavSection.universities),
@@ -791,7 +753,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           title: '📚 Courses',
           subtitle:
               'Undergraduate degree programs, entry requirements & minimum Z-scores',
-          countLabel: '${_courses.length} Degrees',
+          countLabel: '$_courseCount Degrees',
           color: const Color(0xFFF59E0B),
           onTap: () => _selectSection(AdminNavSection.courses),
         ),
@@ -1293,224 +1255,31 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   // 4. COURSES MANAGEMENT TAB
   // ---------------------------------------------------------------------------
   Widget _buildCoursesTab() {
-    final query = _courseSearchController.text.trim().toLowerCase();
-    final filtered = _courses.where((c) {
-      return query.isEmpty ||
-          c.title.toLowerCase().contains(query) ||
-          c.university.toLowerCase().contains(query) ||
-          c.stream.toLowerCase().contains(query);
-    }).toList();
+    return FutureBuilder<String?>(
+      future: AuthService().token(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-          color: Colors.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        '📚 Courses Management',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      Text(
-                        '${_courses.length} degree programs cataloged',
-                        style: const TextStyle(
-                          color: Color(0xFF64748B),
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                  FilledButton.icon(
-                    onPressed: () => _showCourseDialog(context),
-                    icon: const Icon(Icons.add_rounded, size: 18),
-                    label: const Text('Add Course'),
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(130, 44),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: _courseSearchController,
-                onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(
-                  hintText:
-                      'Search courses by degree title, stream, or university...',
-                  prefixIcon: Icon(Icons.search_rounded),
-                  fillColor: Color(0xFFF1F5F9),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Divider(height: 1),
-        Expanded(
-          child: _coursesLoading
-              ? const Center(child: CircularProgressIndicator())
-              : filtered.isEmpty
-              ? const Center(
-                  child: Text(
-                    'No courses found. Add a course to start the catalog.',
-                  ),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: filtered.length,
-                  itemBuilder: (context, index) {
-                    final course = filtered[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        side: const BorderSide(color: Color(0xFFE2E8F0)),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    course.title,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 3,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFEFF6FF),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Text(
-                                    course.stream,
-                                    style: const TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFF2563EB),
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  tooltip: 'Edit course',
-                                  onPressed: () => _showCourseDialog(
-                                    context,
-                                    course: course,
-                                  ),
-                                  icon: const Icon(Icons.edit_outlined),
-                                ),
-                                IconButton(
-                                  tooltip: 'Archive course',
-                                  onPressed: () => _archiveCourse(course),
-                                  icon: const Icon(Icons.archive_outlined),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              course.university,
-                              style: const TextStyle(
-                                color: Color(0xFF64748B),
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF1F5F9),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.access_time_rounded,
-                                        size: 14,
-                                        color: Color(0xFF475569),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '${course.durationYears.toStringAsFixed(0)} Years Duration',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFFEF3C7),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.star_rounded,
-                                        size: 14,
-                                        color: Color(0xFFD97706),
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Min Z-Score: ${course.minZScore}',
-                                        style: const TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          color: Color(0xFFB45309),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-        ),
-      ],
+        final token = snapshot.data;
+        if (token == null) {
+          return const Center(
+            child: Text('Please sign in again to manage courses.'),
+          );
+        }
+
+        return AdminManageCoursesPage(
+          token: token,
+          embedded: true,
+          universities: _adminUniversities,
+          onCountChanged: (count) {
+            if (count != _courseCount && mounted) {
+              setState(() => _courseCount = count);
+            }
+          },
+        );
+      },
     );
   }
 
@@ -1552,7 +1321,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   /// Opens the career add/edit form, closing it once a save succeeds.
-  void _openCareerForm(BuildContext context, String token, {Career? career}) {
+  void _openCareerForm(
+    BuildContext context,
+    String token, {
+    Career? career,
+  }) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -1562,6 +1335,31 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           onSaved: (_) => Navigator.pop(context),
         ),
       ),
+    );
+  }
+
+  Widget _buildGroupChatTab() {
+    return FutureBuilder<String?>(
+      future: AuthService().token(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final token = snapshot.data;
+        if (token == null) {
+          return const Center(
+            child: Text('Please sign in again to view the group chat.'),
+          );
+        }
+
+        return GroupChatPage(
+          token: token,
+          currentUserId: 'admin',
+          currentUserName: 'CareerIQ Admin',
+          isAdmin: true,
+        );
+      },
     );
   }
 
@@ -1960,249 +1758,6 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           },
         );
       },
-    );
-  }
-
-  void _showCourseDialog(BuildContext context, {AdminCourse? course}) {
-    final titleCtrl = TextEditingController(text: course?.title ?? '');
-    final uniCtrl = TextEditingController(text: course?.university ?? '');
-    final zScoreCtrl = TextEditingController(
-      text: course == null || course.minZScore == 0
-          ? ''
-          : course.minZScore.toString(),
-    );
-    final durationCtrl = TextEditingController(
-      text: course?.durationYears.toStringAsFixed(1) ?? '4',
-    );
-    final descriptionCtrl = TextEditingController(
-      text: _courseRecords[course?.id]?.description ?? '',
-    );
-    const streams = [
-      'Mathematics',
-      'Science',
-      'Technology',
-      'Commerce',
-      'Arts',
-      'Any',
-    ];
-    String stream = streams.contains(course?.stream)
-        ? course!.stream
-        : 'Mathematics';
-
-    String? selectedUniId = _courseRecords[course?.id]?.universityId;
-    if (selectedUniId == null &&
-        course != null &&
-        _adminUniversities.isNotEmpty) {
-      final match = _adminUniversities.firstWhere(
-        (u) =>
-            u.universityName.toLowerCase().trim() ==
-            course.university.toLowerCase().trim(),
-        orElse: () => const AdminUniversityModel(
-          id: '',
-          userId: '',
-          universityName: '',
-          location: '',
-          officialEmail: '',
-          address: '',
-          contactNumber: '',
-          representativeName: '',
-          representativeContactNumber: '',
-          status: '',
-        ),
-      );
-      if (match.id.isNotEmpty) selectedUniId = match.id;
-    }
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(
-            course == null ? 'Add Academic Course' : 'Edit Academic Course',
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  controller: titleCtrl,
-                  decoration: const InputDecoration(labelText: 'Degree Title'),
-                ),
-                const SizedBox(height: 10),
-                if (_adminUniversities.isNotEmpty) ...[
-                  DropdownButtonFormField<String?>(
-                    initialValue:
-                        _adminUniversities.any((u) => u.id == selectedUniId)
-                        ? selectedUniId
-                        : null,
-                    isExpanded: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Assign University (from Database)',
-                    ),
-                    hint: const Text('Select registered university'),
-                    items: [
-                      const DropdownMenuItem<String?>(
-                        value: null,
-                        child: Text('Custom / Manual Entry'),
-                      ),
-                      ..._adminUniversities.map(
-                        (u) => DropdownMenuItem<String?>(
-                          value: u.id,
-                          child: Text(
-                            u.universityName,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ),
-                    ],
-                    onChanged: (val) {
-                      setDialogState(() {
-                        selectedUniId = val;
-                        if (val != null) {
-                          final found = _adminUniversities.firstWhere(
-                            (u) => u.id == val,
-                          );
-                          uniCtrl.text = found.universityName;
-                        }
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                ],
-                TextField(
-                  controller: uniCtrl,
-                  decoration: const InputDecoration(
-                    labelText: 'Awarding University Name',
-                  ),
-                  onChanged: (text) {
-                    if (selectedUniId != null) {
-                      final found = _adminUniversities
-                          .where((u) => u.id == selectedUniId)
-                          .toList();
-                      if (found.isEmpty || found.first.universityName != text) {
-                        setDialogState(() => selectedUniId = null);
-                      }
-                    }
-                  },
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  initialValue: stream,
-                  decoration: const InputDecoration(labelText: 'A/L stream'),
-                  items:
-                      const [
-                            'Mathematics',
-                            'Science',
-                            'Technology',
-                            'Commerce',
-                            'Arts',
-                            'Any',
-                          ]
-                          .map(
-                            (value) => DropdownMenuItem(
-                              value: value,
-                              child: Text(value),
-                            ),
-                          )
-                          .toList(),
-                  onChanged: (value) =>
-                      setDialogState(() => stream = value ?? stream),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: durationCtrl,
-                  keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(
-                    labelText: 'Duration (years)',
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: zScoreCtrl,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  decoration: const InputDecoration(
-                    labelText: 'Minimum Z-Score (optional)',
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextField(
-                  controller: descriptionCtrl,
-                  maxLines: 3,
-                  decoration: const InputDecoration(
-                    labelText: 'Description (optional)',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                final duration = double.tryParse(durationCtrl.text);
-                if (titleCtrl.text.trim().isEmpty ||
-                    uniCtrl.text.trim().isEmpty ||
-                    duration == null ||
-                    duration <= 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Enter a title, university, and valid duration.',
-                      ),
-                    ),
-                  );
-                  return;
-                }
-                final token = await AuthService().token();
-                if (token == null) return;
-                try {
-                  final values = {
-                    'title': titleCtrl.text.trim(),
-                    'university': uniCtrl.text.trim(),
-                    if (selectedUniId != null && selectedUniId!.isNotEmpty)
-                      'universityId': selectedUniId,
-                    'stream': stream,
-                    'durationYears': duration,
-                    'minZScore': zScoreCtrl.text.trim().isEmpty
-                        ? null
-                        : double.tryParse(zScoreCtrl.text),
-                    'description': descriptionCtrl.text.trim(),
-                  };
-                  final saved = course == null
-                      ? await _courseService.create(token, values)
-                      : await _courseService.update(token, course.id, values);
-                  if (!mounted || !dialogContext.mounted) return;
-                  setState(() {
-                    _courseRecords[saved.id] = saved;
-                    final index = _courses.indexWhere(
-                      (item) => item.id == saved.id,
-                    );
-                    if (index == -1) {
-                      _courses.insert(0, _toAdminCourse(saved));
-                    } else {
-                      _courses[index] = _toAdminCourse(saved);
-                    }
-                  });
-                  Navigator.pop(dialogContext);
-                } catch (error) {
-                  if (dialogContext.mounted) {
-                    ScaffoldMessenger.of(dialogContext).showSnackBar(
-                      SnackBar(content: Text('Could not save course: $error')),
-                    );
-                  }
-                }
-              },
-              child: const Text('Save Course'),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

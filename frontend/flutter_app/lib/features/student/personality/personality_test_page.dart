@@ -99,7 +99,6 @@ class _PersonalityTestPageState extends State<PersonalityTestPage> {
         _result = result;
         _phase = _Phase.result;
       });
-      widget.onCompleted?.call();
     } catch (error) {
       if (!mounted) return;
       setState(() {
@@ -184,7 +183,13 @@ class _PersonalityTestPageState extends State<PersonalityTestPage> {
       case _Phase.result:
         return PersonalityResultPage(
           result: _result!,
-          onDone: () => Navigator.of(context).pop(),
+          onDone: () {
+            if (widget.onCompleted != null) {
+              widget.onCompleted!();
+            } else {
+              Navigator.of(context).pop();
+            }
+          },
           onRetake: _startTest,
         );
     }
