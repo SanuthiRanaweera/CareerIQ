@@ -10,6 +10,7 @@ import '../../models/career.dart';
 import '../career/screens/admin_career_form_page.dart';
 import '../career/screens/admin_manage_careers_page.dart';
 import 'admin_notifications_page.dart';
+import '../student/group_chat_page.dart';
 import 'models/admin_models.dart';
 import 'university/screens/university_list_screen.dart';
 import 'university/services/university_admin_service.dart';
@@ -21,6 +22,7 @@ enum AdminNavSection {
   universities,
   courses,
   careers,
+  groupChat,
   notifications,
   settings,
 }
@@ -401,6 +403,11 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   ),
                 ),
                 _buildNavItem(
+                  section: AdminNavSection.groupChat,
+                  icon: Icons.forum_rounded,
+                  label: 'Group Chat',
+                ),
+                _buildNavItem(
                   section: AdminNavSection.notifications,
                   icon: Icons.campaign_outlined,
                   label: 'Notifications',
@@ -521,6 +528,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         return _buildCoursesTab();
       case AdminNavSection.careers:
         return _buildCareersTab();
+      case AdminNavSection.groupChat:
+        return _buildGroupChatTab();
       case AdminNavSection.notifications:
         return const AdminNotificationsPage();
       case AdminNavSection.settings:
@@ -1328,6 +1337,32 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       ),
     );
   }
+
+  Widget _buildGroupChatTab() {
+    return FutureBuilder<String?>(
+      future: AuthService().token(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final token = snapshot.data;
+        if (token == null) {
+          return const Center(
+            child: Text('Please sign in again to view the group chat.'),
+          );
+        }
+
+        return GroupChatPage(
+          token: token,
+          currentUserId: 'admin',
+          currentUserName: 'CareerIQ Admin',
+          isAdmin: true,
+        );
+      },
+    );
+  }
+
   Widget _buildSettingsTab() {
     return ListView(
       padding: const EdgeInsets.all(20),

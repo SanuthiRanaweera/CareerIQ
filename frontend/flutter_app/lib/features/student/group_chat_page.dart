@@ -10,12 +10,14 @@ class GroupChatPage extends StatefulWidget {
     required this.currentUserId,
     required this.currentUserName,
     this.currentUserProfileImage,
+    this.isAdmin = false,
   });
 
   final String token;
   final String currentUserId;
   final String currentUserName;
   final String? currentUserProfileImage;
+  final bool isAdmin;
 
   @override
   State<GroupChatPage> createState() => _GroupChatPageState();
@@ -290,7 +292,7 @@ class _GroupChatPageState extends State<GroupChatPage> {
                                             Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
-                                                if (isMe)
+                                                if (isMe || widget.isAdmin)
                                                   PopupMenuButton<String>(
                                                     icon: const Icon(Icons.more_vert, size: 18, color: Color(0xFF94A3B8)),
                                                     onSelected: (value) {
@@ -301,16 +303,17 @@ class _GroupChatPageState extends State<GroupChatPage> {
                                                       }
                                                     },
                                                     itemBuilder: (context) => [
-                                                      const PopupMenuItem(
-                                                        value: 'edit',
-                                                        child: Row(
-                                                          children: [
-                                                            Icon(Icons.edit_outlined, size: 16),
-                                                            SizedBox(width: 8),
-                                                            Text('Edit'),
-                                                          ],
+                                                      if (isMe)
+                                                        const PopupMenuItem(
+                                                          value: 'edit',
+                                                          child: Row(
+                                                            children: [
+                                                              Icon(Icons.edit_outlined, size: 16),
+                                                              SizedBox(width: 8),
+                                                              Text('Edit'),
+                                                            ],
+                                                          ),
                                                         ),
-                                                      ),
                                                       const PopupMenuItem(
                                                         value: 'delete',
                                                         child: Row(
@@ -372,8 +375,9 @@ class _GroupChatPageState extends State<GroupChatPage> {
                             ),
                           ),
           ),
-          SafeArea(
-            top: false,
+          if (!widget.isAdmin)
+            SafeArea(
+              top: false,
             child: Container(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
               decoration: const BoxDecoration(
