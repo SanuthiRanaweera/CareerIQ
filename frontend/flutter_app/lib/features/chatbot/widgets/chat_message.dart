@@ -10,7 +10,9 @@ class ChatMessageBubble extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Align(
-      alignment: message.isStudent ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: message.isStudent
+          ? Alignment.centerRight
+          : Alignment.centerLeft,
       child: Container(
         constraints: const BoxConstraints(maxWidth: 340),
         margin: const EdgeInsets.only(bottom: 12),
@@ -23,8 +25,16 @@ class ChatMessageBubble extends StatelessWidget {
             bottomLeft: Radius.circular(message.isStudent ? 18 : 5),
             bottomRight: Radius.circular(message.isStudent ? 5 : 18),
           ),
-          border: message.isStudent ? null : Border.all(color: const Color(0xFFE2E8F0)),
-          boxShadow: const [BoxShadow(color: Color(0x0A1F2937), blurRadius: 12, offset: Offset(0, 4))],
+          border: message.isStudent
+              ? null
+              : Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0A1F2937),
+              blurRadius: 12,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Text(
           message.message,

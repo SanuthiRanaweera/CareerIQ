@@ -281,7 +281,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                   child: _profileImage.text.trim().isEmpty
                                       ? Text(
                                           _name.text.trim().isNotEmpty
-                                              ? _name.text.trim()[0].toUpperCase()
+                                              ? _name.text
+                                                    .trim()[0]
+                                                    .toUpperCase()
                                               : '?',
                                           style: const TextStyle(
                                             fontSize: 34,
@@ -320,17 +322,17 @@ class _RegisterPageState extends State<RegisterPage> {
                             const SizedBox(height: 10),
                             Text(
                               'Profile photo (optional)',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF1F2937),
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    color: const Color(0xFF1F2937),
+                                  ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Pick an avatar or enter an image URL',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                color: const Color(0xFF64748B),
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: const Color(0xFF64748B)),
                             ),
                             const SizedBox(height: 12),
                             SingleChildScrollView(
@@ -340,12 +342,15 @@ class _RegisterPageState extends State<RegisterPage> {
                                 children: [
                                   for (final avatarUrl in _presetAvatars)
                                     Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                      ),
                                       child: InkWell(
                                         borderRadius: BorderRadius.circular(25),
                                         onTap: () {
                                           setState(() {
-                                            if (_profileImage.text == avatarUrl) {
+                                            if (_profileImage.text ==
+                                                avatarUrl) {
                                               _profileImage.clear();
                                             } else {
                                               _profileImage.text = avatarUrl;
@@ -357,7 +362,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                              color: _profileImage.text == avatarUrl
+                                              color:
+                                                  _profileImage.text ==
+                                                      avatarUrl
                                                   ? const Color(0xFF3B82F6)
                                                   : Colors.transparent,
                                               width: 2.5,
@@ -365,7 +372,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                           ),
                                           child: CircleAvatar(
                                             radius: 20,
-                                            backgroundColor: const Color(0xFFE2E8F0),
+                                            backgroundColor: const Color(
+                                              0xFFE2E8F0,
+                                            ),
                                             child: ClipOval(
                                               child: Image.network(
                                                 avatarUrl,
@@ -395,7 +404,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           prefixIcon: const Icon(Icons.image_outlined),
                           suffixIcon: _profileImage.text.isNotEmpty
                               ? IconButton(
-                                  icon: const Icon(Icons.close_rounded, size: 20),
+                                  icon: const Icon(
+                                    Icons.close_rounded,
+                                    size: 20,
+                                  ),
                                   onPressed: () {
                                     setState(() {
                                       _profileImage.clear();
@@ -403,7 +415,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   },
                                 )
                               : null,
-                          helperText: 'Direct image link (JPG, PNG, WebP) or select an avatar above',
+                          helperText:
+                              'Direct image link (JPG, PNG, WebP) or select an avatar above',
                         ),
                       ),
                       const SizedBox(height: 12),

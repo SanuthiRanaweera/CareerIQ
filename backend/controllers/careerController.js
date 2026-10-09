@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Career = require('../models/Career');
+const SavedCareer = require('../models/SavedCareer');
 const { AL_STREAMS, PERSONALITY_TYPES, WORK_STYLES } = require('../data/careerOptions');
 const careerRecommendationService = require('../services/careerRecommendationService');
 
@@ -130,6 +131,8 @@ async function deleteCareer(req, res, next) {
 		if (!isValidId(req.params.id)) return res.status(404).json(NOT_FOUND);
 		const career = await Career.findByIdAndDelete(req.params.id);
 		if (!career) return res.status(404).json(NOT_FOUND);
+		// Drop the career from every student's shortlist so none is left pointing at it.
+		await SavedCareer.deleteMany({ career: career._id });
 		return res.json({ success: true, message: 'Career deleted successfully' });
 	} catch (error) {
 		return next(error);

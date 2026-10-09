@@ -70,10 +70,14 @@ class _UniversityListScreenState extends State<UniversityListScreen> {
     return _universities.where((u) {
       // Filter by status
       if (_selectedStatusFilter != 'All') {
-        final targetStatus = _selectedStatusFilter.toLowerCase().replaceAll(' ', '_');
+        final targetStatus = _selectedStatusFilter.toLowerCase().replaceAll(
+          ' ',
+          '_',
+        );
         if (targetStatus == 'active' && !u.isActive) return false;
         if (targetStatus == 'inactive' && !u.isInactive) return false;
-        if (targetStatus.contains('pending') && !u.isPendingVerification) return false;
+        if (targetStatus.contains('pending') && !u.isPendingVerification)
+          return false;
       }
 
       // Filter by search query
@@ -104,7 +108,9 @@ class _UniversityListScreenState extends State<UniversityListScreen> {
   Future<void> _navigateToDetails(AdminUniversityModel uni) async {
     final result = await Navigator.push<bool>(
       context,
-      MaterialPageRoute(builder: (_) => UniversityDetailsScreen(university: uni)),
+      MaterialPageRoute(
+        builder: (_) => UniversityDetailsScreen(university: uni),
+      ),
     );
     if (result == true && mounted) {
       _loadUniversities();
@@ -280,10 +286,7 @@ class _UniversityListScreenState extends State<UniversityListScreen> {
                   ? 'No university records match your search or filter criteria.'
                   : 'There are no registered universities in the database yet.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF64748B),
-              ),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
@@ -475,10 +478,7 @@ class _UniversityListScreenState extends State<UniversityListScreen> {
   @override
   Widget build(BuildContext context) {
     if (widget.embedded) {
-      return Container(
-        color: const Color(0xFFF8FAFC),
-        child: _buildBody(),
-      );
+      return Container(color: const Color(0xFFF8FAFC), child: _buildBody());
     }
 
     return Scaffold(
@@ -496,4 +496,3 @@ class _UniversityListScreenState extends State<UniversityListScreen> {
     );
   }
 }
-

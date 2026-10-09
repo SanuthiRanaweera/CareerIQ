@@ -123,18 +123,18 @@ class RecommendationAnswers {
   /// reports its own count on the response; this mirrors it so the form can
   /// reason about completeness before submitting.
   int get answeredCount => [
-        stream.isNotEmpty,
-        subjects.isNotEmpty,
-        interests.isNotEmpty,
-        personalityType.isNotEmpty,
-        workStyle.isNotEmpty,
-      ].where((answered) => answered).length;
+    stream.isNotEmpty,
+    subjects.isNotEmpty,
+    interests.isNotEmpty,
+    personalityType.isNotEmpty,
+    workStyle.isNotEmpty,
+  ].where((answered) => answered).length;
 
   /// Short description of what the ranking was based on, e.g.
   /// "Science stream, Analytical".
   String get summary => [
-        if (stream.isNotEmpty) '$stream stream',
-        if (personalityType.isNotEmpty) personalityType,
-        if (workStyle.isNotEmpty) workStyle,
-      ].join(', ');
+    if (stream.isNotEmpty) '$stream stream',
+    if (personalityType.isNotEmpty) personalityType,
+    if (workStyle.isNotEmpty) workStyle,
+  ].join(', ');
 }

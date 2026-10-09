@@ -51,11 +51,17 @@ class Student {
           .toList(),
       profileCompletion: (json['profileCompletion'] as num?)?.toInt() ?? 0,
       personalityCategory: personality?['category'] as String?,
-      favoriteUniversities: ((json['favoriteUniversities'] as List?) ?? const [])
-          .map((item) => item is Map ? (item['_id'] ?? item['id'] ?? '').toString() : item.toString())
-          .where((id) => id.isNotEmpty)
-          .toList(),
-      zScore: (json['zScore'] as num?)?.toDouble() ??
+      favoriteUniversities:
+          ((json['favoriteUniversities'] as List?) ?? const [])
+              .map(
+                (item) => item is Map
+                    ? (item['_id'] ?? item['id'] ?? '').toString()
+                    : item.toString(),
+              )
+              .where((id) => id.isNotEmpty)
+              .toList(),
+      zScore:
+          (json['zScore'] as num?)?.toDouble() ??
           (json['alZScore'] as num?)?.toDouble(),
     );
   }

@@ -154,9 +154,8 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
   String? get _streamsError =>
       _streams.isEmpty ? 'Please choose at least one A/L stream' : null;
 
-  String? get _whatYouDoError => _whatYouDo.isEmpty
-      ? 'Add at least one day-to-day responsibility'
-      : null;
+  String? get _whatYouDoError =>
+      _whatYouDo.isEmpty ? 'Add at least one day-to-day responsibility' : null;
 
   String? get _skillsError =>
       _requiredSkills.isEmpty ? 'Add at least one required skill' : null;
@@ -164,16 +163,16 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
   /// Plain-language names of everything still outstanding, used for the
   /// summary message.
   List<String> get _missingFields => [
-        if (_titleError != null) 'title',
-        if (_categoryError != null) 'category',
-        if (_descriptionError != null) 'description',
-        if (_validateSalaryMin(_salaryMin.text) != null) 'minimum salary',
-        if (_validateSalaryMax(_salaryMax.text) != null) 'maximum salary',
-        if (_outlookError != null) 'demand level',
-        if (_streamsError != null) 'A/L streams',
-        if (_whatYouDoError != null) "what you'd do",
-        if (_skillsError != null) 'skills',
-      ];
+    if (_titleError != null) 'title',
+    if (_categoryError != null) 'category',
+    if (_descriptionError != null) 'description',
+    if (_validateSalaryMin(_salaryMin.text) != null) 'minimum salary',
+    if (_validateSalaryMax(_salaryMax.text) != null) 'maximum salary',
+    if (_outlookError != null) 'demand level',
+    if (_streamsError != null) 'A/L streams',
+    if (_whatYouDoError != null) "what you'd do",
+    if (_skillsError != null) 'skills',
+  ];
 
   /// Naming nine fields in a snackbar is unreadable, so a long list is
   /// summarised by count and the inline messages do the rest.
@@ -261,9 +260,7 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(_isEditing ? 'Edit career' : 'Add career'),
-      ),
+      appBar: AppBar(title: Text(_isEditing ? 'Edit career' : 'Add career')),
       body: SafeArea(
         child: Form(
           key: _formKey,
@@ -374,8 +371,7 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
                   _ChoiceRow(
                     options: jobOutlooks,
                     selected: _jobOutlook,
-                    onSelected: (value) =>
-                        setState(() => _jobOutlook = value),
+                    onSelected: (value) => setState(() => _jobOutlook = value),
                   ),
                 ],
               ),
@@ -406,8 +402,7 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
                     values: _whatYouDo,
                     hintText: 'e.g. Write and review code',
                     errorText: _submitted ? _whatYouDoError : null,
-                    onChanged: (values) =>
-                        setState(() => _whatYouDo = values),
+                    onChanged: (values) => setState(() => _whatYouDo = values),
                   ),
                 ],
               ),
@@ -487,14 +482,10 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
                     hintText: 'e.g. Combined Mathematics',
                     maxLength: 60,
                     suggestions: alSubjectOptions,
-                    onChanged: (values) =>
-                        setState(() => _alSubjects = values),
+                    onChanged: (values) => setState(() => _alSubjects = values),
                   ),
                   const SizedBox(height: 22),
-                  Text(
-                    'Personality types',
-                    style: theme.textTheme.titleLarge,
-                  ),
+                  Text('Personality types', style: theme.textTheme.titleLarge),
                   const SizedBox(height: 12),
                   _MultiChoiceRow(
                     options: personalityTypes,
@@ -502,8 +493,8 @@ class _AdminCareerFormPageState extends State<AdminCareerFormPage> {
                     onToggle: (value) => setState(() {
                       _personalityTypes = _personalityTypes.contains(value)
                           ? _personalityTypes
-                              .where((item) => item != value)
-                              .toList()
+                                .where((item) => item != value)
+                                .toList()
                           : [..._personalityTypes, value];
                     }),
                   ),
@@ -649,33 +640,33 @@ class _ChoiceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: options
-            .map(
-              (option) => ChoiceChip(
-                label: Text(option),
-                selected: selected == option,
-                onSelected: (_) => onSelected(option),
-                showCheckmark: false,
-                backgroundColor: Colors.white,
-                selectedColor: const Color(0xFF3B82F6),
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: selected == option
-                      ? Colors.white
-                      : const Color(0xFF64748B),
-                ),
-                side: BorderSide(
-                  color: selected == option
-                      ? const Color(0xFF3B82F6)
-                      : const Color(0xFFCBD5E1),
-                ),
-                shape: const StadiumBorder(),
-              ),
-            )
-            .toList(),
-      );
+    spacing: 8,
+    runSpacing: 8,
+    children: options
+        .map(
+          (option) => ChoiceChip(
+            label: Text(option),
+            selected: selected == option,
+            onSelected: (_) => onSelected(option),
+            showCheckmark: false,
+            backgroundColor: Colors.white,
+            selectedColor: const Color(0xFF3B82F6),
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: selected == option
+                  ? Colors.white
+                  : const Color(0xFF64748B),
+            ),
+            side: BorderSide(
+              color: selected == option
+                  ? const Color(0xFF3B82F6)
+                  : const Color(0xFFCBD5E1),
+            ),
+            shape: const StadiumBorder(),
+          ),
+        )
+        .toList(),
+  );
 }
 
 /// Pick any number.
@@ -692,31 +683,31 @@ class _MultiChoiceRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: options
-            .map(
-              (option) => FilterChip(
-                label: Text(option),
-                selected: selected.contains(option),
-                onSelected: (_) => onToggle(option),
-                backgroundColor: Colors.white,
-                selectedColor: const Color(0xFFDBEAFE),
-                checkmarkColor: const Color(0xFF1D4ED8),
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: selected.contains(option)
-                      ? const Color(0xFF1D4ED8)
-                      : const Color(0xFF64748B),
-                ),
-                side: BorderSide(
-                  color: selected.contains(option)
-                      ? const Color(0xFF3B82F6)
-                      : const Color(0xFFCBD5E1),
-                ),
-                shape: const StadiumBorder(),
-              ),
-            )
-            .toList(),
-      );
+    spacing: 8,
+    runSpacing: 8,
+    children: options
+        .map(
+          (option) => FilterChip(
+            label: Text(option),
+            selected: selected.contains(option),
+            onSelected: (_) => onToggle(option),
+            backgroundColor: Colors.white,
+            selectedColor: const Color(0xFFDBEAFE),
+            checkmarkColor: const Color(0xFF1D4ED8),
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: selected.contains(option)
+                  ? const Color(0xFF1D4ED8)
+                  : const Color(0xFF64748B),
+            ),
+            side: BorderSide(
+              color: selected.contains(option)
+                  ? const Color(0xFF3B82F6)
+                  : const Color(0xFFCBD5E1),
+            ),
+            shape: const StadiumBorder(),
+          ),
+        )
+        .toList(),
+  );
 }

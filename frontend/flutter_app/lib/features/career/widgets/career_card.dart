@@ -32,7 +32,10 @@ class CareerCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text(career.title, style: theme.textTheme.titleLarge),
+                    child: Text(
+                      career.title,
+                      style: theme.textTheme.titleLarge,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   DemandLevelBadge(jobOutlook: career.jobOutlook),
@@ -100,8 +103,8 @@ class DemandLevelBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     if (jobOutlook.isEmpty) return const SizedBox.shrink();
 
-    final colours = _palette[jobOutlook] ??
-        const (Color(0xFFF1F5F9), Color(0xFF475569));
+    final colours =
+        _palette[jobOutlook] ?? const (Color(0xFFF1F5F9), Color(0xFF475569));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),

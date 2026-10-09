@@ -100,7 +100,9 @@ class PersonalityIntroPage extends StatelessWidget {
               const Spacer(),
               FilledButton(
                 onPressed: onStart,
-                child: Text(existingResult == null ? 'Start Test' : 'Retake Test'),
+                child: Text(
+                  existingResult == null ? 'Start Test' : 'Retake Test',
+                ),
               ),
               if (onViewResult != null) ...[
                 const SizedBox(height: 10),
@@ -129,9 +131,7 @@ class _StatItem extends StatelessWidget {
       const SizedBox(height: 6),
       Text(
         label,
-        style: Theme.of(
-          context,
-        ).textTheme.titleLarge?.copyWith(fontSize: 15),
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(fontSize: 15),
       ),
     ],
   );

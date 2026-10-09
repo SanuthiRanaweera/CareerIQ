@@ -782,8 +782,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         ),
         _buildManagementRow(
           title: '🏫 Universities',
-          subtitle:
-              'Higher education institutes & partner universities',
+          subtitle: 'Higher education institutes & partner universities',
           countLabel: '$_universityCount Registered',
           color: const Color(0xFF0EA5E9),
           onTap: () => _selectSection(AdminNavSection.universities),
@@ -1553,11 +1552,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   }
 
   /// Opens the career add/edit form, closing it once a save succeeds.
-  void _openCareerForm(
-    BuildContext context,
-    String token, {
-    Career? career,
-  }) {
+  void _openCareerForm(BuildContext context, String token, {Career? career}) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -1569,6 +1564,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       ),
     );
   }
+
   Widget _buildSettingsTab() {
     return ListView(
       padding: const EdgeInsets.all(20),
@@ -1994,7 +1990,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         : 'Mathematics';
 
     String? selectedUniId = _courseRecords[course?.id]?.universityId;
-    if (selectedUniId == null && course != null && _adminUniversities.isNotEmpty) {
+    if (selectedUniId == null &&
+        course != null &&
+        _adminUniversities.isNotEmpty) {
       final match = _adminUniversities.firstWhere(
         (u) =>
             u.universityName.toLowerCase().trim() ==
@@ -2034,7 +2032,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 const SizedBox(height: 10),
                 if (_adminUniversities.isNotEmpty) ...[
                   DropdownButtonFormField<String?>(
-                    initialValue: _adminUniversities.any((u) => u.id == selectedUniId)
+                    initialValue:
+                        _adminUniversities.any((u) => u.id == selectedUniId)
                         ? selectedUniId
                         : null,
                     isExpanded: true,
@@ -2061,8 +2060,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       setDialogState(() {
                         selectedUniId = val;
                         if (val != null) {
-                          final found =
-                              _adminUniversities.firstWhere((u) => u.id == val);
+                          final found = _adminUniversities.firstWhere(
+                            (u) => u.id == val,
+                          );
                           uniCtrl.text = found.universityName;
                         }
                       });
@@ -2205,5 +2205,4 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       ),
     );
   }
-
 }

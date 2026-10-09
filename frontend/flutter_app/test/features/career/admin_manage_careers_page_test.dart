@@ -24,22 +24,34 @@ void main() {
   }
 
   group('AdminManageCareersPage', () {
-    testWidgets('shows a loading indicator before the careers arrive',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminManageCareersPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('shows a loading indicator before the careers arrive', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(),
+          ),
+        ),
+      );
       await tester.pump();
 
       expect(find.text('Loading careers...'), findsOneWidget);
       await tester.pumpAndSettle();
     });
 
-    testWidgets('lists each career with category, demand and salary',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminManageCareersPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('lists each career with category, demand and salary', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Career records'), findsOneWidget);
@@ -53,10 +65,14 @@ void main() {
     });
 
     testWidgets('uses singular wording for a single career', (tester) async {
-      await tester.pumpWidget(wrap(AdminManageCareersPage(
-        token: 't',
-        careerService: FakeCareerService(careers: [careerFixture()]),
-      )));
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(careers: [careerFixture()]),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('1 career'), findsOneWidget);
@@ -78,14 +94,19 @@ void main() {
   });
 
   group('AdminManageCareersPage add and edit', () {
-    testWidgets('offers an add button that reports the request',
-        (tester) async {
+    testWidgets('offers an add button that reports the request', (
+      tester,
+    ) async {
       var addPressed = false;
-      await tester.pumpWidget(wrap(AdminManageCareersPage(
-        token: 't',
-        careerService: FakeCareerService(),
-        onAddCareer: () => addPressed = true,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(),
+            onAddCareer: () => addPressed = true,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Add career'));
@@ -94,11 +115,17 @@ void main() {
       expect(addPressed, isTrue);
     });
 
-    testWidgets('hides the add button when no handler is supplied',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminManageCareersPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('hides the add button when no handler is supplied', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Add career'), findsNothing);
@@ -107,11 +134,15 @@ void main() {
 
     testWidgets('the edit icon reports the career to edit', (tester) async {
       Career? editing;
-      await tester.pumpWidget(wrap(AdminManageCareersPage(
-        token: 't',
-        careerService: FakeCareerService(),
-        onEditCareer: (career) => editing = career,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(),
+            onEditCareer: (career) => editing = career,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.byTooltip('Edit Medical Doctor'));
@@ -120,14 +151,19 @@ void main() {
       expect(editing?.title, 'Medical Doctor');
     });
 
-    testWidgets('tapping the row opens the same editor as the icon',
-        (tester) async {
+    testWidgets('tapping the row opens the same editor as the icon', (
+      tester,
+    ) async {
       Career? editing;
-      await tester.pumpWidget(wrap(AdminManageCareersPage(
-        token: 't',
-        careerService: FakeCareerService(),
-        onEditCareer: (career) => editing = career,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(),
+            onEditCareer: (career) => editing = career,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await tester.tap(find.text('Software Engineer'));
@@ -136,11 +172,17 @@ void main() {
       expect(editing?.title, 'Software Engineer');
     });
 
-    testWidgets('hides the edit icon when no handler is supplied',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminManageCareersPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('hides the edit icon when no handler is supplied', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.edit_outlined), findsNothing);
@@ -148,8 +190,9 @@ void main() {
   });
 
   group('AdminManageCareersPage search', () {
-    testWidgets('searching narrows the list through the backend',
-        (tester) async {
+    testWidgets('searching narrows the list through the backend', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminManageCareersPage(token: 't', careerService: service)),
@@ -164,8 +207,9 @@ void main() {
       expect(find.text('1 career'), findsOneWidget);
     });
 
-    testWidgets('rapid typing is debounced into a single request',
-        (tester) async {
+    testWidgets('rapid typing is debounced into a single request', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminManageCareersPage(token: 't', careerService: service)),
@@ -204,9 +248,14 @@ void main() {
     });
 
     testWidgets('the clear button resets the search box', (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminManageCareersPage(token: 't', careerService: FakeCareerService()),
-      ));
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.close_rounded), findsNothing);
@@ -221,12 +270,17 @@ void main() {
   });
 
   group('AdminManageCareersPage empty and error states', () {
-    testWidgets('prompts to add the first career when none exist',
-        (tester) async {
-      await tester.pumpWidget(wrap(AdminManageCareersPage(
-        token: 't',
-        careerService: FakeCareerService(careers: const []),
-      )));
+    testWidgets('prompts to add the first career when none exist', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(careers: const []),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('No careers yet'), findsOneWidget);
@@ -234,12 +288,18 @@ void main() {
     });
 
     testWidgets('shows the server message with a retry action', (tester) async {
-      await tester.pumpWidget(wrap(AdminManageCareersPage(
-        token: 't',
-        careerService: FakeCareerService(
-          error: const ApiException('Admin access is required for this action'),
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(
+              error: const ApiException(
+                'Admin access is required for this action',
+              ),
+            ),
+          ),
         ),
-      )));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Something went wrong'), findsOneWidget);
@@ -324,8 +384,7 @@ void main() {
       expect(service.lastDeletedId, 'id-md');
     });
 
-    testWidgets('confirms the deletion and refreshes the list',
-        (tester) async {
+    testWidgets('confirms the deletion and refreshes the list', (tester) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminManageCareersPage(token: 't', careerService: service)),
@@ -377,8 +436,9 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('reports a server refusal and keeps the career',
-        (tester) async {
+    testWidgets('reports a server refusal and keeps the career', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminManageCareersPage(token: 't', careerService: service)),
@@ -402,8 +462,9 @@ void main() {
       expect(find.text('Medical Doctor'), findsOneWidget);
     });
 
-    testWidgets('falls back to a friendly message for a non-API failure',
-        (tester) async {
+    testWidgets('falls back to a friendly message for a non-API failure', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminManageCareersPage(token: 't', careerService: service)),
@@ -426,9 +487,14 @@ void main() {
     });
 
     testWidgets('every row offers a delete action', (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminManageCareersPage(token: 't', careerService: FakeCareerService()),
-      ));
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: FakeCareerService(),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.delete_outline_rounded), findsNWidgets(3));

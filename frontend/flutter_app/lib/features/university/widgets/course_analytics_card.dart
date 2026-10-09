@@ -98,10 +98,7 @@ class CourseAnalyticsCard extends StatelessWidget {
                     SizedBox(height: 4),
                     Text(
                       'Course views will appear here as students browse.',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF94A3B8),
-                      ),
+                      style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
                     ),
                   ],
                 ),
@@ -213,4 +210,3 @@ class CourseAnalyticsCard extends StatelessWidget {
     );
   }
 }
-

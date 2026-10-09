@@ -33,12 +33,12 @@ class _AddUniversityScreenState extends State<AddUniversityScreen> {
       if (!mounted) return;
 
       final universityId = (result['universityId'] ?? '').toString();
-      final officialEmail =
-          (result['officialEmail'] ?? _formData.officialEmail).toString();
+      final officialEmail = (result['officialEmail'] ?? _formData.officialEmail)
+          .toString();
       final universityName =
           (result['universityName'] ?? _formData.universityName).toString();
-      final desiredStatus =
-          (result['desiredStatus'] ?? _formData.status).toString();
+      final desiredStatus = (result['desiredStatus'] ?? _formData.status)
+          .toString();
 
       // Open OTP verification screen
       final verified = await Navigator.push<bool>(
@@ -63,9 +63,12 @@ class _AddUniversityScreenState extends State<AddUniversityScreen> {
           if (msg.toLowerCase().contains('already exists')) {
             _errorMessage = 'This university email is already registered.';
           } else if (msg.toLowerCase().contains('unable to send')) {
-            _errorMessage = 'Unable to send verification code. Please check email configuration.';
+            _errorMessage =
+                'Unable to send verification code. Please check email configuration.';
           } else {
-            _errorMessage = msg.isNotEmpty ? msg : 'Failed to create university.';
+            _errorMessage = msg.isNotEmpty
+                ? msg
+                : 'Failed to create university.';
           }
         });
       }
@@ -111,7 +114,10 @@ class _AddUniversityScreenState extends State<AddUniversityScreen> {
                       const SizedBox(height: 4),
                       const Text(
                         'Fill in the university and representative details. A verification OTP will be sent to the university official email.',
-                        style: TextStyle(color: Color(0xFF64748B), fontSize: 13),
+                        style: TextStyle(
+                          color: Color(0xFF64748B),
+                          fontSize: 13,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       if (_errorMessage != null) ...[
@@ -124,8 +130,11 @@ class _AddUniversityScreenState extends State<AddUniversityScreen> {
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline_rounded,
-                                  color: Color(0xFFDC2626), size: 20),
+                              const Icon(
+                                Icons.error_outline_rounded,
+                                color: Color(0xFFDC2626),
+                                size: 20,
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -185,4 +194,3 @@ class _AddUniversityScreenState extends State<AddUniversityScreen> {
     );
   }
 }
-

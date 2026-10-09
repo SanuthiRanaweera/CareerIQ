@@ -40,11 +40,7 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  Future<void> typeIn(
-    WidgetTester tester,
-    String label,
-    String value,
-  ) async {
+  Future<void> typeIn(WidgetTester tester, String label, String value) async {
     final field = find.widgetWithText(TextFormField, label);
     await scrollTo(tester, field);
     await tester.enterText(field, value);
@@ -100,9 +96,11 @@ void main() {
 
   group('AdminCareerFormPage create mode', () {
     testWidgets('shows a create-mode heading and button', (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
-      ));
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Add career'), findsOneWidget);
@@ -114,11 +112,15 @@ void main() {
     testWidgets('creates a career with every required field', (tester) async {
       final service = FakeCareerService();
       Career? saved;
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        careerService: service,
-        onSaved: (career) => saved = career,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(
+            token: 't',
+            careerService: service,
+            onSaved: (career) => saved = career,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await fillRequired(tester);
@@ -139,9 +141,11 @@ void main() {
     });
 
     testWidgets('confirms the save with a success message', (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
-      ));
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await fillRequired(tester);
@@ -152,8 +156,9 @@ void main() {
   });
 
   group('AdminCareerFormPage validation', () {
-    testWidgets('refuses to save an empty form and says what is missing',
-        (tester) async {
+    testWidgets('refuses to save an empty form and says what is missing', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminCareerFormPage(token: 't', careerService: service)),
@@ -171,11 +176,14 @@ void main() {
       );
     });
 
-    testWidgets('shows a message for each empty required text field',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('shows a message for each empty required text field', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Saving happens from the bottom of the form, by which point the fields
@@ -189,8 +197,9 @@ void main() {
       expect(find.text('Description is required'), findsOneWidget);
     });
 
-    testWidgets('a field scrolled out of view is still validated',
-        (tester) async {
+    testWidgets('a field scrolled out of view is still validated', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminCareerFormPage(token: 't', careerService: service)),
@@ -213,8 +222,9 @@ void main() {
       expect(find.text('Please complete: title'), findsOneWidget);
     });
 
-    testWidgets('requires both list fields the backend insists on',
-        (tester) async {
+    testWidgets('requires both list fields the backend insists on', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminCareerFormPage(token: 't', careerService: service)),
@@ -265,9 +275,11 @@ void main() {
     });
 
     testWidgets('rejects a non-numeric salary', (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
-      ));
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await fillRequired(tester);
@@ -281,31 +293,36 @@ void main() {
 
   group('AdminCareerFormPage edit mode', () {
     Career existing() => careerFixture(
-          id: 'id-se',
-          title: 'Software Engineer',
-          category: 'Information Technology',
-          description: 'Designs, builds and maintains software systems.',
-          whatYouDo: const ['Write and review code'],
-          requiredSkills: const ['Programming'],
-          recommendedStreams: const ['Technology'],
-          industryOpportunities: const ['Software export companies'],
-          relatedCourseKeywords: const ['software engineering'],
-          pathway: const [
-            CareerPathwayStep(
-              order: 1,
-              stage: 'A/L Stream',
-              title: 'Technology stream',
-            ),
-          ],
-        );
+      id: 'id-se',
+      title: 'Software Engineer',
+      category: 'Information Technology',
+      description: 'Designs, builds and maintains software systems.',
+      whatYouDo: const ['Write and review code'],
+      requiredSkills: const ['Programming'],
+      recommendedStreams: const ['Technology'],
+      industryOpportunities: const ['Software export companies'],
+      relatedCourseKeywords: const ['software engineering'],
+      pathway: const [
+        CareerPathwayStep(
+          order: 1,
+          stage: 'A/L Stream',
+          title: 'Technology stream',
+        ),
+      ],
+    );
 
-    testWidgets('pre-fills the form from the career being edited',
-        (tester) async {
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        career: existing(),
-        careerService: FakeCareerService(),
-      )));
+    testWidgets('pre-fills the form from the career being edited', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(
+            token: 't',
+            career: existing(),
+            careerService: FakeCareerService(),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Edit career'), findsOneWidget);
@@ -320,11 +337,15 @@ void main() {
 
     testWidgets('saves changes through updateCareer', (tester) async {
       final service = FakeCareerService();
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        career: existing(),
-        careerService: service,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(
+            token: 't',
+            career: existing(),
+            careerService: service,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await typeIn(tester, 'Career title *', 'Senior Software Engineer');
@@ -339,14 +360,19 @@ void main() {
       );
     });
 
-    testWidgets('keeps every field when only the title is changed',
-        (tester) async {
+    testWidgets('keeps every field when only the title is changed', (
+      tester,
+    ) async {
       final service = FakeCareerService();
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        career: existing(),
-        careerService: service,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(
+            token: 't',
+            career: existing(),
+            careerService: service,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await typeIn(tester, 'Career title *', 'Renamed Career');
@@ -363,11 +389,15 @@ void main() {
 
     testWidgets('removing a list entry is saved', (tester) async {
       final service = FakeCareerService();
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        career: existing(),
-        careerService: service,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(
+            token: 't',
+            career: existing(),
+            careerService: service,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await scrollTo(tester, find.byTooltip('Remove Programming'));
@@ -382,16 +412,21 @@ void main() {
   });
 
   group('AdminCareerFormPage server errors', () {
-    testWidgets('shows a duplicate title message from the backend',
-        (tester) async {
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        careerService: FakeCareerService(
-          error: const ApiException(
-            'A career with this title already exists',
+    testWidgets('shows a duplicate title message from the backend', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(
+            token: 't',
+            careerService: FakeCareerService(
+              error: const ApiException(
+                'A career with this title already exists',
+              ),
+            ),
           ),
         ),
-      )));
+      );
       await tester.pumpAndSettle();
 
       await fillRequired(tester);
@@ -404,12 +439,18 @@ void main() {
     });
 
     testWidgets('shows a permission message for a non-admin', (tester) async {
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        careerService: FakeCareerService(
-          error: const ApiException('Admin access is required for this action'),
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(
+            token: 't',
+            careerService: FakeCareerService(
+              error: const ApiException(
+                'Admin access is required for this action',
+              ),
+            ),
+          ),
         ),
-      )));
+      );
       await tester.pumpAndSettle();
 
       await fillRequired(tester);
@@ -421,12 +462,17 @@ void main() {
       );
     });
 
-    testWidgets('falls back to a friendly message for a non-API failure',
-        (tester) async {
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        careerService: FakeCareerService(error: Exception('socket closed')),
-      )));
+    testWidgets('falls back to a friendly message for a non-API failure', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(
+            token: 't',
+            careerService: FakeCareerService(error: Exception('socket closed')),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await fillRequired(tester);

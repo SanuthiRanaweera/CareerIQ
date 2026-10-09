@@ -96,14 +96,15 @@ class _UniversityFormState extends State<UniversityForm> {
     _contactController = TextEditingController(text: d.contactNumber);
     _repNameController = TextEditingController(text: d.representativeName);
     _repEmailController = TextEditingController(text: d.representativeEmail);
-    _repContactController =
-        TextEditingController(text: d.representativeContactNumber);
+    _repContactController = TextEditingController(
+      text: d.representativeContactNumber,
+    );
     _passwordController = TextEditingController(text: d.password);
-    _confirmPasswordController =
-        TextEditingController(text: d.confirmPassword);
+    _confirmPasswordController = TextEditingController(text: d.confirmPassword);
     _status = d.status.isEmpty ? 'active' : d.status;
-    _universityType =
-        d.universityType.isEmpty ? 'State University' : d.universityType;
+    _universityType = d.universityType.isEmpty
+        ? 'State University'
+        : d.universityType;
   }
 
   @override
@@ -169,7 +170,10 @@ class _UniversityFormState extends State<UniversityForm> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 1. UNIVERSITY INFORMATION
-          _buildSectionHeader('UNIVERSITY INFORMATION', Icons.account_balance_rounded),
+          _buildSectionHeader(
+            'UNIVERSITY INFORMATION',
+            Icons.account_balance_rounded,
+          ),
           TextFormField(
             controller: _nameController,
             onChanged: (_) => _notifyChange(),
@@ -178,8 +182,9 @@ class _UniversityFormState extends State<UniversityForm> {
               hintText: 'e.g. University of Colombo',
               prefixIcon: Icon(Icons.school_outlined),
             ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'University Name is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'University Name is required'
+                : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -190,8 +195,9 @@ class _UniversityFormState extends State<UniversityForm> {
               hintText: 'e.g. Colombo, Western Province',
               prefixIcon: Icon(Icons.location_on_outlined),
             ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'University Location is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'University Location is required'
+                : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -220,11 +226,13 @@ class _UniversityFormState extends State<UniversityForm> {
             maxLines: 2,
             decoration: const InputDecoration(
               labelText: 'University Address *',
-              hintText: 'e.g. College House, 94 Cumaratunga Munidasa Mawatha, Colombo 03',
+              hintText:
+                  'e.g. College House, 94 Cumaratunga Munidasa Mawatha, Colombo 03',
               prefixIcon: Icon(Icons.place_outlined),
             ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'University Address is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'University Address is required'
+                : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -236,12 +244,16 @@ class _UniversityFormState extends State<UniversityForm> {
               hintText: 'e.g. +94 11 258 1835',
               prefixIcon: Icon(Icons.phone_outlined),
             ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Contact Number is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'Contact Number is required'
+                : null,
           ),
 
           // 2. ADMIN / REPRESENTATIVE INFORMATION
-          _buildSectionHeader('ADMIN / REPRESENTATIVE INFORMATION', Icons.person_outline_rounded),
+          _buildSectionHeader(
+            'ADMIN / REPRESENTATIVE INFORMATION',
+            Icons.person_outline_rounded,
+          ),
           TextFormField(
             controller: _repNameController,
             onChanged: (_) => _notifyChange(),
@@ -250,8 +262,9 @@ class _UniversityFormState extends State<UniversityForm> {
               hintText: 'e.g. Prof. H.D. Karunaratne',
               prefixIcon: Icon(Icons.badge_outlined),
             ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Representative Name is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'Representative Name is required'
+                : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
@@ -274,13 +287,17 @@ class _UniversityFormState extends State<UniversityForm> {
               hintText: 'e.g. +94 77 123 4567',
               prefixIcon: Icon(Icons.phone_iphone_outlined),
             ),
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Representative Contact Number is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'Representative Contact Number is required'
+                : null,
           ),
 
           // 3. ACCOUNT INFORMATION (Only during account creation)
           if (widget.isCreating) ...[
-            _buildSectionHeader('ACCOUNT INFORMATION', Icons.lock_outline_rounded),
+            _buildSectionHeader(
+              'ACCOUNT INFORMATION',
+              Icons.lock_outline_rounded,
+            ),
             TextFormField(
               controller: _passwordController,
               onChanged: (_) => _notifyChange(),
@@ -301,7 +318,8 @@ class _UniversityFormState extends State<UniversityForm> {
               ),
               validator: (v) {
                 if (v == null || v.isEmpty) return 'Password is required';
-                if (v.length < 6) return 'Password must be at least 6 characters';
+                if (v.length < 6)
+                  return 'Password must be at least 6 characters';
                 return null;
               },
             ),
@@ -320,12 +338,14 @@ class _UniversityFormState extends State<UniversityForm> {
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
                   ),
-                  onPressed: () => setState(() =>
-                      _obscureConfirmPassword = !_obscureConfirmPassword),
+                  onPressed: () => setState(
+                    () => _obscureConfirmPassword = !_obscureConfirmPassword,
+                  ),
                 ),
               ),
               validator: (v) {
-                if (v == null || v.isEmpty) return 'Confirm Password is required';
+                if (v == null || v.isEmpty)
+                  return 'Confirm Password is required';
                 if (v != _passwordController.text) {
                   return 'Passwords do not match';
                 }
@@ -385,4 +405,3 @@ class _UniversityFormState extends State<UniversityForm> {
     );
   }
 }
-

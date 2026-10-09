@@ -121,8 +121,9 @@ class _CareerRecommendationResultsPageState
 
     // Careers that scored nothing are left out: a list padded with 0% results
     // is noise, not guidance.
-    final matches =
-        result.matches.where((match) => match.matchPercentage > 0).toList();
+    final matches = result.matches
+        .where((match) => match.matchPercentage > 0)
+        .toList();
 
     if (matches.isEmpty) {
       return CareerEmptyView(
@@ -143,14 +144,14 @@ class _CareerRecommendationResultsPageState
         _buildHeader(context, result, matches.length),
         const SizedBox(height: 20),
         ...matches.asMap().entries.map(
-              (entry) => _MatchCard(
-                rank: entry.key + 1,
-                match: entry.value,
-                onTap: widget.onCareerSelected == null
-                    ? null
-                    : () => widget.onCareerSelected!(entry.value.career),
-              ),
-            ),
+          (entry) => _MatchCard(
+            rank: entry.key + 1,
+            match: entry.value,
+            onTap: widget.onCareerSelected == null
+                ? null
+                : () => widget.onCareerSelected!(entry.value.career),
+          ),
+        ),
         if (widget.onEditAnswers != null) ...[
           const SizedBox(height: 12),
           OutlinedButton.icon(
@@ -241,11 +242,7 @@ class _CareerRecommendationResultsPageState
 
 /// One ranked career: position, match percentage, and why it matched.
 class _MatchCard extends StatelessWidget {
-  const _MatchCard({
-    required this.rank,
-    required this.match,
-    this.onTap,
-  });
+  const _MatchCard({required this.rank, required this.match, this.onTap});
 
   final int rank;
   final CareerRecommendation match;
@@ -305,8 +302,9 @@ class _MatchCard extends StatelessWidget {
                         const SizedBox(height: 2),
                         Text(
                           career.category,
-                          style: theme.textTheme.bodyLarge
-                              ?.copyWith(fontSize: 14),
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
@@ -352,8 +350,9 @@ class _MatchCard extends StatelessWidget {
                         Expanded(
                           child: Text(
                             reason,
-                            style: theme.textTheme.bodyLarge
-                                ?.copyWith(fontSize: 14),
+                            style: theme.textTheme.bodyLarge?.copyWith(
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ],

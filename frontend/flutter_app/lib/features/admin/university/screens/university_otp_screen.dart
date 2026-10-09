@@ -24,8 +24,10 @@ class UniversityOtpScreen extends StatefulWidget {
 
 class _UniversityOtpScreenState extends State<UniversityOtpScreen> {
   final _service = UniversityAdminService();
-  final List<TextEditingController> _controllers =
-      List.generate(6, (_) => TextEditingController());
+  final List<TextEditingController> _controllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
   bool _loading = false;
@@ -65,13 +67,14 @@ class _UniversityOtpScreenState extends State<UniversityOtpScreen> {
     });
   }
 
-  String get _enteredOtp =>
-      _controllers.map((c) => c.text.trim()).join();
+  String get _enteredOtp => _controllers.map((c) => c.text.trim()).join();
 
   Future<void> _verifyOtp() async {
     final otp = _enteredOtp;
     if (otp.length != 6) {
-      setState(() => _error = 'Please enter all 6 digits of the verification code.');
+      setState(
+        () => _error = 'Please enter all 6 digits of the verification code.',
+      );
       return;
     }
 
@@ -101,9 +104,11 @@ class _UniversityOtpScreenState extends State<UniversityOtpScreen> {
       if (mounted) {
         setState(() {
           if (msg.toLowerCase().contains('too many attempts')) {
-            _error = 'Too many attempts. Please request a new verification code.';
+            _error =
+                'Too many attempts. Please request a new verification code.';
           } else if (msg.toLowerCase().contains('expired')) {
-            _error = 'Verification code has expired. Please request a new code.';
+            _error =
+                'Verification code has expired. Please request a new code.';
           } else if (msg.toLowerCase().contains('invalid')) {
             _error = 'Invalid verification code.';
           } else {
@@ -148,7 +153,11 @@ class _UniversityOtpScreenState extends State<UniversityOtpScreen> {
     } catch (e) {
       final msg = e.toString().replaceAll('Exception: ', '').trim();
       if (mounted) {
-        setState(() => _error = msg.isNotEmpty ? msg : 'Unable to send verification code.');
+        setState(
+          () => _error = msg.isNotEmpty
+              ? msg
+              : 'Unable to send verification code.',
+        );
       }
     } finally {
       if (mounted) setState(() => _resending = false);
@@ -259,9 +268,7 @@ class _UniversityOtpScreenState extends State<UniversityOtpScreen> {
                       Text(
                         'Verify University Email',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
+                        style: Theme.of(context).textTheme.headlineSmall
                             ?.copyWith(
                               fontWeight: FontWeight.w800,
                               color: const Color(0xFF1E293B),
@@ -299,15 +306,20 @@ class _UniversityOtpScreenState extends State<UniversityOtpScreen> {
                         const SizedBox(height: 14),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 8),
+                            horizontal: 12,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFFEE2E2),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.error_outline_rounded,
-                                  size: 16, color: Color(0xFFDC2626)),
+                              const Icon(
+                                Icons.error_outline_rounded,
+                                size: 16,
+                                color: Color(0xFFDC2626),
+                              ),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -371,9 +383,13 @@ class _UniversityOtpScreenState extends State<UniversityOtpScreen> {
                                         width: 14,
                                         height: 14,
                                         child: CircularProgressIndicator(
-                                            strokeWidth: 2),
+                                          strokeWidth: 2,
+                                        ),
                                       )
-                                    : const Icon(Icons.refresh_rounded, size: 16),
+                                    : const Icon(
+                                        Icons.refresh_rounded,
+                                        size: 16,
+                                      ),
                                 label: const Text(
                                   'Resend OTP',
                                   style: TextStyle(
@@ -394,4 +410,3 @@ class _UniversityOtpScreenState extends State<UniversityOtpScreen> {
     );
   }
 }
-

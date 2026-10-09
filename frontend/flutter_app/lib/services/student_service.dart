@@ -40,8 +40,11 @@ class StudentService {
     );
     final list = response['data'] as List<dynamic>? ?? [];
     return list
-        .map((item) =>
-            item is Map ? (item['_id'] ?? item['id'] ?? '').toString() : item.toString())
+        .map(
+          (item) => item is Map
+              ? (item['_id'] ?? item['id'] ?? '').toString()
+              : item.toString(),
+        )
         .where((id) => id.isNotEmpty)
         .toList();
   }

@@ -63,10 +63,7 @@ class _StudentUniversitySearchPageState
   }
 
   Future<void> _initData() async {
-    await Future.wait([
-      _loadFavorites(),
-      _loadUniversities(),
-    ]);
+    await Future.wait([_loadFavorites(), _loadUniversities()]);
   }
 
   Future<void> _loadFavorites() async {
@@ -116,7 +113,10 @@ class _StudentUniversitySearchPageState
 
   void _onSearchChanged(String _) {
     _searchDebounce?.cancel();
-    _searchDebounce = Timer(const Duration(milliseconds: 350), _loadUniversities);
+    _searchDebounce = Timer(
+      const Duration(milliseconds: 350),
+      _loadUniversities,
+    );
   }
 
   void _toggleCompare(UniversityComparisonModel uni) {
@@ -181,8 +181,7 @@ class _StudentUniversitySearchPageState
           university: uni,
           token: widget.token,
           student: widget.student,
-          isSelectedForCompare:
-              _selectedForCompare.any((u) => u.id == uni.id),
+          isSelectedForCompare: _selectedForCompare.any((u) => u.id == uni.id),
           isFavorite: _favoriteIds.contains(uni.id),
           onToggleCompare: () => _toggleCompare(uni),
           onToggleFavorite: () => _toggleFavorite(uni.id),
@@ -350,101 +349,99 @@ class _StudentUniversitySearchPageState
               child: _loading
                   ? const Center(child: CircularProgressIndicator())
                   : _error != null
-                      ? Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.error_outline_rounded,
-                                  size: 44,
-                                  color: Color(0xFFDC2626),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  _error!,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                FilledButton(
-                                  onPressed: _loadUniversities,
-                                  child: const Text('Retry'),
-                                ),
-                              ],
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              size: 44,
+                              color: Color(0xFFDC2626),
                             ),
-                          ),
-                        )
-                      : displayed.isEmpty
-                          ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(24),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(
-                                      Icons.school_outlined,
-                                      size: 52,
-                                      color: Color(0xFF94A3B8),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    const Text(
-                                      'No universities found',
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF334155),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      _onlyFavorites
-                                          ? 'You have not added any universities to your favorites yet.'
-                                          : _searchController.text.isNotEmpty
-                                              ? 'No universities match your search query.'
-                                              : 'No universities currently listed.',
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        color: Color(0xFF64748B),
-                                      ),
-                                    ),
-                                    if (_onlyFavorites) ...[
-                                      const SizedBox(height: 16),
-                                      OutlinedButton(
-                                        onPressed: () {
-                                          setState(() => _onlyFavorites = false);
-                                        },
-                                        child: const Text('Show all universities'),
-                                      ),
-                                    ],
-                                  ],
-                                ),
+                            const SizedBox(height: 10),
+                            Text(
+                              _error!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
                               ),
-                            )
-                          : ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(20, 6, 20, 24),
-                              itemCount: displayed.length,
-                              itemBuilder: (context, index) {
-                                final uni = displayed[index];
-                                final isSelected = _selectedForCompare
-                                    .any((u) => u.id == uni.id);
-                                final isFav = _favoriteIds.contains(uni.id);
-
-                                return StudentUniversityCard(
-                                  university: uni,
-                                  isSelectedForCompare: isSelected,
-                                  isFavorite: isFav,
-                                  studentStream: widget.student.stream,
-                                  onView: () => _openDetails(uni),
-                                  onToggleCompare: () => _toggleCompare(uni),
-                                  onToggleFavorite: () =>
-                                      _toggleFavorite(uni.id),
-                                );
-                              },
                             ),
+                            const SizedBox(height: 16),
+                            FilledButton(
+                              onPressed: _loadUniversities,
+                              child: const Text('Retry'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : displayed.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.school_outlined,
+                              size: 52,
+                              color: Color(0xFF94A3B8),
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              'No universities found',
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF334155),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              _onlyFavorites
+                                  ? 'You have not added any universities to your favorites yet.'
+                                  : _searchController.text.isNotEmpty
+                                  ? 'No universities match your search query.'
+                                  : 'No universities currently listed.',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Color(0xFF64748B)),
+                            ),
+                            if (_onlyFavorites) ...[
+                              const SizedBox(height: 16),
+                              OutlinedButton(
+                                onPressed: () {
+                                  setState(() => _onlyFavorites = false);
+                                },
+                                child: const Text('Show all universities'),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(20, 6, 20, 24),
+                      itemCount: displayed.length,
+                      itemBuilder: (context, index) {
+                        final uni = displayed[index];
+                        final isSelected = _selectedForCompare.any(
+                          (u) => u.id == uni.id,
+                        );
+                        final isFav = _favoriteIds.contains(uni.id);
+
+                        return StudentUniversityCard(
+                          university: uni,
+                          isSelectedForCompare: isSelected,
+                          isFavorite: isFav,
+                          studentStream: widget.student.stream,
+                          onView: () => _openDetails(uni),
+                          onToggleCompare: () => _toggleCompare(uni),
+                          onToggleFavorite: () => _toggleFavorite(uni.id),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -452,4 +449,3 @@ class _StudentUniversitySearchPageState
     );
   }
 }
-

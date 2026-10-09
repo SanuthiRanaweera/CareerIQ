@@ -9,10 +9,7 @@ export 'screens/university_dashboard_screen.dart';
 typedef UniversityDashboardPage = UniversityDashboardScreen;
 
 class UniversityLoginPage extends StatefulWidget {
-  const UniversityLoginPage({
-    super.key,
-    this.onLoginSuccess,
-  });
+  const UniversityLoginPage({super.key, this.onLoginSuccess});
 
   final VoidCallback? onLoginSuccess;
 
@@ -318,28 +315,28 @@ class _UniversityLoginPageState extends State<UniversityLoginPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('University Portal Access'),
-          leading: BackButton(
-            onPressed: () {
-              if (_isOtpStep) {
-                setState(() => _isOtpStep = false);
-              } else {
-                Navigator.maybePop(context);
-              }
-            },
+    appBar: AppBar(
+      title: const Text('University Portal Access'),
+      leading: BackButton(
+        onPressed: () {
+          if (_isOtpStep) {
+            setState(() => _isOtpStep = false);
+          } else {
+            Navigator.maybePop(context);
+          }
+        },
+      ),
+    ),
+    body: SafeArea(
+      child: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: _isOtpStep ? _buildOtpForm() : _buildLoginForm(),
           ),
         ),
-        body: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 440),
-                child: _isOtpStep ? _buildOtpForm() : _buildLoginForm(),
-              ),
-            ),
-          ),
-        ),
-      );
+      ),
+    ),
+  );
 }

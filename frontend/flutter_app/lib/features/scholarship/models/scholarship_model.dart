@@ -1,10 +1,7 @@
 import '../../../models/student.dart';
 
 class RequiredSubjectModel {
-  const RequiredSubjectModel({
-    required this.subject,
-    required this.grade,
-  });
+  const RequiredSubjectModel({required this.subject, required this.grade});
 
   final String subject;
   final String grade;
@@ -15,10 +12,7 @@ class RequiredSubjectModel {
         grade: (json['grade'] ?? '').toString().trim(),
       );
 
-  Map<String, dynamic> toJson() => {
-        'subject': subject,
-        'grade': grade,
-      };
+  Map<String, dynamic> toJson() => {'subject': subject, 'grade': grade};
 }
 
 class ScholarshipEligibilityModel {
@@ -38,7 +32,8 @@ class ScholarshipEligibilityModel {
   final String districtRequirement;
   final String otherRequirements;
 
-  String? get district => districtRequirement.isNotEmpty ? districtRequirement : null;
+  String? get district =>
+      districtRequirement.isNotEmpty ? districtRequirement : null;
   String? get other => otherRequirements.isNotEmpty ? otherRequirements : null;
 
   factory ScholarshipEligibilityModel.fromJson(Map<String, dynamic> json) {
@@ -48,26 +43,27 @@ class ScholarshipEligibilityModel {
       minimumResults: rawResults
           .map((r) => RequiredSubjectModel.fromJson(r as Map<String, dynamic>))
           .toList(),
-      academicRequirement:
-          (json['academicRequirement'] ?? '').toString().trim(),
+      academicRequirement: (json['academicRequirement'] ?? '')
+          .toString()
+          .trim(),
       ageRequirement: (json['ageRequirement'] ?? '').toString().trim(),
-      districtRequirement:
-          (json['districtRequirement'] ?? '').toString().trim(),
+      districtRequirement: (json['districtRequirement'] ?? '')
+          .toString()
+          .trim(),
       otherRequirements: (json['otherRequirements'] ?? '').toString().trim(),
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'stream': stream,
-        'minimumResults': minimumResults.map((r) => r.toJson()).toList(),
-        if (academicRequirement.isNotEmpty)
-          'academicRequirement': academicRequirement,
-        if (ageRequirement.isNotEmpty) 'ageRequirement': ageRequirement,
-        if (districtRequirement.isNotEmpty)
-          'districtRequirement': districtRequirement,
-        if (otherRequirements.isNotEmpty)
-          'otherRequirements': otherRequirements,
-      };
+    'stream': stream,
+    'minimumResults': minimumResults.map((r) => r.toJson()).toList(),
+    if (academicRequirement.isNotEmpty)
+      'academicRequirement': academicRequirement,
+    if (ageRequirement.isNotEmpty) 'ageRequirement': ageRequirement,
+    if (districtRequirement.isNotEmpty)
+      'districtRequirement': districtRequirement,
+    if (otherRequirements.isNotEmpty) 'otherRequirements': otherRequirements,
+  };
 }
 
 class EligibilityCheckResult {
@@ -139,8 +135,7 @@ class ScholarshipModel {
       status.toLowerCase() == 'expired' ||
       DateTime.now().isAfter(applicationDeadline);
 
-  bool get isActive =>
-      status.toLowerCase() == 'active' && !isExpired;
+  bool get isActive => status.toLowerCase() == 'active' && !isExpired;
 
   bool get isClosed => status.toLowerCase() == 'closed';
   bool get isDraft => status.toLowerCase() == 'draft';
@@ -149,7 +144,10 @@ class ScholarshipModel {
 
   String get initials {
     final clean = universityName.replaceAll(RegExp(r'[^a-zA-Z\s]'), '');
-    final words = clean.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+    final words = clean
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
     if (words.isEmpty) return 'U';
     if (words.length == 1) {
       return words[0].substring(0, words[0].length >= 2 ? 2 : 1).toUpperCase();
@@ -167,7 +165,8 @@ class ScholarshipModel {
         isEligible: false,
         matchedCriteria: [],
         unmetCriteria: ['Student profile not available'],
-        guidanceMessage: 'Please log in and complete your profile to verify eligibility.',
+        guidanceMessage:
+            'Please log in and complete your profile to verify eligibility.',
       );
     }
 
@@ -205,18 +204,26 @@ class ScholarshipModel {
         final reqVal = gradePoints(reqGrade);
 
         final studentSub = student.alResults.firstWhere(
-          (s) => s.name.toLowerCase().contains(reqName) || reqName.contains(s.name.toLowerCase()),
+          (s) =>
+              s.name.toLowerCase().contains(reqName) ||
+              reqName.contains(s.name.toLowerCase()),
           orElse: () => SubjectResult(id: null, name: '', grade: ''),
         );
 
         if (studentSub.name.isEmpty) {
-          unmet.add('Requires ${reqSub.subject} ($reqGrade) - Not in your results');
+          unmet.add(
+            'Requires ${reqSub.subject} ($reqGrade) - Not in your results',
+          );
         } else {
           final studentVal = gradePoints(studentSub.grade);
           if (studentVal >= reqVal) {
-            matched.add('${reqSub.subject}: You scored ${studentSub.grade} (Meets required $reqGrade)');
+            matched.add(
+              '${reqSub.subject}: You scored ${studentSub.grade} (Meets required $reqGrade)',
+            );
           } else {
-            unmet.add('${reqSub.subject}: Requires $reqGrade, you scored ${studentSub.grade}');
+            unmet.add(
+              '${reqSub.subject}: Requires $reqGrade, you scored ${studentSub.grade}',
+            );
           }
         }
       }
@@ -259,22 +266,28 @@ class ScholarshipModel {
 
     return ScholarshipModel(
       id: (json['_id'] ?? json['id'] ?? '').toString(),
-      universityId: (json['universityId'] is Map
-              ? json['universityId']['_id'] ?? json['universityId']['id']
-              : json['universityId'] ?? '')
-          .toString(),
-      universityName: (json['universityName'] ??
-              (json['universityId'] is Map
-                  ? json['universityId']['universityName']
-                  : ''))
-          .toString()
-          .trim(),
+      universityId:
+          (json['universityId'] is Map
+                  ? json['universityId']['_id'] ?? json['universityId']['id']
+                  : json['universityId'] ?? '')
+              .toString(),
+      universityName:
+          (json['universityName'] ??
+                  (json['universityId'] is Map
+                      ? json['universityId']['universityName']
+                      : ''))
+              .toString()
+              .trim(),
       title: (json['title'] ?? '').toString().trim(),
       description: (json['description'] ?? '').toString().trim(),
       scholarshipType: (json['scholarshipType'] ?? 'Merit').toString().trim(),
       amount: (json['amount'] ?? '').toString().trim(),
-      coverage: covRaw.map((c) => c.toString().trim()).where((c) => c.isNotEmpty).toList(),
-      numberOfScholarships: (json['numberOfScholarships'] as num?)?.toInt() ?? 1,
+      coverage: covRaw
+          .map((c) => c.toString().trim())
+          .where((c) => c.isNotEmpty)
+          .toList(),
+      numberOfScholarships:
+          (json['numberOfScholarships'] as num?)?.toInt() ?? 1,
       applicationDeadline: deadline,
       startDate: json['startDate'] != null
           ? DateTime.tryParse(json['startDate'].toString())
@@ -284,19 +297,23 @@ class ScholarshipModel {
           : null,
       eligibility: json['eligibility'] is Map<String, dynamic>
           ? ScholarshipEligibilityModel.fromJson(
-              json['eligibility'] as Map<String, dynamic>)
+              json['eligibility'] as Map<String, dynamic>,
+            )
           : const ScholarshipEligibilityModel(),
-      applicationInstructions:
-          (json['applicationInstructions'] ?? '').toString().trim(),
-      requiredDocuments:
-          docsRaw.map((d) => d.toString().trim()).where((d) => d.isNotEmpty).toList(),
+      applicationInstructions: (json['applicationInstructions'] ?? '')
+          .toString()
+          .trim(),
+      requiredDocuments: docsRaw
+          .map((d) => d.toString().trim())
+          .where((d) => d.isNotEmpty)
+          .toList(),
       status: (json['status'] ?? 'active').toString().trim(),
       applicationsCount: (json['applicationsCount'] as num?)?.toInt() ?? 0,
       hasApplied: json['hasApplied'] as bool? ?? false,
       applicationId: json['applicationId']?.toString(),
       applicationStatus: json['applicationStatus']?.toString(),
-      isDeadlinePassed: json['isDeadlinePassed'] as bool? ??
-          DateTime.now().isAfter(deadline),
+      isDeadlinePassed:
+          json['isDeadlinePassed'] as bool? ?? DateTime.now().isAfter(deadline),
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,
@@ -307,22 +324,22 @@ class ScholarshipModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'universityId': universityId,
-        'universityName': universityName,
-        'title': title,
-        'description': description,
-        'scholarshipType': scholarshipType,
-        'amount': amount,
-        'coverage': coverage,
-        'numberOfScholarships': numberOfScholarships,
-        'applicationDeadline': applicationDeadline.toIso8601String(),
-        if (startDate != null) 'startDate': startDate!.toIso8601String(),
-        if (endDate != null) 'endDate': endDate!.toIso8601String(),
-        'eligibility': eligibility.toJson(),
-        if (applicationInstructions.isNotEmpty)
-          'applicationInstructions': applicationInstructions,
-        'requiredDocuments': requiredDocuments,
-        'status': status,
-      };
+    'id': id,
+    'universityId': universityId,
+    'universityName': universityName,
+    'title': title,
+    'description': description,
+    'scholarshipType': scholarshipType,
+    'amount': amount,
+    'coverage': coverage,
+    'numberOfScholarships': numberOfScholarships,
+    'applicationDeadline': applicationDeadline.toIso8601String(),
+    if (startDate != null) 'startDate': startDate!.toIso8601String(),
+    if (endDate != null) 'endDate': endDate!.toIso8601String(),
+    'eligibility': eligibility.toJson(),
+    if (applicationInstructions.isNotEmpty)
+      'applicationInstructions': applicationInstructions,
+    'requiredDocuments': requiredDocuments,
+    'status': status,
+  };
 }

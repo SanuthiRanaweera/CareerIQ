@@ -19,7 +19,9 @@ class _AddScholarshipScreenState extends State<AddScholarshipScreen> {
   final _descController = TextEditingController();
   final _amountController = TextEditingController();
   final _numController = TextEditingController(text: '1');
-  final _academicReqController = TextEditingController(text: 'Minimum 3 passes');
+  final _academicReqController = TextEditingController(
+    text: 'Minimum 3 passes',
+  );
   final _ageReqController = TextEditingController();
   final _districtReqController = TextEditingController();
   final _otherReqController = TextEditingController();
@@ -171,10 +173,9 @@ class _AddScholarshipScreenState extends State<AddScholarshipScreen> {
                 final sub = subjectCtrl.text.trim();
                 if (sub.isNotEmpty) {
                   setState(() {
-                    _minimumResults.add(RequiredSubjectModel(
-                      subject: sub,
-                      grade: selectedGrade,
-                    ));
+                    _minimumResults.add(
+                      RequiredSubjectModel(subject: sub, grade: selectedGrade),
+                    );
                   });
                   Navigator.pop(dialogCtx);
                 }
@@ -265,9 +266,7 @@ class _AddScholarshipScreenState extends State<AddScholarshipScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Add Scholarship'),
-      ),
+      appBar: AppBar(title: const Text('Add Scholarship')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -301,7 +300,9 @@ class _AddScholarshipScreenState extends State<AddScholarshipScreen> {
             const SizedBox(height: 14),
             DropdownButtonFormField<String>(
               value: _selectedType,
-              decoration: const InputDecoration(labelText: 'Scholarship Type *'),
+              decoration: const InputDecoration(
+                labelText: 'Scholarship Type *',
+              ),
               items: _types
                   .map((t) => DropdownMenuItem(value: t, child: Text(t)))
                   .toList(),
@@ -485,8 +486,10 @@ class _AddScholarshipScreenState extends State<AddScholarshipScreen> {
               ..._minimumResults.map(
                 (req) => Container(
                   margin: const EdgeInsets.only(bottom: 6),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(10),
@@ -607,9 +610,11 @@ class _AddScholarshipScreenState extends State<AddScholarshipScreen> {
             DropdownButtonFormField<String>(
               value: _selectedStatus,
               decoration: const InputDecoration(labelText: 'Status *'),
-              items: ['Active', 'Draft', 'Closed']
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                  .toList(),
+              items: [
+                'Active',
+                'Draft',
+                'Closed',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
               onChanged: (val) {
                 if (val != null) setState(() => _selectedStatus = val);
               },
@@ -638,8 +643,10 @@ class _AddScholarshipScreenState extends State<AddScholarshipScreen> {
                     )
                   : const Text(
                       'Create Scholarship',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
             ),
           ],
@@ -649,13 +656,12 @@ class _AddScholarshipScreenState extends State<AddScholarshipScreen> {
   }
 
   Widget _buildSectionHeader(String title) => Text(
-        title,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.1,
-          color: Color(0xFF3B82F6),
-        ),
-      );
+    title,
+    style: const TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 1.1,
+      color: Color(0xFF3B82F6),
+    ),
+  );
 }
-

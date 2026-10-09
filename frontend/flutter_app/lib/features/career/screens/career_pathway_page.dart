@@ -63,14 +63,14 @@ class CareerPathwayPage extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         ...steps.asMap().entries.map(
-              (entry) => _TimelineStep(
-                step: entry.value,
-                number: entry.key + 1,
-                // The connector is drawn below every step except the last, so
-                // the line stops at the end of the path.
-                isLast: entry.key == steps.length - 1,
-              ),
-            ),
+          (entry) => _TimelineStep(
+            step: entry.value,
+            number: entry.key + 1,
+            // The connector is drawn below every step except the last, so
+            // the line stops at the end of the path.
+            isLast: entry.key == steps.length - 1,
+          ),
+        ),
       ],
     );
   }
@@ -154,8 +154,9 @@ class _TimelineStep extends StatelessWidget {
                         const SizedBox(height: 6),
                         Text(
                           step.description,
-                          style: theme.textTheme.bodyLarge
-                              ?.copyWith(fontSize: 15),
+                          style: theme.textTheme.bodyLarge?.copyWith(
+                            fontSize: 15,
+                          ),
                         ),
                       ],
                     ],
@@ -178,23 +179,23 @@ class _StagePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: Alignment.centerLeft,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: const Color(0xFFDBEAFE),
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF1D4ED8),
-            ),
-          ),
+    alignment: Alignment.centerLeft,
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: const Color(0xFFDBEAFE),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF1D4ED8),
         ),
-      );
+      ),
+    ),
+  );
 }
 
 /// Roughly how long this step takes, e.g. "3-4 years".
@@ -205,22 +206,18 @@ class _DurationLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Icon(
-            Icons.schedule_rounded,
-            size: 14,
-            color: Color(0xFF64748B),
-          ),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFF64748B),
-            ),
-          ),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      const Icon(Icons.schedule_rounded, size: 14, color: Color(0xFF64748B)),
+      const SizedBox(width: 4),
+      Text(
+        label,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF64748B),
+        ),
+      ),
+    ],
+  );
 }

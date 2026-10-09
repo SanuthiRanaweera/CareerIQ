@@ -4,10 +4,7 @@ import '../models/university_dashboard_data.dart';
 import '../services/university_service.dart';
 
 class EditUniversityProfileScreen extends StatefulWidget {
-  const EditUniversityProfileScreen({
-    super.key,
-    required this.profile,
-  });
+  const EditUniversityProfileScreen({super.key, required this.profile});
 
   final UniversityProfileModel profile;
 
@@ -44,9 +41,12 @@ class _EditUniversityProfileScreenState
     _addressController = TextEditingController(text: p.address);
     _contactController = TextEditingController(text: p.contactNumber);
     _repNameController = TextEditingController(text: p.representativeName);
-    _repEmailController = TextEditingController(text: p.representativeEmail ?? '');
-    _repContactController =
-        TextEditingController(text: p.representativeContactNumber);
+    _repEmailController = TextEditingController(
+      text: p.representativeEmail ?? '',
+    );
+    _repContactController = TextEditingController(
+      text: p.representativeContactNumber,
+    );
     _websiteController = TextEditingController(text: p.website ?? '');
     _descriptionController = TextEditingController(text: p.description ?? '');
     _logoController = TextEditingController(text: p.logo ?? '');
@@ -162,8 +162,11 @@ class _EditUniversityProfileScreenState
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.lock_outline_rounded,
-                          color: Color(0xFF2563EB), size: 20),
+                      const Icon(
+                        Icons.lock_outline_rounded,
+                        color: Color(0xFF2563EB),
+                        size: 20,
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -202,7 +205,9 @@ class _EditUniversityProfileScreenState
                 ),
 
                 _buildSectionHeader(
-                    'UNIVERSITY INFORMATION', Icons.account_balance_outlined),
+                  'UNIVERSITY INFORMATION',
+                  Icons.account_balance_outlined,
+                ),
                 TextFormField(
                   controller: _nameController,
                   decoration: const InputDecoration(
@@ -275,7 +280,9 @@ class _EditUniversityProfileScreenState
                 ),
 
                 _buildSectionHeader(
-                    'REPRESENTATIVE INFORMATION', Icons.badge_outlined),
+                  'REPRESENTATIVE INFORMATION',
+                  Icons.badge_outlined,
+                ),
                 TextFormField(
                   controller: _repNameController,
                   decoration: const InputDecoration(
@@ -309,7 +316,9 @@ class _EditUniversityProfileScreenState
                 ),
 
                 _buildSectionHeader(
-                    'ONLINE PRESENCE & ABOUT', Icons.language_outlined),
+                  'ONLINE PRESENCE & ABOUT',
+                  Icons.language_outlined,
+                ),
                 TextFormField(
                   controller: _websiteController,
                   decoration: const InputDecoration(
@@ -346,7 +355,10 @@ class _EditUniversityProfileScreenState
                             color: Colors.white,
                           ),
                         )
-                      : const Icon(Icons.check_circle_outline_rounded, size: 20),
+                      : const Icon(
+                          Icons.check_circle_outline_rounded,
+                          size: 20,
+                        ),
                   label: Text(
                     _isLoading ? 'Saving...' : 'Save Profile Changes',
                     style: const TextStyle(

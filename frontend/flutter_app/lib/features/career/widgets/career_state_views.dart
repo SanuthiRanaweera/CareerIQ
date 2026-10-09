@@ -26,8 +26,9 @@ void showCareerMessage(
       SnackBar(
         content: Text(message),
         behavior: SnackBarBehavior.floating,
-        backgroundColor:
-            success ? const Color(0xFF15803D) : const Color(0xFF1F2937),
+        backgroundColor: success
+            ? const Color(0xFF15803D)
+            : const Color(0xFF1F2937),
       ),
     );
 }
@@ -41,15 +42,15 @@ class CareerLoadingView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 18),
-            Text(message, style: Theme.of(context).textTheme.bodyLarge),
-          ],
-        ),
-      );
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const CircularProgressIndicator(),
+        const SizedBox(height: 18),
+        Text(message, style: Theme.of(context).textTheme.bodyLarge),
+      ],
+    ),
+  );
 }
 
 /// Error state with the server's own message and a retry action.
@@ -68,40 +69,40 @@ class CareerErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _CentredScrollable(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const CircleAvatar(
-              radius: 34,
-              backgroundColor: Color(0xFFFEE2E2),
-              foregroundColor: Color(0xFFDC2626),
-              child: Icon(Icons.error_outline_rounded, size: 32),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              'Something went wrong',
-              style: Theme.of(context).textTheme.titleLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            // Constrained so the stadium button does not stretch edge to edge.
-            SizedBox(
-              width: 200,
-              child: FilledButton.icon(
-                onPressed: onRetry,
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Try again'),
-              ),
-            ),
-          ],
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const CircleAvatar(
+          radius: 34,
+          backgroundColor: Color(0xFFFEE2E2),
+          foregroundColor: Color(0xFFDC2626),
+          child: Icon(Icons.error_outline_rounded, size: 32),
         ),
-      );
+        const SizedBox(height: 18),
+        Text(
+          'Something went wrong',
+          style: Theme.of(context).textTheme.titleLarge,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          message,
+          style: Theme.of(context).textTheme.bodyLarge,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 24),
+        // Constrained so the stadium button does not stretch edge to edge.
+        SizedBox(
+          width: 200,
+          child: FilledButton.icon(
+            onPressed: onRetry,
+            icon: const Icon(Icons.refresh_rounded),
+            label: const Text('Try again'),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /// Empty state: nothing failed, there is just nothing to show yet.
@@ -123,41 +124,41 @@ class CareerEmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _CentredScrollable(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              radius: 34,
-              backgroundColor: const Color(0xFFDBEAFE),
-              foregroundColor: const Color(0xFF3B82F6),
-              child: Icon(icon, size: 32),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              message,
-              style: Theme.of(context).textTheme.bodyLarge,
-              textAlign: TextAlign.center,
-            ),
-            if (onRetry != null) ...[
-              const SizedBox(height: 24),
-              SizedBox(
-                width: 200,
-                child: OutlinedButton.icon(
-                  onPressed: onRetry,
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: Text(actionLabel),
-                ),
-              ),
-            ],
-          ],
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CircleAvatar(
+          radius: 34,
+          backgroundColor: const Color(0xFFDBEAFE),
+          foregroundColor: const Color(0xFF3B82F6),
+          child: Icon(icon, size: 32),
         ),
-      );
+        const SizedBox(height: 18),
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleLarge,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 8),
+        Text(
+          message,
+          style: Theme.of(context).textTheme.bodyLarge,
+          textAlign: TextAlign.center,
+        ),
+        if (onRetry != null) ...[
+          const SizedBox(height: 24),
+          SizedBox(
+            width: 200,
+            child: OutlinedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh_rounded),
+              label: Text(actionLabel),
+            ),
+          ),
+        ],
+      ],
+    ),
+  );
 }
 
 /// Centres its child while staying scrollable, so these views can sit inside a
@@ -169,17 +170,17 @@ class _CentredScrollable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
-                child: child,
-              ),
-            ),
+    builder: (context, constraints) => SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 40),
+            child: child,
           ),
         ),
-      );
+      ),
+    ),
+  );
 }

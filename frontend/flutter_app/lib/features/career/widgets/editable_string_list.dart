@@ -52,9 +52,8 @@ class _EditableStringListState extends State<EditableStringList> {
 
   /// Case-insensitive, so "Technology" is not stored next to "technology".
   bool _alreadyAdded(String value) => widget.values.any(
-        (existing) =>
-            existing.toLowerCase() == value.trim().toLowerCase(),
-      );
+    (existing) => existing.toLowerCase() == value.trim().toLowerCase(),
+  );
 
   /// Adds a value unless it is blank or already present. Used by both the
   /// text input and the suggestion chips.
@@ -151,8 +150,9 @@ class _EditableStringListState extends State<EditableStringList> {
                       )
                     : null,
                 onPressed: added ? null : () => _addValue(suggestion),
-                backgroundColor:
-                    added ? const Color(0xFFF1F5F9) : const Color(0xFFEFF6FF),
+                backgroundColor: added
+                    ? const Color(0xFFF1F5F9)
+                    : const Color(0xFFEFF6FF),
                 shape: StadiumBorder(
                   side: BorderSide(
                     color: added
@@ -202,38 +202,38 @@ class _EditableStringListState extends State<EditableStringList> {
         if (widget.values.isNotEmpty) ...[
           const SizedBox(height: 6),
           ...widget.values.asMap().entries.map(
-                (entry) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(14, 6, 6, 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
-                    ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            entry.value,
-                            style: theme.textTheme.bodyLarge?.copyWith(
-                              fontSize: 15,
-                              color: const Color(0xFF1F2937),
-                            ),
-                          ),
+            (entry) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(14, 6, 6, 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        entry.value,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 15,
+                          color: const Color(0xFF1F2937),
                         ),
-                        IconButton(
-                          tooltip: 'Remove ${entry.value}',
-                          onPressed: () => _removeAt(entry.key),
-                          icon: const Icon(Icons.close_rounded, size: 18),
-                          color: const Color(0xFF64748B),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
+                    IconButton(
+                      tooltip: 'Remove ${entry.value}',
+                      onPressed: () => _removeAt(entry.key),
+                      icon: const Icon(Icons.close_rounded, size: 18),
+                      color: const Color(0xFF64748B),
+                      visualDensity: VisualDensity.compact,
+                    ),
+                  ],
                 ),
               ),
+            ),
+          ),
         ],
         if (hasError) ...[
           const SizedBox(height: 6),

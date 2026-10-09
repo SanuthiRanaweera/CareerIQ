@@ -33,7 +33,8 @@ void main() {
       order: 2,
       stage: 'Degree',
       title: 'BSc in Software Engineering',
-      description: 'State universities such as Moratuwa, or a private institute.',
+      description:
+          'State universities such as Moratuwa, or a private institute.',
       durationLabel: '3-4 years',
     ),
     CareerPathwayStep(
@@ -63,30 +64,33 @@ void main() {
   ];
 
   group('CareerPathwayPage', () {
-    testWidgets('shows the career name and the number of steps',
-        (tester) async {
-      await tester.pumpWidget(wrap(CareerPathwayPage(
-        career: careerFixture(
-          title: 'Software Engineer',
-          pathway: sixStepPathway,
+    testWidgets('shows the career name and the number of steps', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          CareerPathwayPage(
+            career: careerFixture(
+              title: 'Software Engineer',
+              pathway: sixStepPathway,
+            ),
+          ),
         ),
-      )));
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Career pathway'), findsOneWidget);
       expect(find.text('YOUR PATH TO'), findsOneWidget);
       expect(find.text('Software Engineer'), findsOneWidget);
-      expect(
-        find.text('6 steps from A/L to a senior role'),
-        findsOneWidget,
-      );
+      expect(find.text('6 steps from A/L to a senior role'), findsOneWidget);
     });
 
-    testWidgets('numbers each step and shows its stage, title and duration',
-        (tester) async {
-      await tester.pumpWidget(wrap(CareerPathwayPage(
-        career: careerFixture(pathway: sixStepPathway),
-      )));
+    testWidgets('numbers each step and shows its stage, title and duration', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(CareerPathwayPage(career: careerFixture(pathway: sixStepPathway))),
+      );
       await tester.pumpAndSettle();
 
       // First step, visible without scrolling.
@@ -106,16 +110,35 @@ void main() {
       expect(find.text('5+ years'), findsOneWidget);
     });
 
-    testWidgets('renders steps in pathway order even when supplied jumbled',
-        (tester) async {
+    testWidgets('renders steps in pathway order even when supplied jumbled', (
+      tester,
+    ) async {
       // The backend sorts on save, but the screen must not depend on that.
-      await tester.pumpWidget(wrap(CareerPathwayPage(
-        career: careerFixture(pathway: const [
-          CareerPathwayStep(order: 3, stage: 'Skills', title: 'Third step'),
-          CareerPathwayStep(order: 1, stage: 'A/L Stream', title: 'First step'),
-          CareerPathwayStep(order: 2, stage: 'Degree', title: 'Second step'),
-        ]),
-      )));
+      await tester.pumpWidget(
+        wrap(
+          CareerPathwayPage(
+            career: careerFixture(
+              pathway: const [
+                CareerPathwayStep(
+                  order: 3,
+                  stage: 'Skills',
+                  title: 'Third step',
+                ),
+                CareerPathwayStep(
+                  order: 1,
+                  stage: 'A/L Stream',
+                  title: 'First step',
+                ),
+                CareerPathwayStep(
+                  order: 2,
+                  stage: 'Degree',
+                  title: 'Second step',
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       final firstY = tester.getTopLeft(find.text('First step')).dy;
@@ -126,15 +149,26 @@ void main() {
       expect(secondY, lessThan(thirdY));
     });
 
-    testWidgets('numbers steps by position, not by their stored order value',
-        (tester) async {
+    testWidgets('numbers steps by position, not by their stored order value', (
+      tester,
+    ) async {
       // A pathway whose order values start at 5 should still read 1, 2, 3.
-      await tester.pumpWidget(wrap(CareerPathwayPage(
-        career: careerFixture(pathway: const [
-          CareerPathwayStep(order: 5, stage: 'Degree', title: 'Step A'),
-          CareerPathwayStep(order: 9, stage: 'Entry Job', title: 'Step B'),
-        ]),
-      )));
+      await tester.pumpWidget(
+        wrap(
+          CareerPathwayPage(
+            career: careerFixture(
+              pathway: const [
+                CareerPathwayStep(order: 5, stage: 'Degree', title: 'Step A'),
+                CareerPathwayStep(
+                  order: 9,
+                  stage: 'Entry Job',
+                  title: 'Step B',
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('1'), findsOneWidget);
@@ -143,15 +177,22 @@ void main() {
       expect(find.text('9'), findsNothing);
     });
 
-    testWidgets('draws a connector between steps but not after the last',
-        (tester) async {
-      await tester.pumpWidget(wrap(CareerPathwayPage(
-        career: careerFixture(pathway: const [
-          CareerPathwayStep(order: 1, stage: 'A/L Stream', title: 'One'),
-          CareerPathwayStep(order: 2, stage: 'Degree', title: 'Two'),
-          CareerPathwayStep(order: 3, stage: 'Skills', title: 'Three'),
-        ]),
-      )));
+    testWidgets('draws a connector between steps but not after the last', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          CareerPathwayPage(
+            career: careerFixture(
+              pathway: const [
+                CareerPathwayStep(order: 1, stage: 'A/L Stream', title: 'One'),
+                CareerPathwayStep(order: 2, stage: 'Degree', title: 'Two'),
+                CareerPathwayStep(order: 3, stage: 'Skills', title: 'Three'),
+              ],
+            ),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       // Three steps, two connectors: the line stops at the end of the path.
@@ -159,11 +200,21 @@ void main() {
     });
 
     testWidgets('uses singular wording for a one-step pathway', (tester) async {
-      await tester.pumpWidget(wrap(CareerPathwayPage(
-        career: careerFixture(pathway: const [
-          CareerPathwayStep(order: 1, stage: 'Degree', title: 'Only step'),
-        ]),
-      )));
+      await tester.pumpWidget(
+        wrap(
+          CareerPathwayPage(
+            career: careerFixture(
+              pathway: const [
+                CareerPathwayStep(
+                  order: 1,
+                  stage: 'Degree',
+                  title: 'Only step',
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('1 step from A/L to a senior role'), findsOneWidget);
@@ -171,26 +222,33 @@ void main() {
     });
 
     testWidgets('omits the duration when a step has none', (tester) async {
-      await tester.pumpWidget(wrap(CareerPathwayPage(
-        career: careerFixture(pathway: const [
-          CareerPathwayStep(
-            order: 1,
-            stage: 'Skills',
-            title: 'Keep learning',
+      await tester.pumpWidget(
+        wrap(
+          CareerPathwayPage(
+            career: careerFixture(
+              pathway: const [
+                CareerPathwayStep(
+                  order: 1,
+                  stage: 'Skills',
+                  title: 'Keep learning',
+                ),
+              ],
+            ),
           ),
-        ]),
-      )));
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Keep learning'), findsOneWidget);
       expect(find.byIcon(Icons.schedule_rounded), findsNothing);
     });
 
-    testWidgets('shows an empty state when no pathway has been added',
-        (tester) async {
-      await tester.pumpWidget(wrap(CareerPathwayPage(
-        career: careerFixture(pathway: const []),
-      )));
+    testWidgets('shows an empty state when no pathway has been added', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(CareerPathwayPage(career: careerFixture(pathway: const []))),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Pathway coming soon'), findsOneWidget);

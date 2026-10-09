@@ -69,11 +69,11 @@ class AdminUniversityModel {
       officialEmail: (json['officialEmail'] ?? '').toString().trim(),
       address: (json['address'] ?? '').toString().trim(),
       contactNumber: (json['contactNumber'] ?? '').toString().trim(),
-      representativeName:
-          (json['representativeName'] ?? '').toString().trim(),
+      representativeName: (json['representativeName'] ?? '').toString().trim(),
       representativeEmail: json['representativeEmail']?.toString().trim(),
-      representativeContactNumber:
-          (json['representativeContactNumber'] ?? '').toString().trim(),
+      representativeContactNumber: (json['representativeContactNumber'] ?? '')
+          .toString()
+          .trim(),
       universityType: json['universityType']?.toString().trim(),
       website: json['website']?.toString().trim(),
       description: json['description']?.toString().trim(),
@@ -91,24 +91,23 @@ class AdminUniversityModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'userId': userId,
-        'universityName': universityName,
-        'location': location,
-        'officialEmail': officialEmail,
-        'address': address,
-        'contactNumber': contactNumber,
-        'representativeName': representativeName,
-        if (representativeEmail != null)
-          'representativeEmail': representativeEmail,
-        'representativeContactNumber': representativeContactNumber,
-        if (universityType != null) 'universityType': universityType,
-        if (website != null) 'website': website,
-        if (description != null) 'description': description,
-        if (logo != null) 'logo': logo,
-        'status': status,
-        'isEmailVerified': isEmailVerified,
-      };
+    'id': id,
+    'userId': userId,
+    'universityName': universityName,
+    'location': location,
+    'officialEmail': officialEmail,
+    'address': address,
+    'contactNumber': contactNumber,
+    'representativeName': representativeName,
+    if (representativeEmail != null) 'representativeEmail': representativeEmail,
+    'representativeContactNumber': representativeContactNumber,
+    if (universityType != null) 'universityType': universityType,
+    if (website != null) 'website': website,
+    if (description != null) 'description': description,
+    if (logo != null) 'logo': logo,
+    'status': status,
+    'isEmailVerified': isEmailVerified,
+  };
 }
 
 class AdminUniversityStats {
@@ -132,4 +131,3 @@ class AdminUniversityStats {
         pendingVerification: json['pendingVerification'] as int? ?? 0,
       );
 }
-

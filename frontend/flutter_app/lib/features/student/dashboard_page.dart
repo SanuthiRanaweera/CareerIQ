@@ -10,6 +10,8 @@ import '../../services/notification_service.dart';
 import '../career/screens/career_details_page.dart';
 import '../career/screens/career_pathway_page.dart';
 import '../career/screens/careers_list_page.dart';
+import '../career/screens/saved_careers_page.dart';
+import '../../services/saved_career_service.dart';
 import '../scholarship/screens/scholarship_list_screen.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -63,13 +65,14 @@ class _DashboardPageState extends State<DashboardPage> {
 
   /// Opens the career details screen, and from there the pathway timeline, so
   /// the Careers tab leads all the way through the Career module.
-  void _openCareerDetails(Career career) {
-    Navigator.push(
+  Future<void> _openCareerDetails(Career career) {
+    return Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => CareerDetailsPage(
           token: widget.token,
           careerId: career.id,
+          savedCareerService: SavedCareerService(),
           onViewPathway: (loaded) => Navigator.push(
             context,
             MaterialPageRoute(
@@ -137,7 +140,8 @@ class _DashboardPageState extends State<DashboardPage> {
                     minWidth: 48,
                     minHeight: 48,
                   ),
-                  icon: widget.student.profileImage != null &&
+                  icon:
+                      widget.student.profileImage != null &&
                           widget.student.profileImage!.trim().isNotEmpty
                       ? CircleAvatar(
                           radius: 15,
@@ -254,7 +258,10 @@ class _DashboardPageState extends State<DashboardPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Good morning,', style: Theme.of(context).textTheme.bodyLarge),
+                  Text(
+                    'Good morning,',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     'Hello, $firstName',
@@ -394,6 +401,21 @@ class _DashboardPageState extends State<DashboardPage> {
           value: 'Find your match',
           subtitle: 'Answer a few questions to see ranked careers',
           onTap: widget.onCareerRecommendations,
+        ),
+        _InfoCard(
+          icon: Icons.bookmark_border_rounded,
+          title: 'My shortlist',
+          value: 'Your saved careers',
+          subtitle: 'Keep notes and priorities on careers you like',
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => SavedCareersPage(
+                token: widget.token,
+                onCareerSelected: _openCareerDetails,
+              ),
+            ),
+          ),
         ),
         _InfoCard(
           icon: Icons.account_balance_outlined,
@@ -544,7 +566,6 @@ class _CareerBotIcon extends StatelessWidget {
     ),
   );
 }
-
 
 class _InfoCard extends StatelessWidget {
   const _InfoCard({

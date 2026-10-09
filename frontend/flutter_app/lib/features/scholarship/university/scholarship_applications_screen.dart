@@ -26,7 +26,8 @@ class _ScholarshipApplicationsScreenState
   List<ScholarshipApplicationModel> _applications = [];
   bool _isLoading = true;
   String? _errorMessage;
-  String _selectedStatus = 'all'; // all, pending, under_review, shortlisted, approved, rejected
+  String _selectedStatus =
+      'all'; // all, pending, under_review, shortlisted, approved, rejected
 
   @override
   void initState() {
@@ -163,7 +164,9 @@ class _ScholarshipApplicationsScreenState
                             decoration: BoxDecoration(
                               color: const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                              border: Border.all(
+                                color: const Color(0xFFE2E8F0),
+                              ),
                             ),
                             child: Column(
                               children: [
@@ -248,7 +251,9 @@ class _ScholarshipApplicationsScreenState
                             decoration: BoxDecoration(
                               color: const Color(0xFFF8FAFC),
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: const Color(0xFFE2E8F0)),
+                              border: Border.all(
+                                color: const Color(0xFFE2E8F0),
+                              ),
                             ),
                             child: Text(
                               app.personalStatement.isNotEmpty
@@ -280,7 +285,9 @@ class _ScholarshipApplicationsScreenState
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF8FAFC),
                                 borderRadius: BorderRadius.circular(14),
-                                border: Border.all(color: const Color(0xFFE2E8F0)),
+                                border: Border.all(
+                                  color: const Color(0xFFE2E8F0),
+                                ),
                               ),
                               child: Text(
                                 app.careerGoal,
@@ -314,7 +321,8 @@ class _ScholarshipApplicationsScreenState
                                 color: const Color(0xFF0284C7),
                                 current: currentStatus,
                                 onSelect: () => setSheetState(
-                                    () => currentStatus = 'under_review'),
+                                  () => currentStatus = 'under_review',
+                                ),
                               ),
                               _buildStatusChip(
                                 label: 'Shortlisted',
@@ -322,7 +330,8 @@ class _ScholarshipApplicationsScreenState
                                 color: const Color(0xFF8B5CF6),
                                 current: currentStatus,
                                 onSelect: () => setSheetState(
-                                    () => currentStatus = 'shortlisted'),
+                                  () => currentStatus = 'shortlisted',
+                                ),
                               ),
                               _buildStatusChip(
                                 label: 'Approved',
@@ -330,7 +339,8 @@ class _ScholarshipApplicationsScreenState
                                 color: const Color(0xFF10B981),
                                 current: currentStatus,
                                 onSelect: () => setSheetState(
-                                    () => currentStatus = 'approved'),
+                                  () => currentStatus = 'approved',
+                                ),
                               ),
                               _buildStatusChip(
                                 label: 'Rejected',
@@ -338,7 +348,8 @@ class _ScholarshipApplicationsScreenState
                                 color: const Color(0xFFEF4444),
                                 current: currentStatus,
                                 onSelect: () => setSheetState(
-                                    () => currentStatus = 'rejected'),
+                                  () => currentStatus = 'rejected',
+                                ),
                               ),
                             ],
                           ),
@@ -355,8 +366,9 @@ class _ScholarshipApplicationsScreenState
                               fillColor: const Color(0xFFF8FAFC),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide:
-                                    const BorderSide(color: Color(0xFFCBD5E1)),
+                                borderSide: const BorderSide(
+                                  color: Color(0xFFCBD5E1),
+                                ),
                               ),
                             ),
                           ),
@@ -373,15 +385,19 @@ class _ScholarshipApplicationsScreenState
                                 ? null
                                 : () async {
                                     setSheetState(() => isSaving = true);
-                                    final messenger = ScaffoldMessenger.of(context);
+                                    final messenger = ScaffoldMessenger.of(
+                                      context,
+                                    );
                                     try {
                                       await _service.updateApplicationStatus(
                                         applicationId: app.id,
                                         status: currentStatus,
                                         reviewNotes:
-                                            notesController.text.trim().isNotEmpty
-                                                ? notesController.text.trim()
-                                                : null,
+                                            notesController.text
+                                                .trim()
+                                                .isNotEmpty
+                                            ? notesController.text.trim()
+                                            : null,
                                       );
                                       if (sheetCtx.mounted) {
                                         Navigator.pop(sheetCtx);
@@ -404,8 +420,9 @@ class _ScholarshipApplicationsScreenState
                                           content: Text(
                                             'Update failed: ${err.toString().replaceAll('Exception: ', '')}',
                                           ),
-                                          backgroundColor:
-                                              const Color(0xFFEF4444),
+                                          backgroundColor: const Color(
+                                            0xFFEF4444,
+                                          ),
                                         ),
                                       );
                                     }
@@ -458,9 +475,7 @@ class _ScholarshipApplicationsScreenState
         fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
         color: isSelected ? color : const Color(0xFF64748B),
       ),
-      side: BorderSide(
-        color: isSelected ? color : const Color(0xFFCBD5E1),
-      ),
+      side: BorderSide(color: isSelected ? color : const Color(0xFFCBD5E1)),
     );
   }
 
@@ -576,233 +591,223 @@ class _ScholarshipApplicationsScreenState
                     child: CircularProgressIndicator(color: Color(0xFF2563EB)),
                   )
                 : _errorMessage != null
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.error_outline_rounded,
-                                size: 48,
-                                color: Color(0xFFEF4444),
-                              ),
-                              const SizedBox(height: 12),
-                              Text(
-                                _errorMessage!,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Color(0xFF64748B),
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              FilledButton(
-                                onPressed: _loadApplications,
-                                child: const Text('Try Again'),
-                              ),
-                            ],
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error_outline_rounded,
+                            size: 48,
+                            color: Color(0xFFEF4444),
                           ),
-                        ),
-                      )
-                    : _applications.isEmpty
-                        ? Center(
+                          const SizedBox(height: 12),
+                          Text(
+                            _errorMessage!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(0xFF64748B),
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          FilledButton(
+                            onPressed: _loadApplications,
+                            child: const Text('Try Again'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : _applications.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFFEFF6FF),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.assignment_outlined,
+                              size: 40,
+                              color: Color(0xFF2563EB),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'No Applications Received',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            'Student applications will appear here once submitted.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF64748B),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _loadApplications,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                      itemCount: _applications.length,
+                      itemBuilder: (context, index) {
+                        final app = _applications[index];
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 12),
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                            side: const BorderSide(color: Color(0xFFE2E8F0)),
+                          ),
+                          child: InkWell(
+                            borderRadius: BorderRadius.circular(16),
+                            onTap: () => _showReviewBottomSheet(app),
                             child: Padding(
-                              padding: const EdgeInsets.all(32),
+                              padding: const EdgeInsets.all(16),
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
-                                    width: 80,
-                                    height: 80,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFEFF6FF),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.assignment_outlined,
-                                      size: 40,
-                                      color: Color(0xFF2563EB),
-                                    ),
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 20,
+                                        backgroundColor: const Color(
+                                          0xFFEFF6FF,
+                                        ),
+                                        child: Text(
+                                          app.studentName.isNotEmpty
+                                              ? app.studentName[0].toUpperCase()
+                                              : 'S',
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w800,
+                                            color: Color(0xFF2563EB),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              app.studentName,
+                                              style: const TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF0F172A),
+                                              ),
+                                            ),
+                                            if (widget.scholarshipId ==
+                                                null) ...[
+                                              const SizedBox(height: 2),
+                                              Text(
+                                                app.scholarshipTitle,
+                                                style: const TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Color(0xFF2563EB),
+                                                ),
+                                              ),
+                                            ],
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              '${app.stream} Stream'
+                                              '${app.zScore != null ? ' • Z: ${app.zScore!.toStringAsFixed(4)}' : ''}'
+                                              '${app.district.isNotEmpty ? ' • ${app.district}' : ''}',
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Color(0xFF64748B),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      ApplicationStatusBadge(
+                                        status: app.status,
+                                      ),
+                                    ],
                                   ),
-                                  const SizedBox(height: 16),
-                                  const Text(
-                                    'No Applications Received',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFF0F172A),
+                                  if (app.personalStatement.isNotEmpty) ...[
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      app.personalStatement,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Color(0xFF475569),
+                                        height: 1.3,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  const Text(
-                                    'Student applications will appear here once submitted.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF64748B),
-                                    ),
+                                  ],
+                                  const SizedBox(height: 12),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Applied: ${app.createdAt.day}/${app.createdAt.month}/${app.createdAt.year}',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xFF94A3B8),
+                                        ),
+                                      ),
+                                      OutlinedButton.icon(
+                                        style: OutlinedButton.styleFrom(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 6,
+                                          ),
+                                          side: const BorderSide(
+                                            color: Color(0xFF2563EB),
+                                          ),
+                                        ),
+                                        onPressed: () =>
+                                            _showReviewBottomSheet(app),
+                                        icon: const Icon(
+                                          Icons.rate_review_outlined,
+                                          size: 16,
+                                          color: Color(0xFF2563EB),
+                                        ),
+                                        label: const Text(
+                                          'Review',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w700,
+                                            color: Color(0xFF2563EB),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
                             ),
-                          )
-                        : RefreshIndicator(
-                            onRefresh: _loadApplications,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                              itemCount: _applications.length,
-                              itemBuilder: (context, index) {
-                                final app = _applications[index];
-                                return Card(
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  elevation: 0,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                    side: const BorderSide(
-                                      color: Color(0xFFE2E8F0),
-                                    ),
-                                  ),
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(16),
-                                    onTap: () => _showReviewBottomSheet(app),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              CircleAvatar(
-                                                radius: 20,
-                                                backgroundColor:
-                                                    const Color(0xFFEFF6FF),
-                                                child: Text(
-                                                  app.studentName.isNotEmpty
-                                                      ? app.studentName[0]
-                                                          .toUpperCase()
-                                                      : 'S',
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.w800,
-                                                    color: Color(0xFF2563EB),
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      app.studentName,
-                                                      style: const TextStyle(
-                                                        fontSize: 15,
-                                                        fontWeight:
-                                                            FontWeight.w700,
-                                                        color:
-                                                            Color(0xFF0F172A),
-                                                      ),
-                                                    ),
-                                                    if (widget.scholarshipId ==
-                                                        null) ...[
-                                                      const SizedBox(height: 2),
-                                                      Text(
-                                                        app.scholarshipTitle,
-                                                        style: const TextStyle(
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          color:
-                                                              Color(0xFF2563EB),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                    const SizedBox(height: 2),
-                                                    Text(
-                                                      '${app.stream} Stream'
-                                                      '${app.zScore != null ? ' • Z: ${app.zScore!.toStringAsFixed(4)}' : ''}'
-                                                      '${app.district.isNotEmpty ? ' • ${app.district}' : ''}',
-                                                      style: const TextStyle(
-                                                        fontSize: 12,
-                                                        color:
-                                                            Color(0xFF64748B),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              ApplicationStatusBadge(
-                                                status: app.status,
-                                              ),
-                                            ],
-                                          ),
-                                          if (app.personalStatement
-                                              .isNotEmpty) ...[
-                                            const SizedBox(height: 10),
-                                            Text(
-                                              app.personalStatement,
-                                              maxLines: 2,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Color(0xFF475569),
-                                                height: 1.3,
-                                              ),
-                                            ),
-                                          ],
-                                          const SizedBox(height: 12),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'Applied: ${app.createdAt.day}/${app.createdAt.month}/${app.createdAt.year}',
-                                                style: const TextStyle(
-                                                  fontSize: 11,
-                                                  color: Color(0xFF94A3B8),
-                                                ),
-                                              ),
-                                              OutlinedButton.icon(
-                                                style: OutlinedButton.styleFrom(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 6,
-                                                  ),
-                                                  side: const BorderSide(
-                                                    color: Color(0xFF2563EB),
-                                                  ),
-                                                ),
-                                                onPressed: () =>
-                                                    _showReviewBottomSheet(app),
-                                                icon: const Icon(
-                                                  Icons.rate_review_outlined,
-                                                  size: 16,
-                                                  color: Color(0xFF2563EB),
-                                                ),
-                                                label: const Text(
-                                                  'Review',
-                                                  style: TextStyle(
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Color(0xFF2563EB),
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
                           ),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),

@@ -6,10 +6,7 @@ import '../widgets/university_status_badge.dart';
 import 'edit_university_screen.dart';
 
 class UniversityDetailsScreen extends StatefulWidget {
-  const UniversityDetailsScreen({
-    super.key,
-    required this.university,
-  });
+  const UniversityDetailsScreen({super.key, required this.university});
 
   final AdminUniversityModel university;
 
@@ -41,8 +38,10 @@ class _UniversityDetailsScreenState extends State<UniversityDetailsScreen> {
     final newStatus = _university.isActive ? 'inactive' : 'active';
     setState(() => _loading = true);
     try {
-      final updated =
-          await _service.updateUniversityStatus(_university.id, newStatus);
+      final updated = await _service.updateUniversityStatus(
+        _university.id,
+        newStatus,
+      );
       if (mounted) {
         setState(() => _university = updated);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -265,12 +264,15 @@ class _UniversityDetailsScreenState extends State<UniversityDetailsScreen> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(14),
-                              border: Border.all(color: const Color(0xFF93C5FD)),
+                              border: Border.all(
+                                color: const Color(0xFF93C5FD),
+                              ),
                             ),
                             child: Center(
                               child: Text(
                                 _university.universityName.isNotEmpty
-                                    ? _university.universityName[0].toUpperCase()
+                                    ? _university.universityName[0]
+                                          .toUpperCase()
                                     : 'U',
                                 style: const TextStyle(
                                   fontSize: 22,
@@ -320,7 +322,9 @@ class _UniversityDetailsScreenState extends State<UniversityDetailsScreen> {
                             status: _university.status,
                             fontSize: 12,
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 10, vertical: 5),
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
                           ),
                         ],
                       ),
@@ -335,21 +339,30 @@ class _UniversityDetailsScreenState extends State<UniversityDetailsScreen> {
                     Icons.account_balance_rounded,
                     [
                       _buildDetailRow(
-                          'University Name', _university.universityName),
+                        'University Name',
+                        _university.universityName,
+                      ),
                       _buildDetailRow('Location', _university.location),
                       _buildDetailRow(
-                          'Official Email', _university.officialEmail),
+                        'Official Email',
+                        _university.officialEmail,
+                      ),
                       _buildDetailRow('Address', _university.address),
                       _buildDetailRow(
-                          'Contact Number', _university.contactNumber),
+                        'Contact Number',
+                        _university.contactNumber,
+                      ),
                       if (_university.universityType != null &&
                           _university.universityType!.isNotEmpty)
                         _buildDetailRow(
-                            'University Type', _university.universityType!),
+                          'University Type',
+                          _university.universityType!,
+                        ),
                       _buildDetailRow(
-                          'Offered Courses',
-                          '${_university.courseCount} ${_university.courseCount == 1 ? "Program" : "Programs"}',
-                          icon: Icons.school_outlined),
+                        'Offered Courses',
+                        '${_university.courseCount} ${_university.courseCount == 1 ? "Program" : "Programs"}',
+                        icon: Icons.school_outlined,
+                      ),
                     ],
                   ),
 
@@ -359,11 +372,17 @@ class _UniversityDetailsScreenState extends State<UniversityDetailsScreen> {
                     Icons.badge_outlined,
                     [
                       _buildDetailRow(
-                          'Representative Name', _university.representativeName),
-                      _buildDetailRow('Representative Email',
-                          _university.representativeEmail ?? 'Not specified'),
-                      _buildDetailRow('Representative Contact',
-                          _university.representativeContactNumber),
+                        'Representative Name',
+                        _university.representativeName,
+                      ),
+                      _buildDetailRow(
+                        'Representative Email',
+                        _university.representativeEmail ?? 'Not specified',
+                      ),
+                      _buildDetailRow(
+                        'Representative Contact',
+                        _university.representativeContactNumber,
+                      ),
                     ],
                   ),
 
@@ -372,8 +391,10 @@ class _UniversityDetailsScreenState extends State<UniversityDetailsScreen> {
                     'ACCOUNT INFORMATION',
                     Icons.security_outlined,
                     [
-                      _buildDetailRow('Account Status',
-                          _university.isActive ? 'Active' : 'Inactive'),
+                      _buildDetailRow(
+                        'Account Status',
+                        _university.isActive ? 'Active' : 'Inactive',
+                      ),
                       _buildDetailRow(
                         'Email Verification Status',
                         _university.isEmailVerified ? 'Verified' : 'Pending',
@@ -424,4 +445,3 @@ class _UniversityDetailsScreenState extends State<UniversityDetailsScreen> {
     );
   }
 }
-

@@ -116,7 +116,9 @@ class _UniversityScholarshipsScreenState
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to delete: ${e.toString().replaceAll('Exception: ', '')}'),
+            content: Text(
+              'Failed to delete: ${e.toString().replaceAll('Exception: ', '')}',
+            ),
             backgroundColor: const Color(0xFFEF4444),
           ),
         );
@@ -163,19 +165,23 @@ class _UniversityScholarshipsScreenState
                       status == 'active'
                           ? Icons.check_circle_rounded
                           : status == 'closed'
-                              ? Icons.lock_rounded
-                              : Icons.edit_note_rounded,
+                          ? Icons.lock_rounded
+                          : Icons.edit_note_rounded,
                       color: status == 'active'
                           ? const Color(0xFF10B981)
                           : status == 'closed'
-                              ? const Color(0xFFF59E0B)
-                              : const Color(0xFF64748B),
+                          ? const Color(0xFFF59E0B)
+                          : const Color(0xFF64748B),
                     ),
                     title: Text(
                       status[0].toUpperCase() + status.substring(1),
                       style: TextStyle(
-                        fontWeight: isCurrent ? FontWeight.w800 : FontWeight.w600,
-                        color: isCurrent ? const Color(0xFF2563EB) : const Color(0xFF1E293B),
+                        fontWeight: isCurrent
+                            ? FontWeight.w800
+                            : FontWeight.w600,
+                        color: isCurrent
+                            ? const Color(0xFF2563EB)
+                            : const Color(0xFF1E293B),
                       ),
                     ),
                     trailing: isCurrent
@@ -191,13 +197,17 @@ class _UniversityScholarshipsScreenState
       },
     );
 
-    if (selected != null && selected != scholarship.status.toLowerCase() && mounted) {
+    if (selected != null &&
+        selected != scholarship.status.toLowerCase() &&
+        mounted) {
       try {
         await _service.updateScholarshipStatus(scholarship.id, selected);
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Scholarship set to ${selected[0].toUpperCase() + selected.substring(1)}.'),
+            content: Text(
+              'Scholarship set to ${selected[0].toUpperCase() + selected.substring(1)}.',
+            ),
             backgroundColor: const Color(0xFF10B981),
           ),
         );
@@ -206,7 +216,9 @@ class _UniversityScholarshipsScreenState
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to update status: ${e.toString().replaceAll('Exception: ', '')}'),
+            content: Text(
+              'Failed to update status: ${e.toString().replaceAll('Exception: ', '')}',
+            ),
             backgroundColor: const Color(0xFFEF4444),
           ),
         );
@@ -281,7 +293,10 @@ class _UniversityScholarshipsScreenState
                 const SizedBox(height: 8),
                 Text(
                   '• Requirement: ${s.eligibility.academicRequirement}',
-                  style: const TextStyle(fontSize: 13, color: Color(0xFF334155)),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: Color(0xFF334155),
+                  ),
                 ),
               ],
               if (s.eligibility.minimumResults.isNotEmpty) ...[
@@ -297,7 +312,10 @@ class _UniversityScholarshipsScreenState
                 ...s.eligibility.minimumResults.map(
                   (req) => Text(
                     '  - ${req.subject}: Min Grade ${req.grade}',
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF334155)),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF334155),
+                    ),
                   ),
                 ),
               ],
@@ -324,7 +342,8 @@ class _UniversityScholarshipsScreenState
                           ),
                           backgroundColor: const Color(0xFFF1F5F9),
                           padding: EdgeInsets.zero,
-                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
                         ),
                       )
                       .toList(),
@@ -551,9 +570,7 @@ class _UniversityScholarshipsScreenState
         onPressed: () async {
           final created = await Navigator.push<bool>(
             context,
-            MaterialPageRoute(
-              builder: (_) => const AddScholarshipScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const AddScholarshipScreen()),
           );
           if (created == true) {
             _loadData();
@@ -606,142 +623,138 @@ class _UniversityScholarshipsScreenState
           Expanded(
             child: _isLoading
                 ? const Center(
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF2563EB),
-                    ),
+                    child: CircularProgressIndicator(color: Color(0xFF2563EB)),
                   )
                 : _errorMessage != null
-                    ? Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.error_outline_rounded,
-                                size: 48,
-                                color: Color(0xFFEF4444),
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.error_outline_rounded,
+                            size: 48,
+                            color: Color(0xFFEF4444),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            _errorMessage!,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              color: Color(0xFF64748B),
+                              fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          FilledButton(
+                            onPressed: _loadData,
+                            child: const Text('Try Again'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : _scholarships.isEmpty
+                ? Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(32),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEFF6FF),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.school_outlined,
+                              size: 40,
+                              color: Color(0xFF2563EB),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            'No Scholarships Found',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF0F172A),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            'Create your first scholarship to support students and attract top applicants.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF64748B),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          FilledButton.icon(
+                            onPressed: () async {
+                              final created = await Navigator.push<bool>(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const AddScholarshipScreen(),
+                                ),
+                              );
+                              if (created == true) {
+                                _loadData();
+                              }
+                            },
+                            style: FilledButton.styleFrom(
+                              backgroundColor: const Color(0xFF2563EB),
+                            ),
+                            icon: const Icon(Icons.add_rounded),
+                            label: const Text('Create Scholarship'),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _loadData,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
+                      itemCount: _scholarships.length,
+                      itemBuilder: (context, index) {
+                        final s = _scholarships[index];
+                        return UniversityScholarshipCard(
+                          scholarship: s,
+                          onView: () => _showDetailsDialog(s),
+                          onEdit: () async {
+                            final updated = await Navigator.push<bool>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    EditScholarshipScreen(scholarship: s),
                               ),
-                              const SizedBox(height: 12),
-                              Text(
-                                _errorMessage!,
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Color(0xFF64748B),
-                                  fontSize: 14,
+                            );
+                            if (updated == true) {
+                              _loadData();
+                            }
+                          },
+                          onDelete: () => _deleteScholarship(s),
+                          onViewApplications: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => ScholarshipApplicationsScreen(
+                                  scholarshipId: s.id,
+                                  scholarshipTitle: s.title,
                                 ),
                               ),
-                              const SizedBox(height: 16),
-                              FilledButton(
-                                onPressed: _loadData,
-                                child: const Text('Try Again'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    : _scholarships.isEmpty
-                        ? Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(32),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 80,
-                                    height: 80,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFEFF6FF),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.school_outlined,
-                                      size: 40,
-                                      color: Color(0xFF2563EB),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  const Text(
-                                    'No Scholarships Found',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFF0F172A),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  const Text(
-                                    'Create your first scholarship to support students and attract top applicants.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Color(0xFF64748B),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  FilledButton.icon(
-                                    onPressed: () async {
-                                      final created = await Navigator.push<bool>(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) => const AddScholarshipScreen(),
-                                        ),
-                                      );
-                                      if (created == true) {
-                                        _loadData();
-                                      }
-                                    },
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: const Color(0xFF2563EB),
-                                    ),
-                                    icon: const Icon(Icons.add_rounded),
-                                    label: const Text('Create Scholarship'),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : RefreshIndicator(
-                            onRefresh: _loadData,
-                            child: ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
-                              itemCount: _scholarships.length,
-                              itemBuilder: (context, index) {
-                                final s = _scholarships[index];
-                                return UniversityScholarshipCard(
-                                  scholarship: s,
-                                  onView: () => _showDetailsDialog(s),
-                                  onEdit: () async {
-                                    final updated = await Navigator.push<bool>(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => EditScholarshipScreen(
-                                          scholarship: s,
-                                        ),
-                                      ),
-                                    );
-                                    if (updated == true) {
-                                      _loadData();
-                                    }
-                                  },
-                                  onDelete: () => _deleteScholarship(s),
-                                  onViewApplications: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            ScholarshipApplicationsScreen(
-                                          scholarshipId: s.id,
-                                          scholarshipTitle: s.title,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  onToggleStatus: () => _toggleStatus(s),
-                                );
-                              },
-                            ),
-                          ),
+                            );
+                          },
+                          onToggleStatus: () => _toggleStatus(s),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),

@@ -113,9 +113,7 @@ class _PersonalityTestPageState extends State<PersonalityTestPage> {
   Widget build(BuildContext context) {
     switch (_phase) {
       case _Phase.loading:
-        return const Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        );
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
       case _Phase.error:
         return Scaffold(
           appBar: AppBar(title: const Text('Personality & Interest Test')),
@@ -136,7 +134,10 @@ class _PersonalityTestPageState extends State<PersonalityTestPage> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
-                  FilledButton(onPressed: _load, child: const Text('Try Again')),
+                  FilledButton(
+                    onPressed: _load,
+                    child: const Text('Try Again'),
+                  ),
                 ],
               ),
             ),

@@ -20,23 +20,25 @@ class UniversityScholarshipStats {
   final int totalApplications;
   final int pendingApplications;
 
-  factory UniversityScholarshipStats.fromJson(Map<String, dynamic> data) =>
-      UniversityScholarshipStats(
-        totalScholarships: (data['totalScholarships'] as num?)?.toInt() ?? 0,
-        activeScholarships: (data['activeScholarships'] as num?)?.toInt() ?? 0,
-        closedScholarships: (data['closedScholarships'] as num?)?.toInt() ?? 0,
-        expiredScholarships: (data['expiredScholarships'] as num?)?.toInt() ?? 0,
-        totalApplications: (data['applicationsReceived'] as num?)?.toInt() ??
-            (data['totalApplications'] as num?)?.toInt() ??
-            0,
-        pendingApplications: (data['pendingApplications'] as num?)?.toInt() ?? 0,
-      );
+  factory UniversityScholarshipStats.fromJson(
+    Map<String, dynamic> data,
+  ) => UniversityScholarshipStats(
+    totalScholarships: (data['totalScholarships'] as num?)?.toInt() ?? 0,
+    activeScholarships: (data['activeScholarships'] as num?)?.toInt() ?? 0,
+    closedScholarships: (data['closedScholarships'] as num?)?.toInt() ?? 0,
+    expiredScholarships: (data['expiredScholarships'] as num?)?.toInt() ?? 0,
+    totalApplications:
+        (data['applicationsReceived'] as num?)?.toInt() ??
+        (data['totalApplications'] as num?)?.toInt() ??
+        0,
+    pendingApplications: (data['pendingApplications'] as num?)?.toInt() ?? 0,
+  );
 }
 
 class ScholarshipService {
   ScholarshipService({ApiService? api, AuthService? auth})
-      : _api = api ?? ApiService(),
-        _auth = auth ?? AuthService();
+    : _api = api ?? ApiService(),
+      _auth = auth ?? AuthService();
 
   final ApiService _api;
   final AuthService _auth;
@@ -78,7 +80,10 @@ class ScholarshipService {
   }) async {
     final effectiveToken = await _getToken(token);
     final params = <String>[];
-    if (status != null && status.isNotEmpty && status != 'all' && status != 'All') {
+    if (status != null &&
+        status.isNotEmpty &&
+        status != 'all' &&
+        status != 'All') {
       params.add('status=${Uri.encodeComponent(status.toLowerCase())}');
     }
     if (type != null && type.isNotEmpty && type != 'all' && type != 'All') {
@@ -180,7 +185,10 @@ class ScholarshipService {
     if (scholarshipId != null && scholarshipId.isNotEmpty) {
       params.add('scholarshipId=${Uri.encodeComponent(scholarshipId)}');
     }
-    if (status != null && status.isNotEmpty && status != 'all' && status != 'All') {
+    if (status != null &&
+        status.isNotEmpty &&
+        status != 'all' &&
+        status != 'All') {
       params.add(
         'status=${Uri.encodeComponent(status.toLowerCase().replaceAll(' ', '_'))}',
       );
@@ -195,8 +203,11 @@ class ScholarshipService {
 
     final list = response['data'] as List<dynamic>? ?? [];
     return list
-        .map((item) =>
-            ScholarshipApplicationModel.fromJson(item as Map<String, dynamic>))
+        .map(
+          (item) => ScholarshipApplicationModel.fromJson(
+            item as Map<String, dynamic>,
+          ),
+        )
         .toList();
   }
 
@@ -211,7 +222,8 @@ class ScholarshipService {
       token: effectiveToken,
     );
     return ScholarshipApplicationModel.fromJson(
-        response['data'] as Map<String, dynamic>);
+      response['data'] as Map<String, dynamic>,
+    );
   }
 
   Future<ScholarshipApplicationModel> updateApplicationStatus({
@@ -231,7 +243,8 @@ class ScholarshipService {
       },
     );
     return ScholarshipApplicationModel.fromJson(
-        response['data'] as Map<String, dynamic>);
+      response['data'] as Map<String, dynamic>,
+    );
   }
 
   // ==================================================
@@ -253,7 +266,10 @@ class ScholarshipService {
     if (type != null && type.isNotEmpty && type != 'all' && type != 'All') {
       params.add('type=${Uri.encodeComponent(type)}');
     }
-    if (stream != null && stream.isNotEmpty && stream != 'all' && stream != 'All') {
+    if (stream != null &&
+        stream.isNotEmpty &&
+        stream != 'all' &&
+        stream != 'All') {
       params.add('stream=${Uri.encodeComponent(stream)}');
     }
     if (universityId != null && universityId.isNotEmpty) {
@@ -279,14 +295,13 @@ class ScholarshipService {
     String? stream,
     String? universityId,
     String? token,
-  }) =>
-      getPublicScholarships(
-        search: search,
-        type: scholarshipType,
-        stream: stream,
-        universityId: universityId,
-        token: token,
-      );
+  }) => getPublicScholarships(
+    search: search,
+    type: scholarshipType,
+    stream: stream,
+    universityId: universityId,
+    token: token,
+  );
 
   Future<ScholarshipModel> getScholarshipDetails(
     String id, [
@@ -301,10 +316,7 @@ class ScholarshipService {
     return ScholarshipModel.fromJson(response['data'] as Map<String, dynamic>);
   }
 
-  Future<ScholarshipModel> getScholarshipById(
-    String id, {
-    String? token,
-  }) =>
+  Future<ScholarshipModel> getScholarshipById(String id, {String? token}) =>
       getScholarshipDetails(id, token);
 
   Future<ScholarshipApplicationModel> applyForScholarship({
@@ -327,7 +339,8 @@ class ScholarshipService {
       },
     );
     return ScholarshipApplicationModel.fromJson(
-        response['data'] as Map<String, dynamic>);
+      response['data'] as Map<String, dynamic>,
+    );
   }
 
   Future<List<ScholarshipApplicationModel>> getMyApplications([
@@ -342,15 +355,17 @@ class ScholarshipService {
 
     final list = response['data'] as List<dynamic>? ?? [];
     return list
-        .map((item) =>
-            ScholarshipApplicationModel.fromJson(item as Map<String, dynamic>))
+        .map(
+          (item) => ScholarshipApplicationModel.fromJson(
+            item as Map<String, dynamic>,
+          ),
+        )
         .toList();
   }
 
   Future<List<ScholarshipApplicationModel>> getStudentApplications([
     String? token,
-  ]) =>
-      getMyApplications(token);
+  ]) => getMyApplications(token);
 
   Future<ScholarshipApplicationModel> getMyApplicationById(
     String id, [
@@ -363,6 +378,7 @@ class ScholarshipService {
       token: effectiveToken,
     );
     return ScholarshipApplicationModel.fromJson(
-        response['data'] as Map<String, dynamic>);
+      response['data'] as Map<String, dynamic>,
+    );
   }
 }

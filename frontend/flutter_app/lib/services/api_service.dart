@@ -7,7 +7,8 @@ String get apiBaseUrl {
   const configuredUrl = String.fromEnvironment('API_BASE_URL');
   if (configuredUrl.isNotEmpty) return configuredUrl;
   if (kIsWeb) return 'http://localhost:3000/api';
-  if (defaultTargetPlatform == TargetPlatform.android) return 'http://10.0.2.2:3000/api';
+  if (defaultTargetPlatform == TargetPlatform.android)
+    return 'http://10.0.2.2:3000/api';
   return 'http://localhost:3000/api';
 }
 
@@ -33,7 +34,9 @@ class ApiService {
 
     final response = await http.Client().send(request);
     final text = await response.stream.bytesToString();
-    final data = text.isEmpty ? <String, dynamic>{} : jsonDecode(text) as Map<String, dynamic>;
+    final data = text.isEmpty
+        ? <String, dynamic>{}
+        : jsonDecode(text) as Map<String, dynamic>;
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw ApiException(data['message'] as String? ?? 'Request failed');
     }

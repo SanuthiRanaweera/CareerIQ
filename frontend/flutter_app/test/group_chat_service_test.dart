@@ -36,7 +36,10 @@ void main() {
       createdAt: DateTime.now(),
     );
 
-    final updated = message.copyWith(message: 'Updated message', senderName: 'Jane Doe');
+    final updated = message.copyWith(
+      message: 'Updated message',
+      senderName: 'Jane Doe',
+    );
     expect(updated.message, 'Updated message');
     expect(updated.senderName, 'Jane Doe');
     expect(updated.id, 'msg-1');

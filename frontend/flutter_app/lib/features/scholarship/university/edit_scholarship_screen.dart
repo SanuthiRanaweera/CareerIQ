@@ -5,10 +5,7 @@ import '../models/scholarship_model.dart';
 import '../services/scholarship_service.dart';
 
 class EditScholarshipScreen extends StatefulWidget {
-  const EditScholarshipScreen({
-    super.key,
-    required this.scholarship,
-  });
+  const EditScholarshipScreen({super.key, required this.scholarship});
 
   final ScholarshipModel scholarship;
 
@@ -87,18 +84,24 @@ class _EditScholarshipScreenState extends State<EditScholarshipScreen> {
     _titleController = TextEditingController(text: s.title);
     _descController = TextEditingController(text: s.description);
     _amountController = TextEditingController(text: s.amount);
-    _numController =
-        TextEditingController(text: s.numberOfScholarships.toString());
-    _academicReqController =
-        TextEditingController(text: s.eligibility.academicRequirement);
-    _ageReqController =
-        TextEditingController(text: s.eligibility.ageRequirement);
-    _districtReqController =
-        TextEditingController(text: s.eligibility.districtRequirement);
-    _otherReqController =
-        TextEditingController(text: s.eligibility.otherRequirements);
-    _instructionsController =
-        TextEditingController(text: s.applicationInstructions);
+    _numController = TextEditingController(
+      text: s.numberOfScholarships.toString(),
+    );
+    _academicReqController = TextEditingController(
+      text: s.eligibility.academicRequirement,
+    );
+    _ageReqController = TextEditingController(
+      text: s.eligibility.ageRequirement,
+    );
+    _districtReqController = TextEditingController(
+      text: s.eligibility.districtRequirement,
+    );
+    _otherReqController = TextEditingController(
+      text: s.eligibility.otherRequirements,
+    );
+    _instructionsController = TextEditingController(
+      text: s.applicationInstructions,
+    );
 
     _selectedType = s.scholarshipType;
     _selectedStream = s.eligibility.stream;
@@ -182,10 +185,9 @@ class _EditScholarshipScreenState extends State<EditScholarshipScreen> {
                 final sub = subjectCtrl.text.trim();
                 if (sub.isNotEmpty) {
                   setState(() {
-                    _minimumResults.add(RequiredSubjectModel(
-                      subject: sub,
-                      grade: selectedGrade,
-                    ));
+                    _minimumResults.add(
+                      RequiredSubjectModel(subject: sub, grade: selectedGrade),
+                    );
                   });
                   Navigator.pop(dialogCtx);
                 }
@@ -266,9 +268,7 @@ class _EditScholarshipScreenState extends State<EditScholarshipScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Edit Scholarship'),
-      ),
+      appBar: AppBar(title: const Text('Edit Scholarship')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -278,7 +278,9 @@ class _EditScholarshipScreenState extends State<EditScholarshipScreen> {
             const SizedBox(height: 12),
             TextFormField(
               controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Scholarship Name *'),
+              decoration: const InputDecoration(
+                labelText: 'Scholarship Name *',
+              ),
               validator: (v) => (v == null || v.trim().isEmpty)
                   ? 'Scholarship Name is required'
                   : null,
@@ -295,7 +297,9 @@ class _EditScholarshipScreenState extends State<EditScholarshipScreen> {
             const SizedBox(height: 14),
             DropdownButtonFormField<String>(
               value: _selectedType,
-              decoration: const InputDecoration(labelText: 'Scholarship Type *'),
+              decoration: const InputDecoration(
+                labelText: 'Scholarship Type *',
+              ),
               items: _types
                   .map((t) => DropdownMenuItem(value: t, child: Text(t)))
                   .toList(),
@@ -306,18 +310,19 @@ class _EditScholarshipScreenState extends State<EditScholarshipScreen> {
             const SizedBox(height: 14),
             TextFormField(
               controller: _amountController,
-              decoration:
-                  const InputDecoration(labelText: 'Amount / Benefit *'),
-              validator: (v) => (v == null || v.trim().isEmpty)
-                  ? 'Amount is required'
-                  : null,
+              decoration: const InputDecoration(
+                labelText: 'Amount / Benefit *',
+              ),
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Amount is required' : null,
             ),
             const SizedBox(height: 14),
             TextFormField(
               controller: _numController,
               keyboardType: TextInputType.number,
-              decoration:
-                  const InputDecoration(labelText: 'Number of Scholarships *'),
+              decoration: const InputDecoration(
+                labelText: 'Number of Scholarships *',
+              ),
               validator: (v) {
                 final n = int.tryParse(v ?? '');
                 if (n == null || n < 1) return 'Must be greater than 0';
@@ -423,8 +428,10 @@ class _EditScholarshipScreenState extends State<EditScholarshipScreen> {
               ..._minimumResults.map(
                 (req) => Container(
                   margin: const EdgeInsets.only(bottom: 6),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFF1F5F9),
                     borderRadius: BorderRadius.circular(10),
@@ -531,9 +538,12 @@ class _EditScholarshipScreenState extends State<EditScholarshipScreen> {
             DropdownButtonFormField<String>(
               value: _selectedStatus,
               decoration: const InputDecoration(labelText: 'Status *'),
-              items: ['Active', 'Draft', 'Closed', 'Expired']
-                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
-                  .toList(),
+              items: [
+                'Active',
+                'Draft',
+                'Closed',
+                'Expired',
+              ].map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
               onChanged: (val) {
                 if (val != null) setState(() => _selectedStatus = val);
               },
@@ -561,8 +571,10 @@ class _EditScholarshipScreenState extends State<EditScholarshipScreen> {
                     )
                   : const Text(
                       'Save Changes',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
             ),
           ],
@@ -572,13 +584,12 @@ class _EditScholarshipScreenState extends State<EditScholarshipScreen> {
   }
 
   Widget _buildSectionHeader(String title) => Text(
-        title,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.1,
-          color: Color(0xFF3B82F6),
-        ),
-      );
+    title,
+    style: const TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w800,
+      letterSpacing: 1.1,
+      color: Color(0xFF3B82F6),
+    ),
+  );
 }
-

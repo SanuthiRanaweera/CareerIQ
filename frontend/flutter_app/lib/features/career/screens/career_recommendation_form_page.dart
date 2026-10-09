@@ -67,13 +67,15 @@ class _CareerRecommendationFormPageState
       return;
     }
 
-    widget.onSubmit(RecommendationAnswers(
-      stream: _stream,
-      subjects: _subjects.toList(),
-      interests: _interests.toList(),
-      personalityType: _personalityType,
-      workStyle: _workStyle,
-    ));
+    widget.onSubmit(
+      RecommendationAnswers(
+        stream: _stream,
+        subjects: _subjects.toList(),
+        interests: _interests.toList(),
+        personalityType: _personalityType,
+        workStyle: _workStyle,
+      ),
+    );
   }
 
   void _toggle(Set<String> target, String value) {
@@ -152,8 +154,7 @@ class _CareerRecommendationFormPageState
               child: _SingleChoiceChips(
                 options: personalityTypes,
                 selected: _personalityType,
-                onSelected: (value) =>
-                    setState(() => _personalityType = value),
+                onSelected: (value) => setState(() => _personalityType = value),
               ),
             ),
 
@@ -230,13 +231,13 @@ class _FormSection extends StatelessWidget {
           children: [
             Row(
               children: [
-                Expanded(
-                  child: Text(title, style: theme.textTheme.titleLarge),
-                ),
+                Expanded(child: Text(title, style: theme.textTheme.titleLarge)),
                 if (required)
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFEE2E2),
                       borderRadius: BorderRadius.circular(999),
@@ -303,33 +304,33 @@ class _SingleChoiceChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: options
-            .map(
-              (option) => ChoiceChip(
-                label: Text(option),
-                selected: selected == option,
-                onSelected: (_) => onSelected(option),
-                showCheckmark: false,
-                backgroundColor: Colors.white,
-                selectedColor: const Color(0xFF3B82F6),
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: selected == option
-                      ? Colors.white
-                      : const Color(0xFF64748B),
-                ),
-                side: BorderSide(
-                  color: selected == option
-                      ? const Color(0xFF3B82F6)
-                      : const Color(0xFFCBD5E1),
-                ),
-                shape: const StadiumBorder(),
-              ),
-            )
-            .toList(),
-      );
+    spacing: 8,
+    runSpacing: 8,
+    children: options
+        .map(
+          (option) => ChoiceChip(
+            label: Text(option),
+            selected: selected == option,
+            onSelected: (_) => onSelected(option),
+            showCheckmark: false,
+            backgroundColor: Colors.white,
+            selectedColor: const Color(0xFF3B82F6),
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: selected == option
+                  ? Colors.white
+                  : const Color(0xFF64748B),
+            ),
+            side: BorderSide(
+              color: selected == option
+                  ? const Color(0xFF3B82F6)
+                  : const Color(0xFFCBD5E1),
+            ),
+            shape: const StadiumBorder(),
+          ),
+        )
+        .toList(),
+  );
 }
 
 /// Pick as many as you like.
@@ -346,31 +347,31 @@ class _MultiChoiceChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: options
-            .map(
-              (option) => FilterChip(
-                label: Text(option),
-                selected: selected.contains(option),
-                onSelected: (_) => onToggle(option),
-                backgroundColor: Colors.white,
-                selectedColor: const Color(0xFFDBEAFE),
-                checkmarkColor: const Color(0xFF1D4ED8),
-                labelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: selected.contains(option)
-                      ? const Color(0xFF1D4ED8)
-                      : const Color(0xFF64748B),
-                ),
-                side: BorderSide(
-                  color: selected.contains(option)
-                      ? const Color(0xFF3B82F6)
-                      : const Color(0xFFCBD5E1),
-                ),
-                shape: const StadiumBorder(),
-              ),
-            )
-            .toList(),
-      );
+    spacing: 8,
+    runSpacing: 8,
+    children: options
+        .map(
+          (option) => FilterChip(
+            label: Text(option),
+            selected: selected.contains(option),
+            onSelected: (_) => onToggle(option),
+            backgroundColor: Colors.white,
+            selectedColor: const Color(0xFFDBEAFE),
+            checkmarkColor: const Color(0xFF1D4ED8),
+            labelStyle: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: selected.contains(option)
+                  ? const Color(0xFF1D4ED8)
+                  : const Color(0xFF64748B),
+            ),
+            side: BorderSide(
+              color: selected.contains(option)
+                  ? const Color(0xFF3B82F6)
+                  : const Color(0xFFCBD5E1),
+            ),
+            shape: const StadiumBorder(),
+          ),
+        )
+        .toList(),
+  );
 }

@@ -14,33 +14,33 @@ class MessageInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Expanded(
-            child: TextField(
-              controller: controller,
-              enabled: enabled,
-              minLines: 1,
-              maxLines: 4,
-              textInputAction: TextInputAction.newline,
-              onSubmitted: (_) => onSend(),
-              decoration: const InputDecoration(
-                hintText: 'Ask about careers, courses, or your next step...',
-                prefixIcon: Icon(Icons.auto_awesome_outlined),
-              ),
-            ),
+    crossAxisAlignment: CrossAxisAlignment.end,
+    children: [
+      Expanded(
+        child: TextField(
+          controller: controller,
+          enabled: enabled,
+          minLines: 1,
+          maxLines: 4,
+          textInputAction: TextInputAction.newline,
+          onSubmitted: (_) => onSend(),
+          decoration: const InputDecoration(
+            hintText: 'Ask about careers, courses, or your next step...',
+            prefixIcon: Icon(Icons.auto_awesome_outlined),
           ),
-          const SizedBox(width: 10),
-          IconButton.filled(
-            onPressed: enabled ? onSend : null,
-            tooltip: 'Send message',
-            icon: const Icon(Icons.arrow_upward_rounded),
-            style: IconButton.styleFrom(
-              backgroundColor: const Color(0xFF3B82F6),
-              foregroundColor: Colors.white,
-              minimumSize: const Size(54, 54),
-            ),
-          ),
-        ],
-      );
+        ),
+      ),
+      const SizedBox(width: 10),
+      IconButton.filled(
+        onPressed: enabled ? onSend : null,
+        tooltip: 'Send message',
+        icon: const Icon(Icons.arrow_upward_rounded),
+        style: IconButton.styleFrom(
+          backgroundColor: const Color(0xFF3B82F6),
+          foregroundColor: Colors.white,
+          minimumSize: const Size(54, 54),
+        ),
+      ),
+    ],
+  );
 }

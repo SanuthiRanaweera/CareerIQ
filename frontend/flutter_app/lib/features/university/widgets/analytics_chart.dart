@@ -121,10 +121,7 @@ class _AnalyticsTrendBarChartState extends State<AnalyticsTrendBarChart> {
                     const SizedBox(height: 4),
                     const Text(
                       'Activity trends will display as students interact.',
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: Color(0xFF94A3B8),
-                      ),
+                      style: TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
                     ),
                   ],
                 ),
@@ -172,7 +169,8 @@ class _AnalyticsTrendBarChartState extends State<AnalyticsTrendBarChart> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     // Tooltip / value above bar
-                    if (isSelected || (p.count > 0 && displayPoints.length <= 7))
+                    if (isSelected ||
+                        (p.count > 0 && displayPoints.length <= 7))
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 4,
@@ -223,11 +221,14 @@ class _AnalyticsTrendBarChartState extends State<AnalyticsTrendBarChart> {
                     const SizedBox(height: 6),
                     // X-axis label
                     Text(
-                      displayPoints.length <= 7 ? p.dayOfWeek : p.label.split(' ').last,
+                      displayPoints.length <= 7
+                          ? p.dayOfWeek
+                          : p.label.split(' ').last,
                       style: TextStyle(
                         fontSize: 9,
-                        fontWeight:
-                            isSelected ? FontWeight.w700 : FontWeight.w500,
+                        fontWeight: isSelected
+                            ? FontWeight.w700
+                            : FontWeight.w500,
                         color: isSelected
                             ? widget.barColor
                             : const Color(0xFF94A3B8),
@@ -245,4 +246,3 @@ class _AnalyticsTrendBarChartState extends State<AnalyticsTrendBarChart> {
     );
   }
 }
-

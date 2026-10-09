@@ -51,10 +51,7 @@ class UniversityStatusBadge extends StatelessWidget {
           Container(
             width: compact ? 6 : 8,
             height: compact ? 6 : 8,
-            decoration: BoxDecoration(
-              color: dot,
-              shape: BoxShape.circle,
-            ),
+            decoration: BoxDecoration(color: dot, shape: BoxShape.circle),
           ),
           SizedBox(width: compact ? 4 : 6),
           Text(
@@ -70,4 +67,3 @@ class UniversityStatusBadge extends StatelessWidget {
     );
   }
 }
-

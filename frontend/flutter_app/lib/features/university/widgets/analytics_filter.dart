@@ -53,8 +53,7 @@ class AnalyticsFilterBar extends StatelessWidget {
                   r['label']!,
                   style: TextStyle(
                     fontSize: 12,
-                    fontWeight:
-                        isSelected ? FontWeight.w700 : FontWeight.w600,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                     color: isSelected
                         ? const Color(0xFF2563EB)
                         : const Color(0xFF64748B),
@@ -68,4 +67,3 @@ class AnalyticsFilterBar extends StatelessWidget {
     );
   }
 }
-

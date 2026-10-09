@@ -22,8 +22,18 @@ class UniversityScholarshipCard extends StatelessWidget {
 
   String _formatDate(DateTime dt) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
   }
@@ -95,8 +105,10 @@ class UniversityScholarshipCard extends StatelessWidget {
                   ),
                 ),
                 PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert_rounded,
-                      color: Color(0xFF64748B)),
+                  icon: const Icon(
+                    Icons.more_vert_rounded,
+                    color: Color(0xFF64748B),
+                  ),
                   onSelected: (val) {
                     switch (val) {
                       case 'view':
@@ -169,8 +181,11 @@ class UniversityScholarshipCard extends StatelessWidget {
                       value: 'delete',
                       child: Row(
                         children: [
-                          Icon(Icons.delete_outline_rounded,
-                              size: 18, color: Colors.red),
+                          Icon(
+                            Icons.delete_outline_rounded,
+                            size: 18,
+                            color: Colors.red,
+                          ),
                           SizedBox(width: 8),
                           Text('Delete', style: TextStyle(color: Colors.red)),
                         ],
@@ -190,8 +205,11 @@ class UniversityScholarshipCard extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.confirmation_number_outlined,
-                        size: 14, color: Color(0xFF64748B)),
+                    const Icon(
+                      Icons.confirmation_number_outlined,
+                      size: 14,
+                      color: Color(0xFF64748B),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '${scholarship.numberOfScholarships} Scholarships',
@@ -206,8 +224,11 @@ class UniversityScholarshipCard extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.event_outlined,
-                        size: 14, color: Color(0xFF64748B)),
+                    const Icon(
+                      Icons.event_outlined,
+                      size: 14,
+                      color: Color(0xFF64748B),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       'Deadline: ${_formatDate(scholarship.applicationDeadline)}',
@@ -250,8 +271,10 @@ class UniversityScholarshipCard extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEFF6FF),
                     borderRadius: BorderRadius.circular(8),
@@ -284,9 +307,13 @@ class UniversityScholarshipCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Text('View',
-                        style: TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.w700)),
+                    child: const Text(
+                      'View',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -302,9 +329,13 @@ class UniversityScholarshipCard extends StatelessWidget {
                       ),
                     ),
                     icon: const Icon(Icons.people_outline_rounded, size: 16),
-                    label: const Text('Applications',
-                        style: TextStyle(
-                            fontSize: 13, fontWeight: FontWeight.w700)),
+                    label: const Text(
+                      'Applications',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -315,4 +346,3 @@ class UniversityScholarshipCard extends StatelessWidget {
     );
   }
 }
-

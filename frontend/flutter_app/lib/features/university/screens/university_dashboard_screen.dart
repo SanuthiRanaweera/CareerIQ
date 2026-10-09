@@ -14,10 +14,7 @@ import 'university_analytics_screen.dart';
 import '../../scholarship/university/university_scholarships_screen.dart';
 
 class UniversityDashboardScreen extends StatefulWidget {
-  const UniversityDashboardScreen({
-    super.key,
-    this.onLogout,
-  });
+  const UniversityDashboardScreen({super.key, this.onLogout});
 
   final VoidCallback? onLogout;
 
@@ -107,9 +104,8 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => UniversityProfileScreen(
-          initialProfile: _dashboardData!.university,
-        ),
+        builder: (_) =>
+            UniversityProfileScreen(initialProfile: _dashboardData!.university),
       ),
     );
     _loadDashboard();
@@ -120,9 +116,8 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
     final updated = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
-        builder: (_) => EditUniversityProfileScreen(
-          profile: _dashboardData!.university,
-        ),
+        builder: (_) =>
+            EditUniversityProfileScreen(profile: _dashboardData!.university),
       ),
     );
     if (updated == true) {
@@ -157,9 +152,7 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
   void _navigateToScholarships() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (_) => const UniversityScholarshipsScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const UniversityScholarshipsScreen()),
     );
   }
 
@@ -264,12 +257,10 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              _errorMessage ?? 'An error occurred while communicating with the server.',
+              _errorMessage ??
+                  'An error occurred while communicating with the server.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF64748B),
-              ),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
@@ -278,7 +269,10 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
               label: const Text('Try Again'),
               style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFF2563EB),
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
               ),
             ),
           ],
@@ -324,10 +318,7 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
                   color: Colors.white.withValues(alpha: 0.9),
                 ),
               ),
-              UniversityStatusBadge(
-                status: university.status,
-                compact: true,
-              ),
+              UniversityStatusBadge(status: university.status, compact: true),
             ],
           ),
           const SizedBox(height: 4),
@@ -582,8 +573,10 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
               ),
               if (badgeCount > 0)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: color,
                     borderRadius: BorderRadius.circular(10),
@@ -610,8 +603,7 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
     );
   }
 
-  Widget _buildRecentActivitySection(
-      List<UniversityActivityModel> activities) {
+  Widget _buildRecentActivitySection(List<UniversityActivityModel> activities) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -636,8 +628,11 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
               child: Center(
                 child: Column(
                   children: [
-                    Icon(Icons.history_rounded,
-                        size: 36, color: Color(0xFF94A3B8)),
+                    Icon(
+                      Icons.history_rounded,
+                      size: 36,
+                      color: Color(0xFF94A3B8),
+                    ),
                     SizedBox(height: 8),
                     Text(
                       'No recent activity',
@@ -739,56 +734,53 @@ class _UniversityDashboardScreenState extends State<UniversityDashboardScreen> {
         child: _isLoading
             ? _buildLoadingSkeleton()
             : _errorMessage != null
-                ? _buildErrorView()
-                : RefreshIndicator(
-                    onRefresh: _loadDashboard,
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildGreetingHeader(_dashboardData!.university),
-                          const SizedBox(height: 20),
-                          ProfileCompletionCard(
-                            completionPercentage: _dashboardData!
-                                .statistics.profileCompletion,
-                            completedFields: _dashboardData!
-                                .statistics.completedFields,
-                            totalFields:
-                                _dashboardData!.statistics.totalFields,
-                            onCompleteProfile: _navigateToEditProfile,
-                          ),
-                          const SizedBox(height: 20),
-                          QuickOverviewCard(
-                            completionPercentage: _dashboardData!
-                                .statistics.profileCompletion,
-                            courseCount:
-                                _dashboardData!.statistics.courseCount,
-                            scholarshipCount:
-                                _dashboardData!.statistics.scholarshipCount,
-                            applicationCount:
-                                _dashboardData!.statistics.applicationCount,
-                            profileViews:
-                                _dashboardData!.statistics.profileViews,
-                            status: _dashboardData!.university.status,
-                            onCoursesTap: _navigateToCourses,
-                            onProfileTap: _navigateToProfile,
-                            onScholarshipsTap: _navigateToScholarships,
-                            onAnalyticsTap: _navigateToAnalytics,
-                          ),
-                          const SizedBox(height: 20),
-                          _buildUniversityInfoCard(
-                              _dashboardData!.university),
-                          const SizedBox(height: 20),
-                          _buildAvailableActions(),
-                          const SizedBox(height: 20),
-                          _buildRecentActivitySection(
-                              _dashboardData!.recentActivity),
-                        ],
+            ? _buildErrorView()
+            : RefreshIndicator(
+                onRefresh: _loadDashboard,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildGreetingHeader(_dashboardData!.university),
+                      const SizedBox(height: 20),
+                      ProfileCompletionCard(
+                        completionPercentage:
+                            _dashboardData!.statistics.profileCompletion,
+                        completedFields:
+                            _dashboardData!.statistics.completedFields,
+                        totalFields: _dashboardData!.statistics.totalFields,
+                        onCompleteProfile: _navigateToEditProfile,
                       ),
-                    ),
+                      const SizedBox(height: 20),
+                      QuickOverviewCard(
+                        completionPercentage:
+                            _dashboardData!.statistics.profileCompletion,
+                        courseCount: _dashboardData!.statistics.courseCount,
+                        scholarshipCount:
+                            _dashboardData!.statistics.scholarshipCount,
+                        applicationCount:
+                            _dashboardData!.statistics.applicationCount,
+                        profileViews: _dashboardData!.statistics.profileViews,
+                        status: _dashboardData!.university.status,
+                        onCoursesTap: _navigateToCourses,
+                        onProfileTap: _navigateToProfile,
+                        onScholarshipsTap: _navigateToScholarships,
+                        onAnalyticsTap: _navigateToAnalytics,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildUniversityInfoCard(_dashboardData!.university),
+                      const SizedBox(height: 20),
+                      _buildAvailableActions(),
+                      const SizedBox(height: 20),
+                      _buildRecentActivitySection(
+                        _dashboardData!.recentActivity,
+                      ),
+                    ],
                   ),
+                ),
+              ),
       ),
     );
   }

@@ -69,9 +69,11 @@ class _StudentUniversityDetailsPageState
   List<UniversityCourseInfo> get _filteredCourses {
     final query = _courseSearchController.text.trim().toLowerCase();
     return _university.courses.where((c) {
-      final matchesStream = _selectedCourseStream == 'All' ||
+      final matchesStream =
+          _selectedCourseStream == 'All' ||
           c.stream.toLowerCase() == _selectedCourseStream.toLowerCase();
-      final matchesQuery = query.isEmpty ||
+      final matchesQuery =
+          query.isEmpty ||
           c.title.toLowerCase().contains(query) ||
           c.stream.toLowerCase().contains(query) ||
           c.degreeType.toLowerCase().contains(query);
@@ -121,8 +123,12 @@ class _StudentUniversityDetailsPageState
               setState(() => _isFavorite = !_isFavorite);
             },
             icon: Icon(
-              _isFavorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-              color: _isFavorite ? const Color(0xFFEF4444) : const Color(0xFF64748B),
+              _isFavorite
+                  ? Icons.favorite_rounded
+                  : Icons.favorite_border_rounded,
+              color: _isFavorite
+                  ? const Color(0xFFEF4444)
+                  : const Color(0xFF64748B),
             ),
             tooltip: _isFavorite ? 'Remove favorite' : 'Add favorite',
           ),
@@ -161,7 +167,9 @@ class _StudentUniversityDetailsPageState
             ),
           ),
           icon: Icon(
-            _isSelected ? Icons.check_circle_rounded : Icons.compare_arrows_rounded,
+            _isSelected
+                ? Icons.check_circle_rounded
+                : Icons.compare_arrows_rounded,
           ),
           label: Text(
             _isSelected ? 'Added to Comparison' : '+ Add to Comparison',
@@ -189,12 +197,17 @@ class _StudentUniversityDetailsPageState
                               height: 64,
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
-                                  colors: [Color(0xFFEFF6FF), Color(0xFFDBEAFE)],
+                                  colors: [
+                                    Color(0xFFEFF6FF),
+                                    Color(0xFFDBEAFE),
+                                  ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                 ),
                                 borderRadius: BorderRadius.circular(16),
-                                border: Border.all(color: const Color(0xFFBFDBFE)),
+                                border: Border.all(
+                                  color: const Color(0xFFBFDBFE),
+                                ),
                               ),
                               child: Center(
                                 child: Text(
@@ -418,7 +431,8 @@ class _StudentUniversityDetailsPageState
                     controller: _courseSearchController,
                     onChanged: (_) => setState(() {}),
                     decoration: InputDecoration(
-                      hintText: 'Search courses offered by ${_university.universityName}...',
+                      hintText:
+                          'Search courses offered by ${_university.universityName}...',
                       prefixIcon: const Icon(Icons.search_rounded, size: 20),
                       suffixIcon: _courseSearchController.text.isNotEmpty
                           ? IconButton(
@@ -451,36 +465,41 @@ class _StudentUniversityDetailsPageState
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: [
-                        'All',
-                        'Mathematics',
-                        'Science',
-                        'Technology',
-                        'Commerce',
-                        'Arts',
-                      ].map((stream) {
-                        final isSelected = _selectedCourseStream == stream;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ChoiceChip(
-                            label: Text(stream),
-                            selected: isSelected,
-                            onSelected: (val) {
-                              if (val) {
-                                setState(() => _selectedCourseStream = stream);
-                              }
-                            },
-                            selectedColor: const Color(0xFFDBEAFE),
-                            labelStyle: TextStyle(
-                              fontSize: 12,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                              color: isSelected
-                                  ? const Color(0xFF1D4ED8)
-                                  : const Color(0xFF64748B),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                      children:
+                          [
+                            'All',
+                            'Mathematics',
+                            'Science',
+                            'Technology',
+                            'Commerce',
+                            'Arts',
+                          ].map((stream) {
+                            final isSelected = _selectedCourseStream == stream;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: ChoiceChip(
+                                label: Text(stream),
+                                selected: isSelected,
+                                onSelected: (val) {
+                                  if (val) {
+                                    setState(
+                                      () => _selectedCourseStream = stream,
+                                    );
+                                  }
+                                },
+                                selectedColor: const Color(0xFFDBEAFE),
+                                labelStyle: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: isSelected
+                                      ? const Color(0xFF1D4ED8)
+                                      : const Color(0xFF64748B),
+                                ),
+                              ),
+                            );
+                          }).toList(),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -518,7 +537,8 @@ class _StudentUniversityDetailsPageState
                     )
                   else
                     ..._filteredCourses.map((course) {
-                      final matches = studentStream != null &&
+                      final matches =
+                          studentStream != null &&
                           studentStream.isNotEmpty &&
                           (course.stream.toLowerCase() ==
                                   studentStream.toLowerCase() ||
@@ -578,7 +598,9 @@ class _StudentUniversityDetailsPageState
                                         ),
                                         decoration: BoxDecoration(
                                           color: const Color(0xFFECFDF5),
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                           border: Border.all(
                                             color: const Color(0xFFA7F3D0),
                                           ),
@@ -627,7 +649,10 @@ class _StudentUniversityDetailsPageState
                                   ),
                                 ],
                                 const SizedBox(height: 12),
-                                const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                                const Divider(
+                                  height: 1,
+                                  color: Color(0xFFF1F5F9),
+                                ),
                                 const SizedBox(height: 8),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -644,7 +669,9 @@ class _StudentUniversityDetailsPageState
                                       ),
                                       label: const Text('View Course'),
                                       style: TextButton.styleFrom(
-                                        foregroundColor: const Color(0xFF2563EB),
+                                        foregroundColor: const Color(
+                                          0xFF2563EB,
+                                        ),
                                         visualDensity: VisualDensity.compact,
                                       ),
                                     ),
@@ -680,53 +707,50 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(icon, size: 18, color: const Color(0xFF3B82F6)),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      label,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Color(0xFF64748B),
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      value,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: isLink
-                            ? const Color(0xFF2563EB)
-                            : const Color(0xFF1E293B),
-                        decoration:
-                            isLink ? TextDecoration.underline : TextDecoration.none,
-                      ),
-                    ),
-                  ],
+    onTap: onTap,
+    borderRadius: BorderRadius.circular(8),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: const Color(0xFF3B82F6)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF64748B),
+                  ),
                 ),
-              ),
-              if (onTap != null)
-                const Icon(
-                  Icons.copy_rounded,
-                  size: 16,
-                  color: Color(0xFF94A3B8),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: isLink
+                        ? const Color(0xFF2563EB)
+                        : const Color(0xFF1E293B),
+                    decoration: isLink
+                        ? TextDecoration.underline
+                        : TextDecoration.none,
+                  ),
                 ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
+          if (onTap != null)
+            const Icon(Icons.copy_rounded, size: 16, color: Color(0xFF94A3B8)),
+        ],
+      ),
+    ),
+  );
 }
 
 class _CoursePill extends StatelessWidget {
@@ -737,27 +761,26 @@ class _CoursePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+    decoration: BoxDecoration(
+      color: const Color(0xFFF8FAFC),
+      borderRadius: BorderRadius.circular(6),
+      border: Border.all(color: const Color(0xFFE2E8F0)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: const Color(0xFF64748B)),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF475569),
+          ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 13, color: const Color(0xFF64748B)),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF475569),
-              ),
-            ),
-          ],
-        ),
-      );
+      ],
+    ),
+  );
 }
-

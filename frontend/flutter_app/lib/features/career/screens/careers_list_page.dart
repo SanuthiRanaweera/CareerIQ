@@ -239,8 +239,10 @@ class _CareersListPageState extends State<CareersListPage> {
                         _loadCareers();
                       },
                     ),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 14,
+              ),
             ),
           ),
           if (_categories.isNotEmpty) ...[
@@ -280,7 +282,9 @@ class _CareersListPageState extends State<CareersListPage> {
               color: selected ? Colors.white : const Color(0xFF64748B),
             ),
             side: BorderSide(
-              color: selected ? const Color(0xFF3B82F6) : const Color(0xFFCBD5E1),
+              color: selected
+                  ? const Color(0xFF3B82F6)
+                  : const Color(0xFFCBD5E1),
             ),
             shape: const StadiumBorder(),
           );

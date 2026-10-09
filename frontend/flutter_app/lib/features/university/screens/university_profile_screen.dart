@@ -8,10 +8,7 @@ import 'edit_university_profile_screen.dart';
 import 'university_courses_screen.dart';
 
 class UniversityProfileScreen extends StatefulWidget {
-  const UniversityProfileScreen({
-    super.key,
-    required this.initialProfile,
-  });
+  const UniversityProfileScreen({super.key, required this.initialProfile});
 
   final UniversityProfileModel initialProfile;
 
@@ -121,8 +118,11 @@ class _UniversityProfileScreenState extends State<UniversityProfileScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.school_outlined,
-                        size: 18, color: Color(0xFF2563EB)),
+                    const Icon(
+                      Icons.school_outlined,
+                      size: 18,
+                      color: Color(0xFF2563EB),
+                    ),
                     const SizedBox(width: 8),
                     const Text(
                       'COURSES OFFERED',
@@ -136,8 +136,10 @@ class _UniversityProfileScreenState extends State<UniversityProfileScreen> {
                   ],
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEFF6FF),
                     borderRadius: BorderRadius.circular(12),
@@ -162,8 +164,11 @@ class _UniversityProfileScreenState extends State<UniversityProfileScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline_rounded,
-                        size: 18, color: Color(0xFF94A3B8)),
+                    const Icon(
+                      Icons.info_outline_rounded,
+                      size: 18,
+                      color: Color(0xFF94A3B8),
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -189,8 +194,11 @@ class _UniversityProfileScreenState extends State<UniversityProfileScreen> {
                       children: [
                         const Padding(
                           padding: EdgeInsets.only(top: 4, right: 8),
-                          child: Icon(Icons.circle,
-                              size: 7, color: Color(0xFF2563EB)),
+                          child: Icon(
+                            Icons.circle,
+                            size: 7,
+                            color: Color(0xFF2563EB),
+                          ),
                         ),
                         Expanded(
                           child: Column(
@@ -215,8 +223,11 @@ class _UniversityProfileScreenState extends State<UniversityProfileScreen> {
                             ],
                           ),
                         ),
-                        const Icon(Icons.chevron_right_rounded,
-                            size: 18, color: Color(0xFF94A3B8)),
+                        const Icon(
+                          Icons.chevron_right_rounded,
+                          size: 18,
+                          color: Color(0xFF94A3B8),
+                        ),
                       ],
                     ),
                   ),
@@ -265,8 +276,9 @@ class _UniversityProfileScreenState extends State<UniversityProfileScreen> {
     IconData? icon,
     bool isPrimary = false,
   }) {
-    final displayValue =
-        (value != null && value.trim().isNotEmpty) ? value : 'Not provided';
+    final displayValue = (value != null && value.trim().isNotEmpty)
+        ? value
+        : 'Not provided';
     final hasValue = value != null && value.trim().isNotEmpty;
 
     return Padding(
@@ -297,8 +309,8 @@ class _UniversityProfileScreenState extends State<UniversityProfileScreen> {
                 fontWeight: isPrimary ? FontWeight.w700 : FontWeight.w600,
                 color: hasValue
                     ? (isPrimary
-                        ? const Color(0xFF2563EB)
-                        : const Color(0xFF0F172A))
+                          ? const Color(0xFF2563EB)
+                          : const Color(0xFF0F172A))
                     : const Color(0xFF94A3B8),
               ),
             ),
@@ -450,45 +462,37 @@ class _UniversityProfileScreenState extends State<UniversityProfileScreen> {
               ),
 
               // Representative Details
-              _buildSection(
-                'ADMIN / REPRESENTATIVE',
-                Icons.badge_outlined,
-                [
-                  _buildInfoRow(
-                    'Name',
-                    _profile.representativeName,
-                    icon: Icons.person_outline,
-                  ),
-                  _buildInfoRow(
-                    'Email',
-                    _profile.representativeEmail,
-                    icon: Icons.mail_outline,
-                  ),
-                  _buildInfoRow(
-                    'Contact Number',
-                    _profile.representativeContactNumber,
-                    icon: Icons.phone_android_outlined,
-                  ),
-                ],
-              ),
+              _buildSection('ADMIN / REPRESENTATIVE', Icons.badge_outlined, [
+                _buildInfoRow(
+                  'Name',
+                  _profile.representativeName,
+                  icon: Icons.person_outline,
+                ),
+                _buildInfoRow(
+                  'Email',
+                  _profile.representativeEmail,
+                  icon: Icons.mail_outline,
+                ),
+                _buildInfoRow(
+                  'Contact Number',
+                  _profile.representativeContactNumber,
+                  icon: Icons.phone_android_outlined,
+                ),
+              ]),
 
               // Online Presence & About
-              _buildSection(
-                'ABOUT & ONLINE PRESENCE',
-                Icons.language_rounded,
-                [
-                  _buildInfoRow(
-                    'Website',
-                    _profile.website,
-                    icon: Icons.link_rounded,
-                  ),
-                  _buildInfoRow(
-                    'Description',
-                    _profile.description,
-                    icon: Icons.notes_rounded,
-                  ),
-                ],
-              ),
+              _buildSection('ABOUT & ONLINE PRESENCE', Icons.language_rounded, [
+                _buildInfoRow(
+                  'Website',
+                  _profile.website,
+                  icon: Icons.link_rounded,
+                ),
+                _buildInfoRow(
+                  'Description',
+                  _profile.description,
+                  icon: Icons.notes_rounded,
+                ),
+              ]),
 
               // Courses Offered
               _buildCoursesOfferedSection(),
