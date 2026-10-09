@@ -80,15 +80,13 @@ void main() {
       Future<void> expectRequired(String sectionTitle, bool required) async {
         await scrollTo(tester, find.text(sectionTitle));
         final card = find
-            .ancestor(
-              of: find.text(sectionTitle),
-              matching: find.byType(Card),
-            )
+            .ancestor(of: find.text(sectionTitle), matching: find.byType(Card))
             .first;
         expect(
           find.descendant(of: card, matching: find.text('Required')),
           required ? findsOneWidget : findsNothing,
-          reason: '$sectionTitle should '
+          reason:
+              '$sectionTitle should '
               '${required ? 'be' : 'not be'} marked required',
         );
       }
@@ -100,8 +98,9 @@ void main() {
       await expectRequired('Preferred work style', false);
     });
 
-    testWidgets('offers the A/L streams from the shared option list',
-        (tester) async {
+    testWidgets('offers the A/L streams from the shared option list', (
+      tester,
+    ) async {
       await tester.pumpWidget(wrap((_) {}));
       await tester.pumpAndSettle();
 
@@ -120,8 +119,9 @@ void main() {
       expect(find.text('Please choose at least one interest'), findsNothing);
     });
 
-    testWidgets('blocks submission and names every missing answer',
-        (tester) async {
+    testWidgets('blocks submission and names every missing answer', (
+      tester,
+    ) async {
       var submitted = false;
       await tester.pumpWidget(wrap((_) => submitted = true));
       await tester.pumpAndSettle();
@@ -135,8 +135,9 @@ void main() {
       );
     });
 
-    testWidgets('shows an inline message under each incomplete question',
-        (tester) async {
+    testWidgets('shows an inline message under each incomplete question', (
+      tester,
+    ) async {
       await tester.pumpWidget(wrap((_) {}));
       await tester.pumpAndSettle();
 
@@ -156,8 +157,9 @@ void main() {
       );
     });
 
-    testWidgets('an error clears as soon as that question is answered',
-        (tester) async {
+    testWidgets('an error clears as soon as that question is answered', (
+      tester,
+    ) async {
       await tester.pumpWidget(wrap((_) {}));
       await tester.pumpAndSettle();
 
@@ -221,8 +223,7 @@ void main() {
       expect(answers!.interests.length, 2);
     });
 
-    testWidgets('tapping a selected interest again removes it',
-        (tester) async {
+    testWidgets('tapping a selected interest again removes it', (tester) async {
       RecommendationAnswers? answers;
       await tester.pumpWidget(wrap((a) => answers = a));
       await tester.pumpAndSettle();
@@ -252,20 +253,22 @@ void main() {
       expect(answers!.stream, 'Commerce');
     });
 
-    testWidgets('an optional single choice can be cleared by tapping it again',
-        (tester) async {
-      RecommendationAnswers? answers;
-      await tester.pumpWidget(wrap((a) => answers = a));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'an optional single choice can be cleared by tapping it again',
+      (tester) async {
+        RecommendationAnswers? answers;
+        await tester.pumpWidget(wrap((a) => answers = a));
+        await tester.pumpAndSettle();
 
-      await completeRequired(tester);
-      await choose(tester, 'Remote');
-      await choose(tester, 'Remote');
-      await submit(tester);
+        await completeRequired(tester);
+        await choose(tester, 'Remote');
+        await choose(tester, 'Remote');
+        await submit(tester);
 
-      // Work style is optional, so undoing the choice must be possible.
-      expect(answers!.workStyle, isEmpty);
-      expect(answers!.answeredCount, 3);
-    });
+        // Work style is optional, so undoing the choice must be possible.
+        expect(answers!.workStyle, isEmpty);
+        expect(answers!.answeredCount, 3);
+      },
+    );
   });
 }

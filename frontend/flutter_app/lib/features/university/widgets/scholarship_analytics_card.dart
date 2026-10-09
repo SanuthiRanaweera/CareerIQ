@@ -235,11 +235,31 @@ class ScholarshipAnalyticsCard extends StatelessWidget {
           spacing: 12,
           runSpacing: 8,
           children: [
-            _buildStatusBadge('Pending', applicationStatus.pending, const Color(0xFFF59E0B)),
-            _buildStatusBadge('Under Review', applicationStatus.underReview, const Color(0xFF3B82F6)),
-            _buildStatusBadge('Shortlisted', applicationStatus.shortlisted, const Color(0xFF8B5CF6)),
-            _buildStatusBadge('Approved', applicationStatus.approved, const Color(0xFF10B981)),
-            _buildStatusBadge('Rejected', applicationStatus.rejected, const Color(0xFFEF4444)),
+            _buildStatusBadge(
+              'Pending',
+              applicationStatus.pending,
+              const Color(0xFFF59E0B),
+            ),
+            _buildStatusBadge(
+              'Under Review',
+              applicationStatus.underReview,
+              const Color(0xFF3B82F6),
+            ),
+            _buildStatusBadge(
+              'Shortlisted',
+              applicationStatus.shortlisted,
+              const Color(0xFF8B5CF6),
+            ),
+            _buildStatusBadge(
+              'Approved',
+              applicationStatus.approved,
+              const Color(0xFF10B981),
+            ),
+            _buildStatusBadge(
+              'Rejected',
+              applicationStatus.rejected,
+              const Color(0xFFEF4444),
+            ),
           ],
         ),
       ],
@@ -253,18 +273,12 @@ class ScholarshipAnalyticsCard extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
         const SizedBox(width: 5),
         Text(
           '$label: ',
-          style: const TextStyle(
-            fontSize: 11,
-            color: Color(0xFF64748B),
-          ),
+          style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
         ),
         Text(
           '$count',
@@ -278,4 +292,3 @@ class ScholarshipAnalyticsCard extends StatelessWidget {
     );
   }
 }
-

@@ -22,7 +22,8 @@ class Course {
         ? (json['university']['universityName'] ?? '')
         : (json['university'] as String? ?? ''),
     universityId: json['universityId'] is Map
-        ? (json['universityId']['_id'] ?? json['universityId']['id'] ?? '').toString()
+        ? (json['universityId']['_id'] ?? json['universityId']['id'] ?? '')
+              .toString()
         : (json['universityId'] as String?),
     stream: json['stream'] as String? ?? 'Any',
     degreeType: json['degreeType'] as String? ?? "Bachelor's Degree",

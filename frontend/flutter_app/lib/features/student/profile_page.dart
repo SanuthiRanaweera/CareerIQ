@@ -213,16 +213,16 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         )
                       : (_profileImage.text.trim().isEmpty
-                          ? _profileInitial()
-                          : ClipOval(
-                              child: Image.network(
-                                _profileImage.text.trim(),
-                                width: 64,
-                                height: 64,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, _, _) => _profileInitial(),
-                              ),
-                            )),
+                            ? _profileInitial()
+                            : ClipOval(
+                                child: Image.network(
+                                  _profileImage.text.trim(),
+                                  width: 64,
+                                  height: 64,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, _, _) => _profileInitial(),
+                                ),
+                              )),
                 ),
                 const SizedBox(width: 16),
                 Expanded(

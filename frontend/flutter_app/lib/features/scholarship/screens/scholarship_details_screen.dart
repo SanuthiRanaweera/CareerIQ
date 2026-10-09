@@ -65,8 +65,18 @@ class _ScholarshipDetailsScreenState extends State<ScholarshipDetailsScreen> {
 
   String _formatDate(DateTime dt) {
     const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
     ];
     return '${dt.day} ${months[dt.month - 1]} ${dt.year}';
   }
@@ -74,7 +84,8 @@ class _ScholarshipDetailsScreenState extends State<ScholarshipDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final eligibilityResult = _scholarship.checkEligibility(widget.student);
-    final isExpired = _scholarship.isExpired ||
+    final isExpired =
+        _scholarship.isExpired ||
         _scholarship.status.toLowerCase() == 'closed' ||
         _scholarship.status.toLowerCase() == 'expired';
     final hasApplied = _scholarship.hasApplied;
@@ -129,75 +140,75 @@ class _ScholarshipDetailsScreenState extends State<ScholarshipDetailsScreen> {
                 ),
               )
             : hasApplied
-                ? FilledButton(
-                    onPressed: null,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF059669),
-                      disabledBackgroundColor: const Color(0xFFD1FAE5),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.check_circle_rounded,
-                          size: 20,
-                          color: Color(0xFF047857),
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Application Submitted',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF047857),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                : FilledButton(
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    onPressed: () async {
-                      final applied = await Navigator.push<bool>(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => ApplyScholarshipScreen(
-                            scholarship: _scholarship,
-                            student: widget.student,
-                            token: widget.token,
-                          ),
-                        ),
-                      );
-
-                      if (applied == true) {
-                        _refreshDetails();
-                      }
-                    },
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.send_rounded, size: 20),
-                        SizedBox(width: 8),
-                        Text(
-                          'Apply for Scholarship',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
+            ? FilledButton(
+                onPressed: null,
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF059669),
+                  disabledBackgroundColor: const Color(0xFFD1FAE5),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
                   ),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.check_circle_rounded,
+                      size: 20,
+                      color: Color(0xFF047857),
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'Application Submitted',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF047857),
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            : FilledButton(
+                style: FilledButton.styleFrom(
+                  backgroundColor: const Color(0xFF2563EB),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+                onPressed: () async {
+                  final applied = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ApplyScholarshipScreen(
+                        scholarship: _scholarship,
+                        student: widget.student,
+                        token: widget.token,
+                      ),
+                    ),
+                  );
+
+                  if (applied == true) {
+                    _refreshDetails();
+                  }
+                },
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.send_rounded, size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      'Apply for Scholarship',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
       ),
       body: _isLoading
           ? const Center(
@@ -511,7 +522,10 @@ class _ScholarshipDetailsScreenState extends State<ScholarshipDetailsScreen> {
                                 ? _scholarship.eligibility.stream
                                 : 'Open to All Streams',
                           ),
-                          if (_scholarship.eligibility.academicRequirement.isNotEmpty)
+                          if (_scholarship
+                              .eligibility
+                              .academicRequirement
+                              .isNotEmpty)
                             _buildCriteriaRow(
                               'Academic Requirement',
                               _scholarship.eligibility.academicRequirement,
@@ -522,7 +536,10 @@ class _ScholarshipDetailsScreenState extends State<ScholarshipDetailsScreen> {
                               'District Restriction',
                               _scholarship.eligibility.district!,
                             ),
-                          if (_scholarship.eligibility.minimumResults.isNotEmpty) ...[
+                          if (_scholarship
+                              .eligibility
+                              .minimumResults
+                              .isNotEmpty) ...[
                             const SizedBox(height: 8),
                             const Text(
                               'Required Subject Grades:',
@@ -535,7 +552,10 @@ class _ScholarshipDetailsScreenState extends State<ScholarshipDetailsScreen> {
                             const SizedBox(height: 4),
                             ..._scholarship.eligibility.minimumResults.map(
                               (r) => Padding(
-                                padding: const EdgeInsets.only(left: 8, bottom: 4),
+                                padding: const EdgeInsets.only(
+                                  left: 8,
+                                  bottom: 4,
+                                ),
                                 child: Text(
                                   '• ${r.subject} (Min grade ${r.grade})',
                                   style: const TextStyle(

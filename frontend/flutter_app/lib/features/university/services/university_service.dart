@@ -6,8 +6,8 @@ import '../models/university_dashboard_data.dart';
 
 class UniversityService {
   UniversityService({ApiService? api, AuthService? auth})
-      : _api = api ?? ApiService(),
-        _auth = auth ?? AuthService();
+    : _api = api ?? ApiService(),
+      _auth = auth ?? AuthService();
 
   final ApiService _api;
   final AuthService _auth;
@@ -129,4 +129,3 @@ class UniversityService {
   /// University logout
   Future<void> logout() => _auth.logout();
 }
-

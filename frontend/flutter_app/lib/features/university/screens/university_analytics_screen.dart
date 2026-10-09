@@ -9,10 +9,7 @@ import '../widgets/scholarship_analytics_card.dart';
 import 'university_courses_screen.dart';
 
 class UniversityAnalyticsScreen extends StatefulWidget {
-  const UniversityAnalyticsScreen({
-    super.key,
-    this.universityName,
-  });
+  const UniversityAnalyticsScreen({super.key, this.universityName});
 
   final String? universityName;
 
@@ -70,7 +67,8 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.universityName != null &&
+    final title =
+        widget.universityName != null &&
             widget.universityName!.trim().isNotEmpty
         ? '${widget.universityName} • Analytics'
         : 'University Analytics';
@@ -80,10 +78,7 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
       appBar: AppBar(
         title: Text(
           title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w800,
-            fontSize: 18,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
         ),
         elevation: 0,
         backgroundColor: Colors.white,
@@ -101,95 +96,96 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
         child: _isLoading
             ? _buildLoadingSkeleton()
             : _errorMessage != null
-                ? _buildErrorView()
-                : RefreshIndicator(
-                    onRefresh: () => _loadAnalytics(showLoading: false),
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 1. Header & Period Selector
-                          _buildPeriodHeader(),
-                          const SizedBox(height: 20),
+            ? _buildErrorView()
+            : RefreshIndicator(
+                onRefresh: () => _loadAnalytics(showLoading: false),
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 1. Header & Period Selector
+                      _buildPeriodHeader(),
+                      const SizedBox(height: 20),
 
-                          // 2. Empty State Notice if zero interactions yet
-                          if (_isCompletelyEmpty()) ...[
-                            _buildEmptyStateBanner(),
-                            const SizedBox(height: 20),
-                          ],
+                      // 2. Empty State Notice if zero interactions yet
+                      if (_isCompletelyEmpty()) ...[
+                        _buildEmptyStateBanner(),
+                        const SizedBox(height: 20),
+                      ],
 
-                          // 3. Overview Statistics Grid
-                          _buildOverviewCards(),
-                          const SizedBox(height: 20),
+                      // 3. Overview Statistics Grid
+                      _buildOverviewCards(),
+                      const SizedBox(height: 20),
 
-                          // 4. Profile Views Detailed Breakdown
-                          _buildProfileViewsBreakdownCard(),
-                          const SizedBox(height: 20),
+                      // 4. Profile Views Detailed Breakdown
+                      _buildProfileViewsBreakdownCard(),
+                      const SizedBox(height: 20),
 
-                          // 5. Profile Views Trend Chart
-                          AnalyticsTrendBarChart(
-                            title: 'Profile Views Trend',
-                            subtitle: 'Daily student profile views over $_rangeLabel',
-                            points: _analytics!.trends.profileViews,
-                            barColor: const Color(0xFF2563EB),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // 6. Student Interest & Favourites Info
-                          _buildStudentInterestCard(),
-                          const SizedBox(height: 20),
-
-                          // 7. Course Engagement Section
-                          CourseAnalyticsCard(
-                            coursesData: _analytics!.courses,
-                            onViewAllCourses: () {
-                              if (widget.universityName != null) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => UniversityCoursesScreen(
-                                      universityName: widget.universityName!,
-                                    ),
-                                  ),
-                                );
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 20),
-
-                          // 8. Course Views Daily Trend
-                          AnalyticsTrendBarChart(
-                            title: 'Course Views Over Time',
-                            subtitle: 'Daily course engagements by students',
-                            points: _analytics!.trends.courseViews,
-                            barColor: const Color(0xFF0EA5E9),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // 9. Scholarship Performance & Status
-                          ScholarshipAnalyticsCard(
-                            scholarshipsData: _analytics!.scholarships,
-                            applicationStatus: _analytics!.applicationStatus,
-                          ),
-                          const SizedBox(height: 20),
-
-                          // 10. Scholarship Applications Daily Trend
-                          AnalyticsTrendBarChart(
-                            title: 'Scholarship Applications Trend',
-                            subtitle: 'Daily submissions received',
-                            points: _analytics!.trends.scholarshipApplications,
-                            barColor: const Color(0xFF10B981),
-                          ),
-                          const SizedBox(height: 20),
-
-                          // 11. Discovery & Comparison Activity
-                          _buildDiscoveryAndComparisonCard(),
-                        ],
+                      // 5. Profile Views Trend Chart
+                      AnalyticsTrendBarChart(
+                        title: 'Profile Views Trend',
+                        subtitle:
+                            'Daily student profile views over $_rangeLabel',
+                        points: _analytics!.trends.profileViews,
+                        barColor: const Color(0xFF2563EB),
                       ),
-                    ),
+                      const SizedBox(height: 20),
+
+                      // 6. Student Interest & Favourites Info
+                      _buildStudentInterestCard(),
+                      const SizedBox(height: 20),
+
+                      // 7. Course Engagement Section
+                      CourseAnalyticsCard(
+                        coursesData: _analytics!.courses,
+                        onViewAllCourses: () {
+                          if (widget.universityName != null) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => UniversityCoursesScreen(
+                                  universityName: widget.universityName!,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
+
+                      // 8. Course Views Daily Trend
+                      AnalyticsTrendBarChart(
+                        title: 'Course Views Over Time',
+                        subtitle: 'Daily course engagements by students',
+                        points: _analytics!.trends.courseViews,
+                        barColor: const Color(0xFF0EA5E9),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // 9. Scholarship Performance & Status
+                      ScholarshipAnalyticsCard(
+                        scholarshipsData: _analytics!.scholarships,
+                        applicationStatus: _analytics!.applicationStatus,
+                      ),
+                      const SizedBox(height: 20),
+
+                      // 10. Scholarship Applications Daily Trend
+                      AnalyticsTrendBarChart(
+                        title: 'Scholarship Applications Trend',
+                        subtitle: 'Daily submissions received',
+                        points: _analytics!.trends.scholarshipApplications,
+                        barColor: const Color(0xFF10B981),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // 11. Discovery & Comparison Activity
+                      _buildDiscoveryAndComparisonCard(),
+                    ],
                   ),
+                ),
+              ),
       ),
     );
   }
@@ -238,10 +234,7 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
         const SizedBox(height: 4),
         const Text(
           'Live student interaction and engagement data from MongoDB',
-          style: TextStyle(
-            fontSize: 12,
-            color: Color(0xFF64748B),
-          ),
+          style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
         ),
         const SizedBox(height: 12),
         AnalyticsFilterBar(
@@ -263,11 +256,7 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
       child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            Icons.info_outline_rounded,
-            color: Color(0xFF2563EB),
-            size: 20,
-          ),
+          Icon(Icons.info_outline_rounded, color: Color(0xFF2563EB), size: 20),
           SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -337,7 +326,8 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
                 icon: Icons.people_outline_rounded,
                 color: const Color(0xFF8B5CF6),
                 bgColor: const Color(0xFFF5F3FF),
-                subtitle: '${_analytics!.studentInterest.newThisMonth} this month',
+                subtitle:
+                    '${_analytics!.studentInterest.newThisMonth} this month',
               ),
             ),
           ],
@@ -375,7 +365,8 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
           icon: Icons.workspace_premium_rounded,
           color: const Color(0xFF10B981),
           bgColor: const Color(0xFFECFDF5),
-          subtitle: '${o.totalApplications} all-time across ${_analytics!.scholarships.total} scholarships',
+          subtitle:
+              '${o.totalApplications} all-time across ${_analytics!.scholarships.total} scholarships',
         ),
       ],
     );
@@ -406,21 +397,34 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
             const SizedBox(height: 4),
             const Text(
               'Real view sessions logged from CareerIQ student app',
-              style: TextStyle(
-                fontSize: 12,
-                color: Color(0xFF64748B),
-              ),
+              style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 16),
             Row(
               children: [
-                _buildBreakdownItem('Today', '${pv.today}', const Color(0xFF2563EB)),
+                _buildBreakdownItem(
+                  'Today',
+                  '${pv.today}',
+                  const Color(0xFF2563EB),
+                ),
                 _buildBreakdownDivider(),
-                _buildBreakdownItem('This Week', '${pv.thisWeek}', const Color(0xFF0EA5E9)),
+                _buildBreakdownItem(
+                  'This Week',
+                  '${pv.thisWeek}',
+                  const Color(0xFF0EA5E9),
+                ),
                 _buildBreakdownDivider(),
-                _buildBreakdownItem('This Month', '${pv.thisMonth}', const Color(0xFF8B5CF6)),
+                _buildBreakdownItem(
+                  'This Month',
+                  '${pv.thisMonth}',
+                  const Color(0xFF8B5CF6),
+                ),
                 _buildBreakdownDivider(),
-                _buildBreakdownItem('All Time', '${pv.allTime}', const Color(0xFF0F172A)),
+                _buildBreakdownItem(
+                  'All Time',
+                  '${pv.allTime}',
+                  const Color(0xFF0F172A),
+                ),
               ],
             ),
           ],
@@ -457,11 +461,7 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
   }
 
   Widget _buildBreakdownDivider() {
-    return Container(
-      height: 28,
-      width: 1,
-      color: const Color(0xFFE2E8F0),
-    );
+    return Container(height: 28, width: 1, color: const Color(0xFFE2E8F0));
   }
 
   Widget _buildStudentInterestCard() {
@@ -527,10 +527,7 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
                 children: [
                   const Text(
                     'Total Favourites:',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF475569),
-                    ),
+                    style: TextStyle(fontSize: 13, color: Color(0xFF475569)),
                   ),
                   Text(
                     '${fav.total}',
@@ -548,10 +545,7 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
                 children: [
                   const Text(
                     'New this month:',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF475569),
-                    ),
+                    style: TextStyle(fontSize: 13, color: Color(0xFF475569)),
                   ),
                   Text(
                     '${interest.newThisMonth}',
@@ -569,10 +563,7 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
                 children: [
                   const Text(
                     'New this week:',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF475569),
-                    ),
+                    style: TextStyle(fontSize: 13, color: Color(0xFF475569)),
                   ),
                   Text(
                     '${interest.newThisWeek}',
@@ -617,10 +608,7 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
             const SizedBox(height: 4),
             const Text(
               'Visibility and side-by-side comparison activity',
-              style: TextStyle(
-                fontSize: 12,
-                color: Color(0xFF64748B),
-              ),
+              style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 16),
             Row(
@@ -795,12 +783,10 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              _errorMessage ?? 'An error occurred while connecting to the analytics server.',
+              _errorMessage ??
+                  'An error occurred while connecting to the analytics server.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF64748B),
-              ),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
@@ -821,4 +807,3 @@ class _UniversityAnalyticsScreenState extends State<UniversityAnalyticsScreen> {
     );
   }
 }
-

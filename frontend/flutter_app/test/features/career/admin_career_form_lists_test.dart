@@ -57,9 +57,7 @@ void main() {
   ) async {
     final addButton = find.byTooltip('Add to $listLabel');
     await scrollTo(tester, addButton);
-    final row = find
-        .ancestor(of: addButton, matching: find.byType(Row))
-        .first;
+    final row = find.ancestor(of: addButton, matching: find.byType(Row)).first;
     await tester.enterText(
       find.descendant(of: row, matching: find.byType(TextField)),
       value,
@@ -154,11 +152,7 @@ void main() {
       await tester.pumpAndSettle();
 
       await fillRequired(tester);
-      await addToList(
-        tester,
-        'Industry opportunities',
-        'Banking IT divisions',
-      );
+      await addToList(tester, 'Industry opportunities', 'Banking IT divisions');
       await addToList(tester, 'Industry opportunities', 'Remote contracts');
       await save(tester);
 
@@ -227,9 +221,11 @@ void main() {
 
   group('AdminCareerFormPage pathway editor', () {
     testWidgets('starts with a prompt and no steps', (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
-      ));
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await scrollTo(tester, find.text('Career pathway'));
@@ -270,11 +266,14 @@ void main() {
       expect(pathway[1].stage, 'Degree');
     });
 
-    testWidgets('requires a stage and a title before adding a step',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('requires a stage and a title before adding a step', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await scrollTo(tester, find.text('Add pathway step'));
@@ -292,11 +291,12 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('a common stage can be filled in with one tap',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('a common stage can be filled in with one tap', (tester) async {
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await scrollTo(tester, find.text('Add pathway step'));
@@ -416,29 +416,29 @@ void main() {
 
   group('AdminCareerFormPage pathway editor in edit mode', () {
     Career seeded() => careerFixture(
-          id: 'id-se',
-          title: 'Software Engineer',
-          industryOpportunities: const ['Software export companies'],
-          pathway: const [
-            CareerPathwayStep(
-              order: 2,
-              stage: 'Degree',
-              title: 'BSc in IT',
-            ),
-            CareerPathwayStep(
-              order: 1,
-              stage: 'A/L Stream',
-              title: 'Technology stream',
-            ),
-          ],
-        );
+      id: 'id-se',
+      title: 'Software Engineer',
+      industryOpportunities: const ['Software export companies'],
+      pathway: const [
+        CareerPathwayStep(order: 2, stage: 'Degree', title: 'BSc in IT'),
+        CareerPathwayStep(
+          order: 1,
+          stage: 'A/L Stream',
+          title: 'Technology stream',
+        ),
+      ],
+    );
 
     testWidgets('pre-fills the pathway in order', (tester) async {
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        career: seeded(),
-        careerService: FakeCareerService(),
-      )));
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(
+            token: 't',
+            career: seeded(),
+            careerService: FakeCareerService(),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       await scrollTo(tester, find.text('Technology stream'));
@@ -449,32 +449,40 @@ void main() {
       expect(firstY, lessThan(secondY));
     });
 
-    testWidgets('adding a step to an existing pathway continues the numbering',
-        (tester) async {
-      final service = FakeCareerService();
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        career: seeded(),
-        careerService: service,
-      )));
-      await tester.pumpAndSettle();
+    testWidgets(
+      'adding a step to an existing pathway continues the numbering',
+      (tester) async {
+        final service = FakeCareerService();
+        await tester.pumpWidget(
+          wrap(
+            AdminCareerFormPage(
+              token: 't',
+              career: seeded(),
+              careerService: service,
+            ),
+          ),
+        );
+        await tester.pumpAndSettle();
 
-      await addPathwayStep(tester, stage: 'Internship', title: 'Intern role');
-      await save(tester, editing: true);
+        await addPathwayStep(tester, stage: 'Internship', title: 'Intern role');
+        await save(tester, editing: true);
 
-      final pathway = service.lastUpdated!.pathway;
-      expect(pathway.length, 3);
-      expect(pathway.map((s) => s.order), [1, 2, 3]);
-      expect(pathway.last.title, 'Intern role');
-    });
+        final pathway = service.lastUpdated!.pathway;
+        expect(pathway.length, 3);
+        expect(pathway.map((s) => s.order), [1, 2, 3]);
+        expect(pathway.last.title, 'Intern role');
+      },
+    );
   });
 
   group('AdminCareerFormPage tag suggestions', () {
     testWidgets('offers suggestions on the tag fields but not the free-form '
         'ones', (tester) async {
-      await tester.pumpWidget(wrap(
-        AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
-      ));
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(token: 't', careerService: FakeCareerService()),
+        ),
+      );
       await tester.pumpAndSettle();
 
       /// Looks for a Suggestions label inside one field's own subtree.
@@ -532,8 +540,9 @@ void main() {
       expect(service.lastCreated!.alSubjects, ['Biology']);
     });
 
-    testWidgets('an added suggestion is disabled and cannot be added twice',
-        (tester) async {
+    testWidgets('an added suggestion is disabled and cannot be added twice', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminCareerFormPage(token: 't', careerService: service)),
@@ -556,8 +565,9 @@ void main() {
       expect(service.lastCreated!.interestTags, ['technology']);
     });
 
-    testWidgets('typing a value that is also a suggestion is not duplicated',
-        (tester) async {
+    testWidgets('typing a value that is also a suggestion is not duplicated', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminCareerFormPage(token: 't', careerService: service)),
@@ -573,8 +583,9 @@ void main() {
       expect(service.lastCreated!.interestTags, ['technology']);
     });
 
-    testWidgets('free text still works for values outside the suggestions',
-        (tester) async {
+    testWidgets('free text still works for values outside the suggestions', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminCareerFormPage(token: 't', careerService: service)),
@@ -593,8 +604,9 @@ void main() {
       expect(service.lastCreated!.alSubjects, ['Statistics']);
     });
 
-    testWidgets('a suggested tag can be removed again with its x control',
-        (tester) async {
+    testWidgets('a suggested tag can be removed again with its x control', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(AdminCareerFormPage(token: 't', careerService: service)),
@@ -613,28 +625,30 @@ void main() {
       expect(service.lastCreated!.interestTags, ['design']);
     });
 
-    testWidgets('editing a career shows its stored tags as already added',
-        (tester) async {
-      final existing = careerFixture(
-        id: 'id-se',
-        title: 'Software Engineer',
-      );
-      await tester.pumpWidget(wrap(AdminCareerFormPage(
-        token: 't',
-        career: Career(
-          id: existing.id,
-          title: existing.title,
-          category: existing.category,
-          description: existing.description,
-          salaryRange: existing.salaryRange,
-          jobOutlook: existing.jobOutlook,
-          whatYouDo: existing.whatYouDo,
-          requiredSkills: existing.requiredSkills,
-          recommendedStreams: existing.recommendedStreams,
-          interestTags: const ['technology'],
+    testWidgets('editing a career shows its stored tags as already added', (
+      tester,
+    ) async {
+      final existing = careerFixture(id: 'id-se', title: 'Software Engineer');
+      await tester.pumpWidget(
+        wrap(
+          AdminCareerFormPage(
+            token: 't',
+            career: Career(
+              id: existing.id,
+              title: existing.title,
+              category: existing.category,
+              description: existing.description,
+              salaryRange: existing.salaryRange,
+              jobOutlook: existing.jobOutlook,
+              whatYouDo: existing.whatYouDo,
+              requiredSkills: existing.requiredSkills,
+              recommendedStreams: existing.recommendedStreams,
+              interestTags: const ['technology'],
+            ),
+            careerService: FakeCareerService(),
+          ),
         ),
-        careerService: FakeCareerService(),
-      )));
+      );
       await tester.pumpAndSettle();
 
       final chip = find.widgetWithText(ActionChip, 'technology');

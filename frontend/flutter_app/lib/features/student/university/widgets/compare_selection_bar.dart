@@ -173,4 +173,3 @@ class CompareSelectionBar extends StatelessWidget {
     );
   }
 }
-

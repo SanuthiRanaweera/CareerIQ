@@ -10,12 +10,12 @@ class ChatMessage {
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) => ChatMessage(
-        id: json['_id'] as String? ?? '${json['sender']}-${json['createdAt']}',
-        sender: json['sender'] as String? ?? 'ai',
-        message: json['message'] as String? ?? '',
-        mode: json['mode'] as String? ?? 'general',
-        createdAt: json['createdAt'] as String?,
-      );
+    id: json['_id'] as String? ?? '${json['sender']}-${json['createdAt']}',
+    sender: json['sender'] as String? ?? 'ai',
+    message: json['message'] as String? ?? '',
+    mode: json['mode'] as String? ?? 'general',
+    createdAt: json['createdAt'] as String?,
+  );
 
   final String id;
   final String sender;
@@ -31,7 +31,11 @@ class ChatbotService {
   final ApiService _api;
 
   Future<List<ChatMessage>> history(String token) async {
-    final response = await _api.request('GET', '/chatbot/history', token: token);
+    final response = await _api.request(
+      'GET',
+      '/chatbot/history',
+      token: token,
+    );
     return (response['data'] as List? ?? const [])
         .map((item) => ChatMessage.fromJson(item as Map<String, dynamic>))
         .toList();

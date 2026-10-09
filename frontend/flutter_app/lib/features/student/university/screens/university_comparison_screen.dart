@@ -159,35 +159,35 @@ class _UniversityComparisonScreenState
               ),
             )
           : _error != null
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(
-                          Icons.error_outline_rounded,
-                          size: 48,
-                          color: Color(0xFFDC2626),
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          _error!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(height: 16),
-                        FilledButton(
-                          onPressed: _loadComparisonData,
-                          child: const Text('Retry'),
-                        ),
-                      ],
+          ? Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      size: 48,
+                      color: Color(0xFFDC2626),
                     ),
-                  ),
-                )
-              : _universities.length < 2
-                  ? _buildEmptyState(context)
-                  : _buildComparisonContent(context, theme, studentStream),
+                    const SizedBox(height: 12),
+                    Text(
+                      _error!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: _loadComparisonData,
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : _universities.length < 2
+          ? _buildEmptyState(context)
+          : _buildComparisonContent(context, theme, studentStream),
     );
   }
 
@@ -195,62 +195,62 @@ class _UniversityComparisonScreenState
   // EMPTY STATE
   // ==================================================
   Widget _buildEmptyState(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFEFF6FF),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.compare_arrows_rounded,
-                  size: 44,
-                  color: Color(0xFF3B82F6),
-                ),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Select two or more universities to compare.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1E293B),
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Add up to 3 universities from the list to see side-by-side details, courses, eligibility criteria, and more.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF64748B),
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 24),
-              FilledButton.icon(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.school_outlined, size: 18),
-                label: const Text('Browse Universities'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B82F6),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(220, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-              ),
-            ],
+    child: Padding(
+      padding: const EdgeInsets.all(32),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
+            decoration: const BoxDecoration(
+              color: Color(0xFFEFF6FF),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.compare_arrows_rounded,
+              size: 44,
+              color: Color(0xFF3B82F6),
+            ),
           ),
-        ),
-      );
+          const SizedBox(height: 20),
+          const Text(
+            'Select two or more universities to compare.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF1E293B),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Add up to 3 universities from the list to see side-by-side details, courses, eligibility criteria, and more.',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFF64748B),
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.school_outlined, size: 18),
+            label: const Text('Browse Universities'),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFF3B82F6),
+              foregroundColor: Colors.white,
+              minimumSize: const Size(220, 48),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 
   // ==================================================
   // COMPARISON CONTENT (SIDE BY SIDE)
@@ -326,10 +326,7 @@ class _UniversityComparisonScreenState
                       ..._universities.map(
                         (uni) => SizedBox(
                           width: uniColumnWidth,
-                          child: _buildUniversityHeaderCard(
-                            uni,
-                            studentStream,
-                          ),
+                          child: _buildUniversityHeaderCard(uni, studentStream),
                         ),
                       ),
                     ],
@@ -377,9 +374,11 @@ class _UniversityComparisonScreenState
                     labelWidth: labelColumnWidth,
                     colWidth: uniColumnWidth,
                     values: _universities
-                        .map((u) => u.establishedYear != null
-                            ? '${u.establishedYear}'
-                            : 'Not available')
+                        .map(
+                          (u) => u.establishedYear != null
+                              ? '${u.establishedYear}'
+                              : 'Not available',
+                        )
                         .toList(),
                   ),
                   _buildComparisonRow(
@@ -387,9 +386,11 @@ class _UniversityComparisonScreenState
                     labelWidth: labelColumnWidth,
                     colWidth: uniColumnWidth,
                     values: _universities
-                        .map((u) => (u.website != null && u.website!.isNotEmpty)
-                            ? u.website!
-                            : 'Not available')
+                        .map(
+                          (u) => (u.website != null && u.website!.isNotEmpty)
+                              ? u.website!
+                              : 'Not available',
+                        )
                         .toList(),
                     isLink: true,
                     onTapLink: (val) {
@@ -407,9 +408,11 @@ class _UniversityComparisonScreenState
                     labelWidth: labelColumnWidth,
                     colWidth: uniColumnWidth,
                     values: _universities
-                        .map((u) => u.officialEmail.isNotEmpty
-                            ? u.officialEmail
-                            : 'Not available')
+                        .map(
+                          (u) => u.officialEmail.isNotEmpty
+                              ? u.officialEmail
+                              : 'Not available',
+                        )
                         .toList(),
                     onTapLink: (val) {
                       if (val != 'Not available') {
@@ -422,9 +425,11 @@ class _UniversityComparisonScreenState
                     labelWidth: labelColumnWidth,
                     colWidth: uniColumnWidth,
                     values: _universities
-                        .map((u) => u.contactNumber.isNotEmpty
-                            ? u.contactNumber
-                            : 'Not available')
+                        .map(
+                          (u) => u.contactNumber.isNotEmpty
+                              ? u.contactNumber
+                              : 'Not available',
+                        )
                         .toList(),
                     onTapLink: (val) {
                       if (val != 'Not available') {
@@ -437,9 +442,11 @@ class _UniversityComparisonScreenState
                     labelWidth: labelColumnWidth,
                     colWidth: uniColumnWidth,
                     values: _universities
-                        .map((u) => u.address.isNotEmpty
-                            ? u.address
-                            : 'Not available')
+                        .map(
+                          (u) => u.address.isNotEmpty
+                              ? u.address
+                              : 'Not available',
+                        )
                         .toList(),
                   ),
                   const SizedBox(height: 14),
@@ -474,44 +481,47 @@ class _UniversityComparisonScreenState
                       }
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: uni.degreeTitles.take(4).map<Widget>((title) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text('• ',
-                                    style: TextStyle(
+                        children:
+                            uni.degreeTitles.take(4).map<Widget>((title) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      '• ',
+                                      style: TextStyle(
                                         fontSize: 12,
-                                        color: Color(0xFF3B82F6))),
-                                Expanded(
-                                  child: Text(
-                                    title,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF1E293B),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList()
-                          ..addAll(
-                            uni.degreeTitles.length > 4
-                                ? [
-                                    Text(
-                                      '+ ${uni.degreeTitles.length - 4} more',
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        color: Color(0xFF2563EB),
-                                        fontWeight: FontWeight.w600,
+                                        color: Color(0xFF3B82F6),
                                       ),
                                     ),
-                                  ]
-                                : [],
-                          ),
+                                    Expanded(
+                                      child: Text(
+                                        title,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF1E293B),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList()..addAll(
+                              uni.degreeTitles.length > 4
+                                  ? [
+                                      Text(
+                                        '+ ${uni.degreeTitles.length - 4} more',
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: Color(0xFF2563EB),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ]
+                                  : [],
+                            ),
                       );
                     },
                   ),
@@ -520,9 +530,11 @@ class _UniversityComparisonScreenState
                     labelWidth: labelColumnWidth,
                     colWidth: uniColumnWidth,
                     values: _universities
-                        .map((u) => u.streams.isNotEmpty
-                            ? u.streams.join(', ')
-                            : 'Not available')
+                        .map(
+                          (u) => u.streams.isNotEmpty
+                              ? u.streams.join(', ')
+                              : 'Not available',
+                        )
                         .toList(),
                   ),
                   const SizedBox(height: 14),
@@ -533,9 +545,7 @@ class _UniversityComparisonScreenState
                     label: 'Min Z-Score',
                     labelWidth: labelColumnWidth,
                     colWidth: uniColumnWidth,
-                    values: _universities
-                        .map((u) => u.zScoreDisplay)
-                        .toList(),
+                    values: _universities.map((u) => u.zScoreDisplay).toList(),
                     isBold: true,
                   ),
                   _buildComparisonWidgetRow(
@@ -632,9 +642,11 @@ class _UniversityComparisonScreenState
                     labelWidth: labelColumnWidth,
                     colWidth: uniColumnWidth,
                     values: _universities
-                        .map((u) => u.degreeTypes.isNotEmpty
-                            ? u.degreeTypes.join(', ')
-                            : 'Bachelor\'s Degree')
+                        .map(
+                          (u) => u.degreeTypes.isNotEmpty
+                              ? u.degreeTypes.join(', ')
+                              : 'Bachelor\'s Degree',
+                        )
                         .toList(),
                   ),
                   const SizedBox(height: 14),
@@ -781,10 +793,7 @@ class _UniversityComparisonScreenState
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 11,
-              color: Color(0xFF64748B),
-            ),
+            style: const TextStyle(fontSize: 11, color: Color(0xFF64748B)),
           ),
           const SizedBox(height: 6),
           Container(
@@ -809,22 +818,22 @@ class _UniversityComparisonScreenState
 
   // Section Header
   Widget _buildSectionHeader(String title) => Container(
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          title,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.8,
-            color: Color(0xFF3B82F6),
-          ),
-        ),
-      );
+    margin: const EdgeInsets.symmetric(vertical: 8),
+    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    decoration: BoxDecoration(
+      color: const Color(0xFFF8FAFC),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Text(
+      title,
+      style: const TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 0.8,
+        color: Color(0xFF3B82F6),
+      ),
+    ),
+  );
 
   // Row for plain text values
   Widget _buildComparisonRow({
@@ -837,79 +846,79 @@ class _UniversityComparisonScreenState
     bool highlightChip = false,
     bool highlightBadge = false,
     ValueChanged<String>? onTapLink,
-  }) =>
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: labelWidth,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF64748B),
-                  ),
-                ),
+  }) => Container(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    decoration: const BoxDecoration(
+      border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: labelWidth,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF64748B),
               ),
             ),
-            ...values.map(
-              (val) => SizedBox(
-                width: colWidth,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: InkWell(
-                    onTap: onTapLink != null ? () => onTapLink(val) : null,
-                    borderRadius: BorderRadius.circular(4),
-                    child: highlightChip
-                        ? Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 2,
-                            ),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFEFF6FF),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              val,
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Color(0xFF2563EB),
-                              ),
-                            ),
-                          )
-                        : Text(
-                            val,
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight:
-                                  isBold ? FontWeight.w700 : FontWeight.w500,
-                              color: isLink
-                                  ? const Color(0xFF2563EB)
-                                  : highlightBadge
-                                      ? const Color(0xFF0F766E)
-                                      : const Color(0xFF1E293B),
-                              decoration: isLink
-                                  ? TextDecoration.underline
-                                  : TextDecoration.none,
-                            ),
+          ),
+        ),
+        ...values.map(
+          (val) => SizedBox(
+            width: colWidth,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: InkWell(
+                onTap: onTapLink != null ? () => onTapLink(val) : null,
+                borderRadius: BorderRadius.circular(4),
+                child: highlightChip
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          val,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF2563EB),
                           ),
-                  ),
-                ),
+                        ),
+                      )
+                    : Text(
+                        val,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: isBold
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                          color: isLink
+                              ? const Color(0xFF2563EB)
+                              : highlightBadge
+                              ? const Color(0xFF0F766E)
+                              : const Color(0xFF1E293B),
+                          decoration: isLink
+                              ? TextDecoration.underline
+                              : TextDecoration.none,
+                        ),
+                      ),
               ),
             ),
-          ],
+          ),
         ),
-      );
+      ],
+    ),
+  );
 
   // Row for custom widgets per university
   Widget _buildComparisonWidgetRow({
@@ -917,40 +926,39 @@ class _UniversityComparisonScreenState
     required double labelWidth,
     required double colWidth,
     required Widget Function(int index) builder,
-  }) =>
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        decoration: const BoxDecoration(
-          border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: labelWidth,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 12),
-                child: Text(
-                  label,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF64748B),
-                  ),
-                ),
+  }) => Container(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    decoration: const BoxDecoration(
+      border: Border(bottom: BorderSide(color: Color(0xFFF1F5F9))),
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: labelWidth,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF64748B),
               ),
             ),
-            for (int i = 0; i < _universities.length; i++)
-              SizedBox(
-                width: colWidth,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 10),
-                  child: builder(i),
-                ),
-              ),
-          ],
+          ),
         ),
-      );
+        for (int i = 0; i < _universities.length; i++)
+          SizedBox(
+            width: colWidth,
+            child: Padding(
+              padding: const EdgeInsets.only(right: 10),
+              child: builder(i),
+            ),
+          ),
+      ],
+    ),
+  );
 
   // ==================================================
   // COURSE-LEVEL COMPARISON WIDGET
@@ -1034,7 +1042,9 @@ class _UniversityComparisonScreenState
                       labelStyle: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: selected ? Colors.white : const Color(0xFF334155),
+                        color: selected
+                            ? Colors.white
+                            : const Color(0xFF334155),
                       ),
                       backgroundColor: const Color(0xFFF1F5F9),
                       shape: RoundedRectangleBorder(
@@ -1166,7 +1176,8 @@ class _UniversityComparisonScreenState
               )
             else
               ...filteredCourses.map((c) {
-                final matches = studentStream != null &&
+                final matches =
+                    studentStream != null &&
                     studentStream.isNotEmpty &&
                     (c.stream.toLowerCase() == studentStream.toLowerCase() ||
                         c.stream.toLowerCase() == 'any');
@@ -1288,4 +1299,3 @@ class _UniversityComparisonScreenState
     );
   }
 }
-

@@ -25,21 +25,20 @@ Career careerFixture({
   int salaryMin = 150000,
   int salaryMax = 500000,
   String jobOutlook = 'Very High',
-}) =>
-    Career(
-      id: id,
-      title: title,
-      category: category,
-      description: description,
-      salaryRange: SalaryRange(min: salaryMin, max: salaryMax),
-      jobOutlook: jobOutlook,
-      whatYouDo: whatYouDo,
-      requiredSkills: requiredSkills,
-      recommendedStreams: recommendedStreams,
-      industryOpportunities: industryOpportunities,
-      pathway: pathway,
-      relatedCourseKeywords: relatedCourseKeywords,
-    );
+}) => Career(
+  id: id,
+  title: title,
+  category: category,
+  description: description,
+  salaryRange: SalaryRange(min: salaryMin, max: salaryMax),
+  jobOutlook: jobOutlook,
+  whatYouDo: whatYouDo,
+  requiredSkills: requiredSkills,
+  recommendedStreams: recommendedStreams,
+  industryOpportunities: industryOpportunities,
+  pathway: pathway,
+  relatedCourseKeywords: relatedCourseKeywords,
+);
 
 /// Three careers across three categories, enough to exercise lists, filters
 /// and singular/plural wording.
@@ -47,35 +46,35 @@ Career careerFixture({
 /// default description would make every search match everything, and a search
 /// test would then pass without proving anything.
 List<Career> sampleCareers() => [
-      careerFixture(
-        id: 'id-se',
-        title: 'Software Engineer',
-        category: 'Information Technology',
-        description: 'Designs, builds and maintains software systems.',
-        requiredSkills: const ['Programming', 'Databases'],
-      ),
-      careerFixture(
-        id: 'id-md',
-        title: 'Medical Doctor',
-        category: 'Healthcare & Medicine',
-        description: 'Diagnoses and treats illness and cares for patients.',
-        requiredSkills: const ['Clinical knowledge', 'Empathy'],
-        recommendedStreams: const ['Science'],
-        salaryMin: 150000,
-        salaryMax: 600000,
-      ),
-      careerFixture(
-        id: 'id-ao',
-        title: 'Agricultural Officer',
-        category: 'Agriculture & Environment',
-        description: 'Supports farmers with crop science and soil management.',
-        requiredSkills: const ['Crop science', 'Field research'],
-        recommendedStreams: const ['Science'],
-        salaryMin: 70000,
-        salaryMax: 220000,
-        jobOutlook: 'Medium',
-      ),
-    ];
+  careerFixture(
+    id: 'id-se',
+    title: 'Software Engineer',
+    category: 'Information Technology',
+    description: 'Designs, builds and maintains software systems.',
+    requiredSkills: const ['Programming', 'Databases'],
+  ),
+  careerFixture(
+    id: 'id-md',
+    title: 'Medical Doctor',
+    category: 'Healthcare & Medicine',
+    description: 'Diagnoses and treats illness and cares for patients.',
+    requiredSkills: const ['Clinical knowledge', 'Empathy'],
+    recommendedStreams: const ['Science'],
+    salaryMin: 150000,
+    salaryMax: 600000,
+  ),
+  careerFixture(
+    id: 'id-ao',
+    title: 'Agricultural Officer',
+    category: 'Agriculture & Environment',
+    description: 'Supports farmers with crop science and soil management.',
+    requiredSkills: const ['Crop science', 'Field research'],
+    recommendedStreams: const ['Science'],
+    salaryMin: 70000,
+    salaryMax: 220000,
+    jobOutlook: 'Medium',
+  ),
+];
 
 /// In-memory stand-in for [CareerService].
 ///
@@ -148,11 +147,13 @@ class FakeCareerService implements CareerService {
     if (search.isNotEmpty) {
       final term = search.toLowerCase();
       results = results
-          .where((c) =>
-              c.title.toLowerCase().contains(term) ||
-              c.category.toLowerCase().contains(term) ||
-              c.description.toLowerCase().contains(term) ||
-              c.requiredSkills.any((s) => s.toLowerCase().contains(term)))
+          .where(
+            (c) =>
+                c.title.toLowerCase().contains(term) ||
+                c.category.toLowerCase().contains(term) ||
+                c.description.toLowerCase().contains(term) ||
+                c.requiredSkills.any((s) => s.toLowerCase().contains(term)),
+          )
           .toList();
     }
     return _respond(results);
@@ -163,11 +164,11 @@ class FakeCareerService implements CareerService {
 
   @override
   Future<Career> getCareerById(String token, String id) => _respond(
-        careers.firstWhere(
-          (c) => c.id == id,
-          orElse: () => careers.isNotEmpty ? careers.first : careerFixture(),
-        ),
-      );
+    careers.firstWhere(
+      (c) => c.id == id,
+      orElse: () => careers.isNotEmpty ? careers.first : careerFixture(),
+    ),
+  );
 
   @override
   Future<Career> createCareer(String token, Career career) {

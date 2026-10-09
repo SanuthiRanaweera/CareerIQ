@@ -102,4 +102,3 @@ class ApplicationStatusBadge extends StatelessWidget {
     );
   }
 }
-

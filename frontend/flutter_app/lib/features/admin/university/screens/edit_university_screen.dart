@@ -5,10 +5,7 @@ import '../services/university_admin_service.dart';
 import '../widgets/university_form.dart';
 
 class EditUniversityScreen extends StatefulWidget {
-  const EditUniversityScreen({
-    super.key,
-    required this.university,
-  });
+  const EditUniversityScreen({super.key, required this.university});
 
   final AdminUniversityModel university;
 
@@ -149,4 +146,3 @@ class _EditUniversityScreenState extends State<EditUniversityScreen> {
     );
   }
 }
-

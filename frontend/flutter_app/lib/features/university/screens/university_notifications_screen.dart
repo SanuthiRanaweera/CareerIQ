@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/university_dashboard_data.dart';
 
 class UniversityNotificationsScreen extends StatelessWidget {
-  const UniversityNotificationsScreen({
-    super.key,
-    required this.notifications,
-  });
+  const UniversityNotificationsScreen({super.key, required this.notifications});
 
   final List<UniversityNotificationModel> notifications;
 
@@ -55,10 +52,7 @@ class UniversityNotificationsScreen extends StatelessWidget {
                     const Text(
                       'You are all caught up! Important account and system notices will appear here.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF64748B),
-                      ),
+                      style: TextStyle(fontSize: 14, color: Color(0xFF64748B)),
                     ),
                   ],
                 ),
@@ -152,4 +146,3 @@ class UniversityNotificationsScreen extends StatelessWidget {
     );
   }
 }
-

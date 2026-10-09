@@ -15,9 +15,12 @@ const _streams = [
 ];
 
 class CourseCatalogPage extends StatefulWidget {
-  const CourseCatalogPage({super.key, this.initialStream});
+  const CourseCatalogPage({super.key, this.initialStream, this.initialSearch});
 
   final String? initialStream;
+
+  /// Pre-fills the search box, e.g. a topic opened from a career's details.
+  final String? initialSearch;
 
   @override
   State<CourseCatalogPage> createState() => _CourseCatalogPageState();
@@ -37,6 +40,7 @@ class _CourseCatalogPageState extends State<CourseCatalogPage> {
     super.initState();
     final stream = widget.initialStream;
     if (stream != null && _streams.contains(stream)) _selectedStream = stream;
+    _searchController.text = widget.initialSearch ?? '';
     _loadCourses();
   }
 

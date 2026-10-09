@@ -4,8 +4,8 @@ import '../models/admin_university_model.dart';
 
 class UniversityAdminService {
   UniversityAdminService({ApiService? api, AuthService? auth})
-      : _api = api ?? ApiService(),
-        _auth = auth ?? AuthService();
+    : _api = api ?? ApiService(),
+      _auth = auth ?? AuthService();
 
   final ApiService _api;
   final AuthService _auth;
@@ -28,11 +28,17 @@ class UniversityAdminService {
     if (search != null && search.trim().isNotEmpty) {
       queryParams.add('search=${Uri.encodeComponent(search.trim())}');
     }
-    if (status != null && status.trim().isNotEmpty && status.toLowerCase() != 'all') {
-      queryParams.add('status=${Uri.encodeComponent(status.trim().toLowerCase())}');
+    if (status != null &&
+        status.trim().isNotEmpty &&
+        status.toLowerCase() != 'all') {
+      queryParams.add(
+        'status=${Uri.encodeComponent(status.trim().toLowerCase())}',
+      );
     }
 
-    final queryString = queryParams.isNotEmpty ? '?${queryParams.join('&')}' : '';
+    final queryString = queryParams.isNotEmpty
+        ? '?${queryParams.join('&')}'
+        : '';
     final response = await _api.request(
       'GET',
       '/universities$queryString',
@@ -41,7 +47,9 @@ class UniversityAdminService {
 
     final list = response['data'] as List<dynamic>? ?? [];
     return list
-        .map((item) => AdminUniversityModel.fromJson(item as Map<String, dynamic>))
+        .map(
+          (item) => AdminUniversityModel.fromJson(item as Map<String, dynamic>),
+        )
         .toList();
   }
 
@@ -53,12 +61,15 @@ class UniversityAdminService {
       '/universities/$id',
       token: token,
     );
-    return AdminUniversityModel.fromJson(response['data'] as Map<String, dynamic>);
+    return AdminUniversityModel.fromJson(
+      response['data'] as Map<String, dynamic>,
+    );
   }
 
   // 3. CREATE UNIVERSITY (triggers OTP email from backend)
   Future<Map<String, dynamic>> createUniversity(
-      Map<String, dynamic> data) async {
+    Map<String, dynamic> data,
+  ) async {
     final token = await _getToken();
     final response = await _api.request(
       'POST',
@@ -71,7 +82,8 @@ class UniversityAdminService {
 
   // 4. VERIFY UNIVERSITY REGISTRATION OTP
   Future<AdminUniversityModel> verifyUniversityOtp(
-      Map<String, dynamic> data) async {
+    Map<String, dynamic> data,
+  ) async {
     final token = await _getToken();
     final response = await _api.request(
       'POST',
@@ -79,12 +91,15 @@ class UniversityAdminService {
       token: token,
       body: data,
     );
-    return AdminUniversityModel.fromJson(response['data'] as Map<String, dynamic>);
+    return AdminUniversityModel.fromJson(
+      response['data'] as Map<String, dynamic>,
+    );
   }
 
   // 5. RESEND UNIVERSITY OTP
   Future<Map<String, dynamic>> resendUniversityOtp(
-      Map<String, dynamic> data) async {
+    Map<String, dynamic> data,
+  ) async {
     final token = await _getToken();
     final response = await _api.request(
       'POST',
@@ -107,17 +122,15 @@ class UniversityAdminService {
       token: token,
       body: data,
     );
-    return AdminUniversityModel.fromJson(response['data'] as Map<String, dynamic>);
+    return AdminUniversityModel.fromJson(
+      response['data'] as Map<String, dynamic>,
+    );
   }
 
   // 7. DELETE UNIVERSITY
   Future<void> deleteUniversity(String id) async {
     final token = await _getToken();
-    await _api.request(
-      'DELETE',
-      '/universities/$id',
-      token: token,
-    );
+    await _api.request('DELETE', '/universities/$id', token: token);
   }
 
   // 8. UPDATE UNIVERSITY STATUS (Activate / Deactivate)
@@ -132,7 +145,9 @@ class UniversityAdminService {
       token: token,
       body: {'status': status.toLowerCase().trim()},
     );
-    return AdminUniversityModel.fromJson(response['data'] as Map<String, dynamic>);
+    return AdminUniversityModel.fromJson(
+      response['data'] as Map<String, dynamic>,
+    );
   }
 
   // 9. GET REAL STATISTICS
@@ -146,7 +161,8 @@ class UniversityAdminService {
       );
       if (response['data'] != null) {
         return AdminUniversityStats.fromJson(
-            response['data'] as Map<String, dynamic>);
+          response['data'] as Map<String, dynamic>,
+        );
       }
     } catch (_) {
       // Fallback: calculate from list if statistics endpoint has issue
@@ -161,4 +177,3 @@ class UniversityAdminService {
     return const AdminUniversityStats();
   }
 }
-

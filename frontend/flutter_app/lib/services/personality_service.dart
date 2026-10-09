@@ -6,7 +6,10 @@ class PersonalityService {
   final ApiService _api;
 
   Future<
-    ({List<PersonalityQuestion> questions, List<PersonalityAnswerOption> options})
+    ({
+      List<PersonalityQuestion> questions,
+      List<PersonalityAnswerOption> options,
+    })
   >
   getQuestions(String token) async {
     final response = await _api.request(
@@ -19,9 +22,7 @@ class PersonalityService {
         .map((q) => PersonalityQuestion.fromJson(q as Map<String, dynamic>))
         .toList();
     final options = (data['options'] as List)
-        .map(
-          (o) => PersonalityAnswerOption.fromJson(o as Map<String, dynamic>),
-        )
+        .map((o) => PersonalityAnswerOption.fromJson(o as Map<String, dynamic>))
         .toList();
     return (questions: questions, options: options);
   }

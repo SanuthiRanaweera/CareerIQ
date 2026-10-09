@@ -9,6 +9,7 @@ const universityRoutes = require('./routes/universityRoutes');
 const personalityRoutes = require('./routes/personalityRoutes');
 const chatbotRoutes = require('./routes/chatbotRoutes');
 const careerRoutes = require('./routes/careerRoutes');
+const savedCareerRoutes = require('./routes/savedCareerRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const groupChatRoutes = require('./routes/groupChatRoutes');
@@ -57,6 +58,7 @@ app.get('/api/admin/university-statistics', require('./middleware/authMiddleware
 app.use('/api/personality', personalityRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/careers', careerRoutes);
+app.use('/api/saved-careers', savedCareerRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/group-chat', groupChatRoutes);

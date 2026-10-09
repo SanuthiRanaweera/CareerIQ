@@ -15,11 +15,11 @@ class SalaryRange {
   });
 
   factory SalaryRange.fromJson(Map<String, dynamic> json) => SalaryRange(
-        min: (json['min'] as num?)?.toInt() ?? 0,
-        max: (json['max'] as num?)?.toInt() ?? 0,
-        currency: json['currency'] as String? ?? 'LKR',
-        period: json['period'] as String? ?? 'month',
-      );
+    min: (json['min'] as num?)?.toInt() ?? 0,
+    max: (json['max'] as num?)?.toInt() ?? 0,
+    currency: json['currency'] as String? ?? 'LKR',
+    period: json['period'] as String? ?? 'month',
+  );
 
   final int min;
   final int max;
@@ -27,11 +27,11 @@ class SalaryRange {
   final String period;
 
   Map<String, dynamic> toJson() => {
-        'min': min,
-        'max': max,
-        'currency': currency,
-        'period': period,
-      };
+    'min': min,
+    'max': max,
+    'currency': currency,
+    'period': period,
+  };
 }
 
 /// One ordered step on the pathway to a career, for example
@@ -61,12 +61,12 @@ class CareerPathwayStep {
   final String durationLabel;
 
   Map<String, dynamic> toJson() => {
-        'order': order,
-        'stage': stage,
-        'title': title,
-        'description': description,
-        'durationLabel': durationLabel,
-      };
+    'order': order,
+    'stage': stage,
+    'title': title,
+    'description': description,
+    'durationLabel': durationLabel,
+  };
 }
 
 /// A career, matching the Career model on the backend.
@@ -92,28 +92,28 @@ class Career {
   });
 
   factory Career.fromJson(Map<String, dynamic> json) => Career(
-        id: json['_id'] as String? ?? '',
-        title: json['title'] as String? ?? '',
-        category: json['category'] as String? ?? '',
-        description: json['description'] as String? ?? '',
-        salaryRange: SalaryRange.fromJson(
-          (json['salaryRange'] as Map<String, dynamic>?) ?? const {},
-        ),
-        jobOutlook: json['jobOutlook'] as String? ?? '',
-        whatYouDo: _stringList(json['whatYouDo']),
-        requiredSkills: _stringList(json['requiredSkills']),
-        recommendedStreams: _stringList(json['recommendedStreams']),
-        industryOpportunities: _stringList(json['industryOpportunities']),
-        pathway: ((json['pathway'] as List?) ?? const [])
-            .map((step) => CareerPathwayStep.fromJson(step as Map<String, dynamic>))
-            .toList(),
-        interestTags: _stringList(json['interestTags']),
-        alSubjects: _stringList(json['alSubjects']),
-        personalityTypes: _stringList(json['personalityTypes']),
-        workStyles: _stringList(json['workStyles']),
-        relatedCourseKeywords: _stringList(json['relatedCourseKeywords']),
-        salaryDisplay: json['salaryDisplay'] as String? ?? '',
-      );
+    id: json['_id'] as String? ?? '',
+    title: json['title'] as String? ?? '',
+    category: json['category'] as String? ?? '',
+    description: json['description'] as String? ?? '',
+    salaryRange: SalaryRange.fromJson(
+      (json['salaryRange'] as Map<String, dynamic>?) ?? const {},
+    ),
+    jobOutlook: json['jobOutlook'] as String? ?? '',
+    whatYouDo: _stringList(json['whatYouDo']),
+    requiredSkills: _stringList(json['requiredSkills']),
+    recommendedStreams: _stringList(json['recommendedStreams']),
+    industryOpportunities: _stringList(json['industryOpportunities']),
+    pathway: ((json['pathway'] as List?) ?? const [])
+        .map((step) => CareerPathwayStep.fromJson(step as Map<String, dynamic>))
+        .toList(),
+    interestTags: _stringList(json['interestTags']),
+    alSubjects: _stringList(json['alSubjects']),
+    personalityTypes: _stringList(json['personalityTypes']),
+    workStyles: _stringList(json['workStyles']),
+    relatedCourseKeywords: _stringList(json['relatedCourseKeywords']),
+    salaryDisplay: json['salaryDisplay'] as String? ?? '',
+  );
 
   final String id;
   final String title;
@@ -162,22 +162,22 @@ class Career {
   /// Body sent when creating or updating a career from the admin form.
   /// The id is excluded because it travels in the URL, not the body.
   Map<String, dynamic> toJson() => {
-        'title': title,
-        'category': category,
-        'description': description,
-        'whatYouDo': whatYouDo,
-        'requiredSkills': requiredSkills,
-        'recommendedStreams': recommendedStreams,
-        'salaryRange': salaryRange.toJson(),
-        'jobOutlook': jobOutlook,
-        'industryOpportunities': industryOpportunities,
-        'pathway': pathway.map((step) => step.toJson()).toList(),
-        'interestTags': interestTags,
-        'alSubjects': alSubjects,
-        'personalityTypes': personalityTypes,
-        'workStyles': workStyles,
-        'relatedCourseKeywords': relatedCourseKeywords,
-      };
+    'title': title,
+    'category': category,
+    'description': description,
+    'whatYouDo': whatYouDo,
+    'requiredSkills': requiredSkills,
+    'recommendedStreams': recommendedStreams,
+    'salaryRange': salaryRange.toJson(),
+    'jobOutlook': jobOutlook,
+    'industryOpportunities': industryOpportunities,
+    'pathway': pathway.map((step) => step.toJson()).toList(),
+    'interestTags': interestTags,
+    'alSubjects': alSubjects,
+    'personalityTypes': personalityTypes,
+    'workStyles': workStyles,
+    'relatedCourseKeywords': relatedCourseKeywords,
+  };
 }
 
 /// One ranked career returned by POST /api/careers/recommend.
@@ -217,8 +217,10 @@ class CareerRecommendationResult {
   factory CareerRecommendationResult.fromJson(Map<String, dynamic> json) =>
       CareerRecommendationResult(
         matches: ((json['data'] as List?) ?? const [])
-            .map((item) =>
-                CareerRecommendation.fromJson(item as Map<String, dynamic>))
+            .map(
+              (item) =>
+                  CareerRecommendation.fromJson(item as Map<String, dynamic>),
+            )
             .toList(),
         answeredComponents: (json['answeredComponents'] as num?)?.toInt() ?? 0,
         totalComponents: (json['totalComponents'] as num?)?.toInt() ?? 0,

@@ -38,7 +38,11 @@ class CareerService {
   /// Distinct category names, used to build the filter chips from real data
   /// rather than a hardcoded list that could drift out of date.
   Future<List<String>> getCategories(String token) async {
-    final response = await _api.request('GET', '/careers/categories', token: token);
+    final response = await _api.request(
+      'GET',
+      '/careers/categories',
+      token: token,
+    );
     return ((response['data'] as List?) ?? const [])
         .whereType<String>()
         .toList();

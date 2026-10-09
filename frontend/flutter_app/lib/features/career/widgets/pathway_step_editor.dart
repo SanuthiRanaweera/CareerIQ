@@ -107,17 +107,17 @@ class PathwayStepEditor extends StatelessWidget {
           )
         else
           ...steps.asMap().entries.map(
-                (entry) => _StepRow(
-                  position: entry.key + 1,
-                  step: entry.value,
-                  isFirst: entry.key == 0,
-                  isLast: entry.key == steps.length - 1,
-                  onEdit: () => _addOrEdit(context, index: entry.key),
-                  onRemove: () => _removeAt(entry.key),
-                  onMoveUp: () => _move(entry.key, -1),
-                  onMoveDown: () => _move(entry.key, 1),
-                ),
-              ),
+            (entry) => _StepRow(
+              position: entry.key + 1,
+              step: entry.value,
+              isFirst: entry.key == 0,
+              isLast: entry.key == steps.length - 1,
+              onEdit: () => _addOrEdit(context, index: entry.key),
+              onRemove: () => _removeAt(entry.key),
+              onMoveUp: () => _move(entry.key, -1),
+              onMoveDown: () => _move(entry.key, 1),
+            ),
+          ),
         const SizedBox(height: 12),
         OutlinedButton.icon(
           onPressed: () => _addOrEdit(context),
@@ -208,7 +208,9 @@ class _StepRow extends StatelessWidget {
                     if (step.durationLabel.isNotEmpty)
                       Text(
                         step.durationLabel,
-                        style: theme.textTheme.bodyLarge?.copyWith(fontSize: 12),
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontSize: 12,
+                        ),
                       ),
                   ],
                 ),
@@ -318,10 +320,10 @@ class _PathwayStepDialogState extends State<_PathwayStepDialog> {
               Text(
                 'Stage',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF1F2937),
-                    ),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: const Color(0xFF1F2937),
+                ),
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -330,7 +332,10 @@ class _PathwayStepDialogState extends State<_PathwayStepDialog> {
                 children: commonPathwayStages
                     .map(
                       (stage) => ActionChip(
-                        label: Text(stage, style: const TextStyle(fontSize: 12)),
+                        label: Text(
+                          stage,
+                          style: const TextStyle(fontSize: 12),
+                        ),
                         onPressed: () => setState(() => _stage.text = stage),
                         backgroundColor: const Color(0xFFF1F5F9),
                         shape: const StadiumBorder(

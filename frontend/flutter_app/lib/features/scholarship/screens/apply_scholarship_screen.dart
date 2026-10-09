@@ -186,10 +186,7 @@ class _ApplyScholarshipScreenState extends State<ApplyScholarshipScreen> {
                 )
               : const Text(
                   'Submit Scholarship Application',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
         ),
       ),
@@ -255,10 +252,7 @@ class _ApplyScholarshipScreenState extends State<ApplyScholarshipScreen> {
               const SizedBox(height: 4),
               const Text(
                 'The following verified academic information will be attached with your application.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF64748B),
-                ),
+                style: TextStyle(fontSize: 12, color: Color(0xFF64748B)),
               ),
               const SizedBox(height: 10),
               Container(

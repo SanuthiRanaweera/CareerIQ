@@ -49,11 +49,12 @@ void main() {
   }
 
   group('CareersListPage', () {
-    testWidgets('shows a loading indicator before the careers arrive',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        CareersListPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('shows a loading indicator before the careers arrive', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(CareersListPage(token: 't', careerService: FakeCareerService())),
+      );
 
       await tester.pump();
 
@@ -63,11 +64,12 @@ void main() {
       await tester.pumpAndSettle();
     });
 
-    testWidgets('renders a card per career with title, category and salary',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        CareersListPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('renders a card per career with title, category and salary', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(CareersListPage(token: 't', careerService: FakeCareerService())),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('Find your path'), findsOneWidget);
@@ -82,11 +84,12 @@ void main() {
       expect(find.text('LKR 70,000 - 220,000 / month'), findsOneWidget);
     });
 
-    testWidgets('writes the demand level as text, not colour alone',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        CareersListPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('writes the demand level as text, not colour alone', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(CareersListPage(token: 't', careerService: FakeCareerService())),
+      );
       await tester.pumpAndSettle();
 
       // Two "Very High" careers and one "Medium" in the sample data. The level
@@ -95,24 +98,34 @@ void main() {
       expect(find.text('Medium demand'), findsOneWidget);
     });
 
-    testWidgets('uses singular wording when only one career exists',
-        (tester) async {
-      await tester.pumpWidget(wrap(CareersListPage(
-        token: 't',
-        careerService: FakeCareerService(careers: [careerFixture()]),
-      )));
+    testWidgets('uses singular wording when only one career exists', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          CareersListPage(
+            token: 't',
+            careerService: FakeCareerService(careers: [careerFixture()]),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('1 career to explore'), findsOneWidget);
       expect(find.text('1 careers to explore'), findsNothing);
     });
 
-    testWidgets('shows an empty state when there are no careers',
-        (tester) async {
-      await tester.pumpWidget(wrap(CareersListPage(
-        token: 't',
-        careerService: FakeCareerService(careers: const []),
-      )));
+    testWidgets('shows an empty state when there are no careers', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          CareersListPage(
+            token: 't',
+            careerService: FakeCareerService(careers: const []),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('No careers yet'), findsOneWidget);
@@ -123,8 +136,9 @@ void main() {
       expect(find.text('Refresh'), findsOneWidget);
     });
 
-    testWidgets('shows the server error message with a retry action',
-        (tester) async {
+    testWidgets('shows the server error message with a retry action', (
+      tester,
+    ) async {
       final service = FakeCareerService(
         error: const ApiException('Invalid or expired token'),
       );
@@ -159,12 +173,17 @@ void main() {
       expect(service.getCareersCallCount, 2);
     });
 
-    testWidgets('falls back to a friendly message for a non-API failure',
-        (tester) async {
-      await tester.pumpWidget(wrap(CareersListPage(
-        token: 't',
-        careerService: FakeCareerService(error: Exception('socket closed')),
-      )));
+    testWidgets('falls back to a friendly message for a non-API failure', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          CareersListPage(
+            token: 't',
+            careerService: FakeCareerService(error: Exception('socket closed')),
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(
@@ -175,11 +194,12 @@ void main() {
       );
     });
 
-    testWidgets('cards are not tappable when no handler is supplied',
-        (tester) async {
-      await tester.pumpWidget(wrap(
-        CareersListPage(token: 't', careerService: FakeCareerService()),
-      ));
+    testWidgets('cards are not tappable when no handler is supplied', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(CareersListPage(token: 't', careerService: FakeCareerService())),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.arrow_forward_rounded), findsNothing);
@@ -187,11 +207,15 @@ void main() {
 
     testWidgets('tapping a card reports the selected career', (tester) async {
       Career? selected;
-      await tester.pumpWidget(wrap(CareersListPage(
-        token: 't',
-        careerService: FakeCareerService(),
-        onCareerSelected: (career) => selected = career,
-      )));
+      await tester.pumpWidget(
+        wrap(
+          CareersListPage(
+            token: 't',
+            careerService: FakeCareerService(),
+            onCareerSelected: (career) => selected = career,
+          ),
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byIcon(Icons.arrow_forward_rounded), findsNWidgets(3));
@@ -204,11 +228,74 @@ void main() {
     });
   });
 
+  group('CareersListPage shortlist chip', () {
+    testWidgets('opens the shortlist when tapped', (tester) async {
+      var opened = false;
+      await tester.pumpWidget(
+        wrap(
+          CareersListPage(
+            token: 't',
+            careerService: FakeCareerService(),
+            onOpenShortlist: () => opened = true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('My shortlist'));
+      await tester.pumpAndSettle();
+
+      expect(opened, isTrue);
+    });
+
+    testWidgets('is hidden when no handler is supplied', (tester) async {
+      await tester.pumpWidget(
+        wrap(CareersListPage(token: 't', careerService: FakeCareerService())),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('My shortlist'), findsNothing);
+    });
+
+    testWidgets('lays out under the real app button themes', (tester) async {
+      // Same infinite-minimum-width button themes as the app in lib/app.dart.
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData(
+            useMaterial3: true,
+            filledButtonTheme: FilledButtonThemeData(
+              style: FilledButton.styleFrom(
+                minimumSize: const Size.fromHeight(54),
+                shape: const StadiumBorder(),
+              ),
+            ),
+            outlinedButtonTheme: OutlinedButtonThemeData(
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size.fromHeight(52),
+                shape: const StadiumBorder(),
+              ),
+            ),
+          ),
+          home: CareersListPage(
+            token: 't',
+            careerService: FakeCareerService(),
+            onOpenShortlist: () {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('My shortlist'), findsOneWidget);
+      expect(find.text('Find your path'), findsOneWidget);
+    });
+  });
+
   group('CareersListPage search and category filter', () {
     testWidgets('shows a search field and a chip per category', (tester) async {
-      await tester.pumpWidget(wrap(
-        CareersListPage(token: 't', careerService: FakeCareerService()),
-      ));
+      await tester.pumpWidget(
+        wrap(CareersListPage(token: 't', careerService: FakeCareerService())),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(TextField), findsOneWidget);
@@ -218,20 +305,28 @@ void main() {
       // row scrolls horizontally, so later chips are reached by dragging.
       expect(find.byKey(categoryChipsKey), findsOneWidget);
       expect(find.widgetWithText(ChoiceChip, 'All'), findsOneWidget);
-      expect(await categoryChip(tester, 'Healthcare & Medicine'), findsOneWidget);
-      expect(await categoryChip(tester, 'Information Technology'), findsOneWidget);
+      expect(
+        await categoryChip(tester, 'Healthcare & Medicine'),
+        findsOneWidget,
+      );
+      expect(
+        await categoryChip(tester, 'Information Technology'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('"All" is selected by default and sends no category filter',
-        (tester) async {
+    testWidgets('"All" is selected by default and sends no category filter', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(CareersListPage(token: 't', careerService: service)),
       );
       await tester.pumpAndSettle();
 
-      final allChip =
-          tester.widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'All'));
+      final allChip = tester.widget<ChoiceChip>(
+        find.widgetWithText(ChoiceChip, 'All'),
+      );
       expect(allChip.selected, isTrue);
       expect(service.lastCategory, 'All');
       expect(find.text('3 careers to explore'), findsOneWidget);
@@ -253,8 +348,9 @@ void main() {
       expect(find.text('1 career found'), findsOneWidget);
     });
 
-    testWidgets('typing searches the backend after the debounce',
-        (tester) async {
+    testWidgets('typing searches the backend after the debounce', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(CareersListPage(token: 't', careerService: service)),
@@ -277,8 +373,9 @@ void main() {
       expect(find.text('Software Engineer'), findsNothing);
     });
 
-    testWidgets('rapid typing is debounced into a single request',
-        (tester) async {
+    testWidgets('rapid typing is debounced into a single request', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(CareersListPage(token: 't', careerService: service)),
@@ -314,8 +411,9 @@ void main() {
       expect(find.text('1 career found'), findsOneWidget);
     });
 
-    testWidgets('a search with no matches offers a way to clear the filters',
-        (tester) async {
+    testWidgets('a search with no matches offers a way to clear the filters', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(CareersListPage(token: 't', careerService: service)),
@@ -358,14 +456,19 @@ void main() {
       expect(find.byIcon(Icons.close_rounded), findsNothing);
     });
 
-    testWidgets('filters stay visible while results are reloading',
-        (tester) async {
-      await tester.pumpWidget(wrap(CareersListPage(
-        token: 't',
-        careerService: FakeCareerService(
-          responseDelay: const Duration(milliseconds: 300),
+    testWidgets('filters stay visible while results are reloading', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        wrap(
+          CareersListPage(
+            token: 't',
+            careerService: FakeCareerService(
+              responseDelay: const Duration(milliseconds: 300),
+            ),
+          ),
         ),
-      )));
+      );
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextField), 'medical');
@@ -384,8 +487,9 @@ void main() {
       expect(find.byType(LinearProgressIndicator), findsNothing);
     });
 
-    testWidgets('a stale response cannot overwrite newer results',
-        (tester) async {
+    testWidgets('a stale response cannot overwrite newer results', (
+      tester,
+    ) async {
       final service = FakeCareerService();
       await tester.pumpWidget(
         wrap(CareersListPage(token: 't', careerService: service)),
@@ -414,8 +518,9 @@ void main() {
       expect(find.text('Medical Doctor'), findsNothing);
     });
 
-    testWidgets('the screen still works when categories fail to load',
-        (tester) async {
+    testWidgets('the screen still works when categories fail to load', (
+      tester,
+    ) async {
       // getCategories failing must not take the whole screen down; the list
       // simply renders without the chip row.
       final service = _CategoriesFailService();

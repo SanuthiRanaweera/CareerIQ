@@ -7,7 +7,8 @@ class GroupChatService {
 
   Future<List<GroupMessage>> getMessages(String token) async {
     final response = await _api.request('GET', '/group-chat', token: token);
-    final list = response['data'] as List? ?? response['messages'] as List? ?? [];
+    final list =
+        response['data'] as List? ?? response['messages'] as List? ?? [];
     return list
         .whereType<Map<String, dynamic>>()
         .map(GroupMessage.fromJson)

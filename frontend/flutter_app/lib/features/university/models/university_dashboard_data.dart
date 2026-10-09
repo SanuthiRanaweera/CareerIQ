@@ -54,25 +54,33 @@ class UniversityProfileModel {
   factory UniversityProfileModel.fromJson(Map<String, dynamic> json) {
     return UniversityProfileModel(
       id: (json['_id'] ?? json['id'] ?? '').toString(),
-      userId: (json['userId'] is Map
-              ? (json['userId']['_id'] ?? json['userId']['id'])
-              : json['userId'] ?? '')
-          .toString(),
-      universityName: (json['universityName'] ?? json['name'] ?? '').toString().trim(),
-      officialEmail: (json['officialEmail'] ?? json['email'] ?? '').toString().trim(),
+      userId:
+          (json['userId'] is Map
+                  ? (json['userId']['_id'] ?? json['userId']['id'])
+                  : json['userId'] ?? '')
+              .toString(),
+      universityName: (json['universityName'] ?? json['name'] ?? '')
+          .toString()
+          .trim(),
+      officialEmail: (json['officialEmail'] ?? json['email'] ?? '')
+          .toString()
+          .trim(),
       location: (json['location'] ?? '').toString().trim(),
       address: (json['address'] ?? '').toString().trim(),
       contactNumber: (json['contactNumber'] ?? '').toString().trim(),
       representativeName: (json['representativeName'] ?? '').toString().trim(),
       representativeEmail: json['representativeEmail']?.toString().trim(),
-      representativeContactNumber:
-          (json['representativeContactNumber'] ?? '').toString().trim(),
-      universityType: json['universityType']?.toString().trim() ?? 'State University',
+      representativeContactNumber: (json['representativeContactNumber'] ?? '')
+          .toString()
+          .trim(),
+      universityType:
+          json['universityType']?.toString().trim() ?? 'State University',
       website: json['website']?.toString().trim(),
       description: json['description']?.toString().trim(),
       logo: json['logo']?.toString().trim(),
       status: (json['status'] ?? 'active').toString().trim(),
-      isEmailVerified: json['isEmailVerified'] == true || json['emailVerified'] == true,
+      isEmailVerified:
+          json['isEmailVerified'] == true || json['emailVerified'] == true,
       courseCount: (json['courseCount'] as num?)?.toInt() ?? 0,
       courses: (json['courses'] as List? ?? const [])
           .map((c) => UniversityCourseItem.fromJson(c as Map<String, dynamic>))
@@ -87,23 +95,23 @@ class UniversityProfileModel {
   }
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'userId': userId,
-        'universityName': universityName,
-        'officialEmail': officialEmail,
-        'location': location,
-        'address': address,
-        'contactNumber': contactNumber,
-        'representativeName': representativeName,
-        'representativeEmail': representativeEmail,
-        'representativeContactNumber': representativeContactNumber,
-        'universityType': universityType,
-        'website': website,
-        'description': description,
-        'logo': logo,
-        'status': status,
-        'isEmailVerified': isEmailVerified,
-      };
+    'id': id,
+    'userId': userId,
+    'universityName': universityName,
+    'officialEmail': officialEmail,
+    'location': location,
+    'address': address,
+    'contactNumber': contactNumber,
+    'representativeName': representativeName,
+    'representativeEmail': representativeEmail,
+    'representativeContactNumber': representativeContactNumber,
+    'universityType': universityType,
+    'website': website,
+    'description': description,
+    'logo': logo,
+    'status': status,
+    'isEmailVerified': isEmailVerified,
+  };
 
   UniversityProfileModel copyWith({
     String? universityName,
@@ -319,12 +327,16 @@ class UniversityDashboardData {
       university: UniversityProfileModel.fromJson(rawUni),
       statistics: UniversityStatisticsModel.fromJson(rawStats),
       notifications: rawNotifs
-          .map((n) => UniversityNotificationModel.fromJson(n as Map<String, dynamic>))
+          .map(
+            (n) =>
+                UniversityNotificationModel.fromJson(n as Map<String, dynamic>),
+          )
           .toList(),
       recentActivity: rawActs
-          .map((a) => UniversityActivityModel.fromJson(a as Map<String, dynamic>))
+          .map(
+            (a) => UniversityActivityModel.fromJson(a as Map<String, dynamic>),
+          )
           .toList(),
     );
   }
 }
-

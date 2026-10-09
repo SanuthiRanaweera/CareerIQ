@@ -17,6 +17,7 @@ import 'features/student/profile_page.dart';
 import 'models/career.dart';
 import 'models/student.dart';
 import 'services/auth_service.dart';
+import 'services/saved_career_service.dart';
 import 'services/student_service.dart';
 
 class MyApp extends StatelessWidget {
@@ -219,9 +220,12 @@ class _AuthGateState extends State<AuthGate> {
         builder: (_) => CareerDetailsPage(
           token: _token!,
           careerId: career.id,
+          savedCareerService: SavedCareerService(),
           onViewPathway: (loaded) => Navigator.push(
             context,
-            MaterialPageRoute(builder: (_) => CareerPathwayPage(career: loaded)),
+            MaterialPageRoute(
+              builder: (_) => CareerPathwayPage(career: loaded),
+            ),
           ),
         ),
       ),

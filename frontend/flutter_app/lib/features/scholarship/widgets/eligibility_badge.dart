@@ -30,10 +30,18 @@ class _EligibilityBadgeState extends State<EligibilityBadge> {
     final res = widget.result;
     final isEligible = res.isEligible;
 
-    final bgColor = isEligible ? const Color(0xFFECFDF5) : const Color(0xFFFFFBEB);
-    final borderColor = isEligible ? const Color(0xFFA7F3D0) : const Color(0xFFFDE68A);
-    final textColor = isEligible ? const Color(0xFF065F46) : const Color(0xFF92400E);
-    final iconColor = isEligible ? const Color(0xFF059669) : const Color(0xFFD97706);
+    final bgColor = isEligible
+        ? const Color(0xFFECFDF5)
+        : const Color(0xFFFFFBEB);
+    final borderColor = isEligible
+        ? const Color(0xFFA7F3D0)
+        : const Color(0xFFFDE68A);
+    final textColor = isEligible
+        ? const Color(0xFF065F46)
+        : const Color(0xFF92400E);
+    final iconColor = isEligible
+        ? const Color(0xFF059669)
+        : const Color(0xFFD97706);
 
     return Container(
       decoration: BoxDecoration(
@@ -49,7 +57,9 @@ class _EligibilityBadgeState extends State<EligibilityBadge> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Icon(
-                isEligible ? Icons.check_circle_rounded : Icons.info_outline_rounded,
+                isEligible
+                    ? Icons.check_circle_rounded
+                    : Icons.info_outline_rounded,
                 color: iconColor,
                 size: 20,
               ),
@@ -111,26 +121,31 @@ class _EligibilityBadgeState extends State<EligibilityBadge> {
                 ),
               ),
               const SizedBox(height: 4),
-              ...res.matchedCriteria.map((c) => Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.check_rounded,
-                            size: 14, color: Color(0xFF059669)),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            c,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF065F46),
-                            ),
+              ...res.matchedCriteria.map(
+                (c) => Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.check_rounded,
+                        size: 14,
+                        color: Color(0xFF059669),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          c,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF065F46),
                           ),
                         ),
-                      ],
-                    ),
-                  )),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
             if (res.unmetCriteria.isNotEmpty) ...[
               const SizedBox(height: 6),
@@ -143,26 +158,31 @@ class _EligibilityBadgeState extends State<EligibilityBadge> {
                 ),
               ),
               const SizedBox(height: 4),
-              ...res.unmetCriteria.map((c) => Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.close_rounded,
-                            size: 14, color: Color(0xFFDC2626)),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            c,
-                            style: const TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF92400E),
-                            ),
+              ...res.unmetCriteria.map(
+                (c) => Padding(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(
+                        Icons.close_rounded,
+                        size: 14,
+                        color: Color(0xFFDC2626),
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          c,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: Color(0xFF92400E),
                           ),
                         ),
-                      ],
-                    ),
-                  )),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ],
         ],

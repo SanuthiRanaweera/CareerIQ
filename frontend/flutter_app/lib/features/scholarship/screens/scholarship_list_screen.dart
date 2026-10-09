@@ -35,7 +35,8 @@ class _ScholarshipListScreenState extends State<ScholarshipListScreen>
   String? _scholarshipsError;
   String? _applicationsError;
 
-  String _selectedType = 'all'; // all, Merit, Need Based, Academic, Sports, Special Category, Other
+  String _selectedType =
+      'all'; // all, Merit, Need Based, Academic, Sports, Special Category, Other
   bool _filterByMyStream = false;
 
   @override
@@ -61,10 +62,9 @@ class _ScholarshipListScreenState extends State<ScholarshipListScreen>
 
     try {
       final typeParam = _selectedType == 'all' ? null : _selectedType;
-      final streamParam =
-          _filterByMyStream && widget.student.stream != null
-              ? widget.student.stream
-              : null;
+      final streamParam = _filterByMyStream && widget.student.stream != null
+          ? widget.student.stream
+          : null;
       final query = _searchController.text.trim().isNotEmpty
           ? _searchController.text.trim()
           : null;
@@ -185,10 +185,7 @@ class _ScholarshipListScreenState extends State<ScholarshipListScreen>
               ],
               Text(
                 'Submitted on: ${app.createdAt.day}/${app.createdAt.month}/${app.createdAt.year}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Color(0xFF64748B),
-                ),
+                style: const TextStyle(fontSize: 12, color: Color(0xFF64748B)),
               ),
               const Divider(height: 20),
               const Text(
@@ -271,7 +268,9 @@ class _ScholarshipListScreenState extends State<ScholarshipListScreen>
                 checkmarkColor: const Color(0xFF1D4ED8),
                 labelStyle: TextStyle(
                   fontSize: 12,
-                  fontWeight: _filterByMyStream ? FontWeight.w800 : FontWeight.w500,
+                  fontWeight: _filterByMyStream
+                      ? FontWeight.w800
+                      : FontWeight.w500,
                   color: _filterByMyStream
                       ? const Color(0xFF1D4ED8)
                       : const Color(0xFF475569),
@@ -360,104 +359,104 @@ class _ScholarshipListScreenState extends State<ScholarshipListScreen>
                   child: CircularProgressIndicator(color: Color(0xFF2563EB)),
                 )
               : _scholarshipsError != null
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.error_outline_rounded,
-                              size: 48,
-                              color: Color(0xFFEF4444),
-                            ),
-                            const SizedBox(height: 12),
-                            Text(
-                              _scholarshipsError!,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                                color: Color(0xFF64748B),
-                                fontSize: 14,
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline_rounded,
+                          size: 48,
+                          color: Color(0xFFEF4444),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _scholarshipsError!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color(0xFF64748B),
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        FilledButton(
+                          onPressed: _loadScholarships,
+                          child: const Text('Try Again'),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : _scholarships.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 80,
+                          height: 80,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEFF6FF),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.school_outlined,
+                            size: 40,
+                            color: Color(0xFF2563EB),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'No Scholarships Available',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF0F172A),
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        const Text(
+                          'There are no active scholarships matching your criteria right now. Check back soon!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF64748B),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              : RefreshIndicator(
+                  onRefresh: _loadScholarships,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    itemCount: _scholarships.length,
+                    itemBuilder: (context, index) {
+                      final s = _scholarships[index];
+                      return ScholarshipCard(
+                        scholarship: s,
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ScholarshipDetailsScreen(
+                                scholarship: s,
+                                student: widget.student,
+                                token: widget.token,
                               ),
                             ),
-                            const SizedBox(height: 16),
-                            FilledButton(
-                              onPressed: _loadScholarships,
-                              child: const Text('Try Again'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  : _scholarships.isEmpty
-                      ? Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(32),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 80,
-                                  height: 80,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFEFF6FF),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const Icon(
-                                    Icons.school_outlined,
-                                    size: 40,
-                                    color: Color(0xFF2563EB),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                const Text(
-                                  'No Scholarships Available',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF0F172A),
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                const Text(
-                                  'There are no active scholarships matching your criteria right now. Check back soon!',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: Color(0xFF64748B),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        )
-                      : RefreshIndicator(
-                          onRefresh: _loadScholarships,
-                          child: ListView.builder(
-                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-                            itemCount: _scholarships.length,
-                            itemBuilder: (context, index) {
-                              final s = _scholarships[index];
-                              return ScholarshipCard(
-                                scholarship: s,
-                                onTap: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ScholarshipDetailsScreen(
-                                        scholarship: s,
-                                        student: widget.student,
-                                        token: widget.token,
-                                      ),
-                                    ),
-                                  );
-                                  _loadScholarships();
-                                  _loadMyApplications();
-                                },
-                              );
-                            },
-                          ),
-                        ),
+                          );
+                          _loadScholarships();
+                          _loadMyApplications();
+                        },
+                      );
+                    },
+                  ),
+                ),
         ),
       ],
     );
@@ -701,10 +700,7 @@ class _ScholarshipListScreenState extends State<ScholarshipListScreen>
       ),
       body: TabBarView(
         controller: _tabController,
-        children: [
-          _buildScholarshipsTab(),
-          _buildApplicationsTab(),
-        ],
+        children: [_buildScholarshipsTab(), _buildApplicationsTab()],
       ),
     );
   }

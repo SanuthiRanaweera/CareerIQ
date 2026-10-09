@@ -33,8 +33,10 @@ class StudentUniversityService {
 
     final list = response['data'] as List<dynamic>? ?? [];
     return list
-        .map((item) =>
-            UniversityComparisonModel.fromJson(item as Map<String, dynamic>))
+        .map(
+          (item) =>
+              UniversityComparisonModel.fromJson(item as Map<String, dynamic>),
+        )
         .toList();
   }
 
@@ -53,8 +55,10 @@ class StudentUniversityService {
     final data = response['data'] as Map<String, dynamic>? ?? {};
     final list = data['universities'] as List<dynamic>? ?? [];
     return list
-        .map((item) =>
-            UniversityComparisonModel.fromJson(item as Map<String, dynamic>))
+        .map(
+          (item) =>
+              UniversityComparisonModel.fromJson(item as Map<String, dynamic>),
+        )
         .toList();
   }
 
@@ -92,8 +96,11 @@ class StudentUniversityService {
     );
     final list = response['data'] as List<dynamic>? ?? [];
     return list
-        .map((item) =>
-            item is Map ? (item['_id'] ?? item['id'] ?? '').toString() : item.toString())
+        .map(
+          (item) => item is Map
+              ? (item['_id'] ?? item['id'] ?? '').toString()
+              : item.toString(),
+        )
         .where((id) => id.isNotEmpty)
         .toList();
   }
@@ -124,4 +131,3 @@ class StudentUniversityService {
         .toList();
   }
 }
-

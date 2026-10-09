@@ -42,7 +42,10 @@ class ProfileCompletionCard extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: isComplete
                         ? const Color(0xFFDCFCE7)
@@ -139,4 +142,3 @@ class ProfileCompletionCard extends StatelessWidget {
     );
   }
 }
-

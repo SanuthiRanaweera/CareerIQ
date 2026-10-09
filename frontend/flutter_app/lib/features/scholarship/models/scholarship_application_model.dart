@@ -24,10 +24,10 @@ class ApplicationDocumentModel {
       );
 
   Map<String, dynamic> toJson() => {
-        'name': name,
-        'fileName': fileName,
-        'fileUrl': fileUrl,
-      };
+    'name': name,
+    'fileName': fileName,
+    'fileUrl': fileUrl,
+  };
 }
 
 class ScholarshipApplicationModel {
@@ -150,7 +150,9 @@ class ScholarshipApplicationModel {
 
     final rawDocs = (json['documents'] as List? ?? const []);
     final docs = rawDocs
-        .map((d) => ApplicationDocumentModel.fromJson(d as Map<String, dynamic>))
+        .map(
+          (d) => ApplicationDocumentModel.fromJson(d as Map<String, dynamic>),
+        )
         .toList();
 
     return ScholarshipApplicationModel(
@@ -162,17 +164,19 @@ class ScholarshipApplicationModel {
       universityId: uId,
       universityName: uName,
       universityLogo: uLogo,
-      studentId: (json['studentId'] is Map
-              ? json['studentId']['_id'] ?? json['studentId']['id']
-              : json['studentId'] ?? '')
-          .toString(),
+      studentId:
+          (json['studentId'] is Map
+                  ? json['studentId']['_id'] ?? json['studentId']['id']
+                  : json['studentId'] ?? '')
+              .toString(),
       studentName: (json['studentName'] ?? '').toString().trim(),
       studentEmail: (json['studentEmail'] ?? '').toString().trim(),
       studentSchool: (json['studentSchool'] ?? '').toString().trim(),
       studentDistrict: (json['studentDistrict'] ?? '').toString().trim(),
       studentStream: (json['studentStream'] ?? '').toString().trim(),
       studentPhone: json['studentPhone']?.toString().trim(),
-      zScore: (json['zScore'] as num?)?.toDouble() ??
+      zScore:
+          (json['zScore'] as num?)?.toDouble() ??
           (json['studentZScore'] as num?)?.toDouble(),
       studentAlResults: alResults,
       personalStatement: (json['personalStatement'] ?? '').toString().trim(),

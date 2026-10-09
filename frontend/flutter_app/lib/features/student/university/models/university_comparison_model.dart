@@ -48,8 +48,9 @@ class UniversityCourseInfo {
         id: (json['_id'] ?? json['id'] ?? '').toString(),
         title: (json['title'] ?? '').toString().trim(),
         stream: (json['stream'] ?? 'Any').toString().trim(),
-        degreeType:
-            (json['degreeType'] ?? "Bachelor's Degree").toString().trim(),
+        degreeType: (json['degreeType'] ?? "Bachelor's Degree")
+            .toString()
+            .trim(),
         durationYears: (json['durationYears'] as num?)?.toDouble() ?? 0.0,
         minZScore: (json['minZScore'] as num?)?.toDouble(),
         subjects: (json['subjects'] as List? ?? const [])
@@ -120,7 +121,10 @@ class UniversityComparisonModel {
 
   String get initials {
     final clean = universityName.replaceAll(RegExp(r'[^a-zA-Z\s]'), '');
-    final words = clean.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).toList();
+    final words = clean
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .toList();
     if (words.isEmpty) return 'U';
     if (words.length == 1) {
       return words[0].substring(0, words[0].length >= 2 ? 2 : 1).toUpperCase();
@@ -133,7 +137,8 @@ class UniversityComparisonModel {
 
   String get durationDisplay {
     if (durations.isEmpty) return 'Not available';
-    final intDurations = durations.map((d) => d.toInt()).toSet().toList()..sort();
+    final intDurations = durations.map((d) => d.toInt()).toSet().toList()
+      ..sort();
     if (intDurations.length == 1) return '${intDurations.first} Years';
     return '${intDurations.first} - ${intDurations.last} Years';
   }
@@ -155,8 +160,14 @@ class UniversityComparisonModel {
   bool matchesStream(String? studentStream) {
     if (studentStream == null || studentStream.trim().isEmpty) return false;
     final lower = studentStream.trim().toLowerCase();
-    return streams.any((s) => s.toLowerCase() == lower || s.toLowerCase() == 'any') ||
-        courses.any((c) => c.stream.toLowerCase() == lower || c.stream.toLowerCase() == 'any');
+    return streams.any(
+          (s) => s.toLowerCase() == lower || s.toLowerCase() == 'any',
+        ) ||
+        courses.any(
+          (c) =>
+              c.stream.toLowerCase() == lower ||
+              c.stream.toLowerCase() == 'any',
+        );
   }
 
   factory UniversityComparisonModel.fromJson(Map<String, dynamic> json) {
@@ -197,8 +208,9 @@ class UniversityComparisonModel {
       district: (json['district'] ?? '').toString().trim(),
       city: (json['city'] ?? '').toString().trim(),
       country: (json['country'] ?? 'Sri Lanka').toString().trim(),
-      universityType:
-          (json['universityType'] ?? 'State University').toString().trim(),
+      universityType: (json['universityType'] ?? 'State University')
+          .toString()
+          .trim(),
       establishedYear: (json['establishedYear'] as num?)?.toInt(),
       website: json['website']?.toString().trim(),
       officialEmail: (json['officialEmail'] ?? '').toString().trim(),
@@ -222,13 +234,16 @@ class UniversityComparisonModel {
       durations: rawDurations.isNotEmpty
           ? rawDurations
           : courses.map((c) => c.durationYears).toSet().toList(),
-      minZScore: (json['minZScore'] as num?)?.toDouble() ??
+      minZScore:
+          (json['minZScore'] as num?)?.toDouble() ??
           (courses.any((c) => c.minZScore != null)
               ? courses
-                  .map((c) => c.minZScore)
-                  .whereType<double>()
-                  .fold<double?>(
-                      null, (min, val) => min == null || val < min ? val : min)
+                    .map((c) => c.minZScore)
+                    .whereType<double>()
+                    .fold<double?>(
+                      null,
+                      (min, val) => min == null || val < min ? val : min,
+                    )
               : null),
       subjects: rawSubjects.isNotEmpty
           ? rawSubjects
@@ -236,4 +251,3 @@ class UniversityComparisonModel {
     );
   }
 }
-

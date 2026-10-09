@@ -5,10 +5,7 @@ import '../services/university_service.dart';
 import '../../student/courses/widgets/course_details_modal.dart';
 
 class UniversityCoursesScreen extends StatefulWidget {
-  const UniversityCoursesScreen({
-    super.key,
-    required this.universityName,
-  });
+  const UniversityCoursesScreen({super.key, required this.universityName});
 
   final String universityName;
 
@@ -101,10 +98,7 @@ class _UniversityCoursesScreenState extends State<UniversityCoursesScreen> {
             Text(
               'There are no degree courses currently linked to ${widget.universityName} in the system.',
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Color(0xFF64748B),
-              ),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
             ),
           ],
         ),
@@ -142,8 +136,10 @@ class _UniversityCoursesScreenState extends State<UniversityCoursesScreen> {
                     ),
                   ),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFEFF6FF),
                       borderRadius: BorderRadius.circular(8),
@@ -179,8 +175,11 @@ class _UniversityCoursesScreenState extends State<UniversityCoursesScreen> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.schedule_rounded,
-                          size: 14, color: Color(0xFF64748B)),
+                      const Icon(
+                        Icons.schedule_rounded,
+                        size: 14,
+                        color: Color(0xFF64748B),
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         '${course.durationYears.toStringAsFixed(1)} Years',
@@ -196,8 +195,11 @@ class _UniversityCoursesScreenState extends State<UniversityCoursesScreen> {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.analytics_outlined,
-                            size: 14, color: Color(0xFF2563EB)),
+                        const Icon(
+                          Icons.analytics_outlined,
+                          size: 14,
+                          color: Color(0xFF2563EB),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Min Z-Score: ${course.minZScore!.toStringAsFixed(2)}',
@@ -314,44 +316,44 @@ class _UniversityCoursesScreenState extends State<UniversityCoursesScreen> {
                       ),
                     )
                   : _errorMessage != null
-                      ? Center(
-                          child: Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(Icons.error_outline_rounded,
-                                    color: Color(0xFFDC2626), size: 40),
-                                const SizedBox(height: 12),
-                                Text(
-                                  _errorMessage!,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    color: Color(0xFF64748B),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                FilledButton(
-                                  onPressed: _loadCourses,
-                                  child: const Text('Try Again'),
-                                ),
-                              ],
+                  ? Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.error_outline_rounded,
+                              color: Color(0xFFDC2626),
+                              size: 40,
                             ),
-                          ),
-                        )
-                      : _filteredCourses.isEmpty
-                          ? _buildEmptyState()
-                          : RefreshIndicator(
-                              onRefresh: _loadCourses,
-                              child: ListView.builder(
-                                padding: const EdgeInsets.all(16),
-                                itemCount: _filteredCourses.length,
-                                itemBuilder: (context, index) {
-                                  return _buildCourseCard(
-                                      _filteredCourses[index]);
-                                },
-                              ),
+                            const SizedBox(height: 12),
+                            Text(
+                              _errorMessage!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Color(0xFF64748B)),
                             ),
+                            const SizedBox(height: 16),
+                            FilledButton(
+                              onPressed: _loadCourses,
+                              child: const Text('Try Again'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : _filteredCourses.isEmpty
+                  ? _buildEmptyState()
+                  : RefreshIndicator(
+                      onRefresh: _loadCourses,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: _filteredCourses.length,
+                        itemBuilder: (context, index) {
+                          return _buildCourseCard(_filteredCourses[index]);
+                        },
+                      ),
+                    ),
             ),
           ],
         ),
@@ -359,4 +361,3 @@ class _UniversityCoursesScreenState extends State<UniversityCoursesScreen> {
     );
   }
 }
-

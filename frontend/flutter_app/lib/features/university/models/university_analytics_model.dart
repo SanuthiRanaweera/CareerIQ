@@ -22,10 +22,7 @@ class DailyTrendPoint {
 }
 
 class MonthlyTrendPoint {
-  const MonthlyTrendPoint({
-    required this.month,
-    required this.count,
-  });
+  const MonthlyTrendPoint({required this.month, required this.count});
 
   final String month;
   final int count;
@@ -206,8 +203,9 @@ class FavouritesAnalyticsData {
       total: (json['total'] as num?)?.toInt() ?? 0,
       newInPeriod: (json['newInPeriod'] as num?)?.toInt() ?? 0,
       trend: ((json['trend'] as List?) ?? const [])
-          .map((item) =>
-              MonthlyTrendPoint.fromJson(item as Map<String, dynamic>))
+          .map(
+            (item) => MonthlyTrendPoint.fromJson(item as Map<String, dynamic>),
+          )
           .toList(),
     );
   }
@@ -231,12 +229,16 @@ class CoursesAnalyticsData {
       total: (json['total'] as num?)?.toInt() ?? 0,
       totalViews: (json['totalViews'] as num?)?.toInt() ?? 0,
       mostViewed: ((json['mostViewed'] as List?) ?? const [])
-          .map((item) =>
-              CourseAnalyticsItem.fromJson(item as Map<String, dynamic>))
+          .map(
+            (item) =>
+                CourseAnalyticsItem.fromJson(item as Map<String, dynamic>),
+          )
           .toList(),
       popularCourses: ((json['popularCourses'] as List?) ?? const [])
-          .map((item) =>
-              CourseAnalyticsItem.fromJson(item as Map<String, dynamic>))
+          .map(
+            (item) =>
+                CourseAnalyticsItem.fromJson(item as Map<String, dynamic>),
+          )
           .toList(),
     );
   }
@@ -264,8 +266,11 @@ class ScholarshipsAnalyticsData {
       applications: (json['applications'] as num?)?.toInt() ?? 0,
       periodApplications: (json['periodApplications'] as num?)?.toInt() ?? 0,
       performance: ((json['performance'] as List?) ?? const [])
-          .map((item) => ScholarshipPerformanceItem.fromJson(
-              item as Map<String, dynamic>))
+          .map(
+            (item) => ScholarshipPerformanceItem.fromJson(
+              item as Map<String, dynamic>,
+            ),
+          )
           .toList(),
     );
   }
@@ -349,8 +354,10 @@ class AnalyticsTrendsData {
           .toList(),
       scholarshipApplications:
           ((json['scholarshipApplications'] as List?) ?? const [])
-              .map((item) =>
-                  DailyTrendPoint.fromJson(item as Map<String, dynamic>))
+              .map(
+                (item) =>
+                    DailyTrendPoint.fromJson(item as Map<String, dynamic>),
+              )
               .toList(),
       courseViews: ((json['courseViews'] as List?) ?? const [])
           .map((item) => DailyTrendPoint.fromJson(item as Map<String, dynamic>))
@@ -422,4 +429,3 @@ class UniversityAnalyticsData {
     );
   }
 }
-

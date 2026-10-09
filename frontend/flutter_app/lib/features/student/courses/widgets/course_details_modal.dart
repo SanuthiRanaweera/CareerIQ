@@ -30,19 +30,14 @@ Future<void> showCourseDetailsModal(
 }
 
 class CourseDetailsModal extends StatelessWidget {
-  const CourseDetailsModal({
-    super.key,
-    required this.course,
-    this.student,
-  });
+  const CourseDetailsModal({super.key, required this.course, this.student});
 
   final Course course;
   final Student? student;
 
-  static String formatDuration(double years) =>
-      years == years.roundToDouble()
-          ? years.toStringAsFixed(0)
-          : years.toStringAsFixed(1);
+  static String formatDuration(double years) => years == years.roundToDouble()
+      ? years.toStringAsFixed(0)
+      : years.toStringAsFixed(1);
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +48,15 @@ class CourseDetailsModal extends StatelessWidget {
     final studentStream = student?.stream ?? '';
     final studentZScore = student?.zScore;
 
-    final isStreamEligible = !hasStudent ||
+    final isStreamEligible =
+        !hasStudent ||
         course.stream.toLowerCase() == 'any' ||
         (studentStream.isNotEmpty &&
             course.stream.toLowerCase() == studentStream.toLowerCase());
 
     final hasZScore = course.minZScore != null;
-    final isZScoreEligible = !hasZScore ||
+    final isZScoreEligible =
+        !hasZScore ||
         studentZScore == null ||
         studentZScore >= course.minZScore!;
 
@@ -165,17 +162,23 @@ class CourseDetailsModal extends StatelessWidget {
                       isStreamEligible
                           ? '• A/L Stream: Matches your ${studentStream.isNotEmpty ? studentStream : "stream"} criteria.'
                           : '• A/L Stream: Course requires ${course.stream} (Your stream: $studentStream).',
-                      style: const TextStyle(fontSize: 12, color: Color(0xFF334155)),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF334155),
+                      ),
                     ),
                     if (course.minZScore != null) ...[
                       const SizedBox(height: 3),
                       Text(
                         studentZScore != null
                             ? (studentZScore >= course.minZScore!
-                                ? '• Z-Score: Your score (${studentZScore.toStringAsFixed(2)}) meets the minimum requirement (${course.minZScore!.toStringAsFixed(2)}).'
-                                : '• Z-Score: Your score (${studentZScore.toStringAsFixed(2)}) is below the required cutoff (${course.minZScore!.toStringAsFixed(2)}).')
+                                  ? '• Z-Score: Your score (${studentZScore.toStringAsFixed(2)}) meets the minimum requirement (${course.minZScore!.toStringAsFixed(2)}).'
+                                  : '• Z-Score: Your score (${studentZScore.toStringAsFixed(2)}) is below the required cutoff (${course.minZScore!.toStringAsFixed(2)}).')
                             : '• Z-Score: Required cutoff is ${course.minZScore!.toStringAsFixed(2)}.',
-                        style: const TextStyle(fontSize: 12, color: Color(0xFF334155)),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF334155),
+                        ),
                       ),
                     ],
                   ],
@@ -274,20 +277,20 @@ class _CourseTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: textColor,
-            fontSize: 12,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      );
+    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+    decoration: BoxDecoration(
+      color: color,
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Text(
+      label,
+      style: TextStyle(
+        color: textColor,
+        fontSize: 12,
+        fontWeight: FontWeight.w700,
+      ),
+    ),
+  );
 }
 
 class _DetailLine extends StatelessWidget {
@@ -303,14 +306,17 @@ class _DetailLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        children: [
-          Icon(icon, color: const Color(0xFFD97706), size: 18),
-          const SizedBox(width: 8),
-          Text('$label: ',
-              style: const TextStyle(
-                  fontWeight: FontWeight.w700, color: Color(0xFF1E293B))),
-          Text(value, style: const TextStyle(color: Color(0xFF475569))),
-        ],
-      );
+    children: [
+      Icon(icon, color: const Color(0xFFD97706), size: 18),
+      const SizedBox(width: 8),
+      Text(
+        '$label: ',
+        style: const TextStyle(
+          fontWeight: FontWeight.w700,
+          color: Color(0xFF1E293B),
+        ),
+      ),
+      Text(value, style: const TextStyle(color: Color(0xFF475569))),
+    ],
+  );
 }
-

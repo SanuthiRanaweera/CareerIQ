@@ -112,7 +112,10 @@ class UniversityCard extends StatelessWidget {
                     ),
                   ),
                   PopupMenuButton<String>(
-                    icon: const Icon(Icons.more_vert_rounded, color: Color(0xFF64748B)),
+                    icon: const Icon(
+                      Icons.more_vert_rounded,
+                      color: Color(0xFF64748B),
+                    ),
                     onSelected: (val) {
                       switch (val) {
                         case 'view':
@@ -170,8 +173,11 @@ class UniversityCard extends StatelessWidget {
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete_outline_rounded,
-                                size: 18, color: Colors.red),
+                            Icon(
+                              Icons.delete_outline_rounded,
+                              size: 18,
+                              color: Colors.red,
+                            ),
                             SizedBox(width: 8),
                             Text('Delete', style: TextStyle(color: Colors.red)),
                           ],
@@ -191,8 +197,11 @@ class UniversityCard extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.email_outlined,
-                          size: 13, color: Color(0xFF64748B)),
+                      const Icon(
+                        Icons.email_outlined,
+                        size: 13,
+                        color: Color(0xFF64748B),
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         university.officialEmail,
@@ -207,8 +216,11 @@ class UniversityCard extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.phone_outlined,
-                            size: 13, color: Color(0xFF64748B)),
+                        const Icon(
+                          Icons.phone_outlined,
+                          size: 13,
+                          color: Color(0xFF64748B),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           university.contactNumber,
@@ -224,8 +236,11 @@ class UniversityCard extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.school_outlined,
-                            size: 13, color: Color(0xFF2563EB)),
+                        const Icon(
+                          Icons.school_outlined,
+                          size: 13,
+                          color: Color(0xFF2563EB),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           university.universityType!,
@@ -240,8 +255,11 @@ class UniversityCard extends StatelessWidget {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.menu_book_rounded,
-                          size: 13, color: Color(0xFF059669)),
+                      const Icon(
+                        Icons.menu_book_rounded,
+                        size: 13,
+                        color: Color(0xFF059669),
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         '${university.courseCount} ${university.courseCount == 1 ? "Course" : "Courses"}',
