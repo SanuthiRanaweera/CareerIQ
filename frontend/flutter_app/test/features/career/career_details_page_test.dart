@@ -141,26 +141,23 @@ void main() {
     });
   });
 
-  group('CareerDetailsPage recommended courses placeholder', () {
-    testWidgets('says course listings are coming and lists the keywords', (
-      tester,
-    ) async {
+  group('CareerDetailsPage recommended courses', () {
+    testWidgets('lists the keywords as tappable course topics', (tester) async {
       await tester.pumpWidget(detailsFor(fullCareer()));
       await tester.pumpAndSettle();
 
       await scrollTo(tester, find.text('Recommended courses'));
 
-      // Course data belongs to the Course module, so this section must be
-      // honest about not having it rather than showing invented courses.
-      expect(find.text('Course listings are coming soon.'), findsOneWidget);
-      expect(find.text('Look for courses in:'), findsOneWidget);
+      expect(
+        find.text('Tap a topic to find matching courses.'),
+        findsOneWidget,
+      );
+      expect(find.text('Course topics:'), findsOneWidget);
       expect(find.text('software engineering'), findsOneWidget);
       expect(find.text('computer science'), findsOneWidget);
     });
 
-    testWidgets('still shows the placeholder when there are no keywords', (
-      tester,
-    ) async {
+    testWidgets('explains when there are no keywords', (tester) async {
       final career = careerFixture(
         id: 'no-keywords',
         relatedCourseKeywords: const [],
@@ -170,8 +167,28 @@ void main() {
 
       await scrollTo(tester, find.text('Recommended courses'));
 
-      expect(find.text('Course listings are coming soon.'), findsOneWidget);
-      expect(find.text('Look for courses in:'), findsNothing);
+      expect(
+        find.text('No course topics have been added for this career yet.'),
+        findsOneWidget,
+      );
+      expect(find.text('Course topics:'), findsNothing);
+    });
+
+    testWidgets('tapping a topic opens the course finder with it searched', (
+      tester,
+    ) async {
+      await tester.pumpWidget(detailsFor(fullCareer()));
+      await tester.pumpAndSettle();
+
+      await scrollTo(tester, find.text('software engineering'));
+      await tester.tap(find.text('software engineering'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Course finder'), findsOneWidget);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller?.text,
+        'software engineering',
+      );
     });
   });
 

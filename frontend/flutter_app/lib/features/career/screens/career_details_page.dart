@@ -7,6 +7,7 @@ import '../../../services/api_service.dart';
 import '../../../models/saved_career.dart';
 import '../../../services/career_service.dart';
 import '../../../services/saved_career_service.dart';
+import '../../student/courses/course_catalog_page.dart';
 import '../widgets/career_card.dart' show DemandLevelBadge;
 import '../widgets/career_state_views.dart';
 
@@ -422,11 +423,15 @@ class _TagWrap extends StatelessWidget {
     required this.values,
     required this.background,
     required this.foreground,
+    this.onTap,
   });
 
   final List<String> values;
   final Color background;
   final Color foreground;
+
+  /// When set, each tag is tappable and reports its own value.
+  final void Function(String value)? onTap;
 
   @override
   Widget build(BuildContext context) => Wrap(
@@ -434,18 +439,25 @@ class _TagWrap extends StatelessWidget {
     runSpacing: 8,
     children: values
         .map(
-          (value) => Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: background,
+          (value) => Material(
+            color: background,
+            borderRadius: BorderRadius.circular(999),
+            child: InkWell(
               borderRadius: BorderRadius.circular(999),
-            ),
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: foreground,
+              onTap: onTap == null ? null : () => onTap!(value),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: foreground,
+                  ),
+                ),
               ),
             ),
           ),
@@ -456,10 +468,9 @@ class _TagWrap extends StatelessWidget {
 
 /// Recommended courses.
 ///
-/// Course data is owned by the Course module, which is built separately. This
-/// career only stores keywords describing the kind of course that fits, so the
-/// section shows those keywords and says plainly that the course listings are
-/// still to come, rather than pretending to have data it does not have.
+/// This career stores keywords describing the kind of course that fits. Each
+/// keyword opens the Course module's finder with that keyword already typed
+/// into the search box, so the student sees the real matching degrees.
 class _RecommendedCoursesSection extends StatelessWidget {
   const _RecommendedCoursesSection({required this.keywords});
 
@@ -483,7 +494,9 @@ class _RecommendedCoursesSection extends StatelessWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                'Course listings are coming soon.',
+                keywords.isEmpty
+                    ? 'No course topics have been added for this career yet.'
+                    : 'Tap a topic to find matching courses.',
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
             ),
@@ -492,7 +505,7 @@ class _RecommendedCoursesSection extends StatelessWidget {
         if (keywords.isNotEmpty) ...[
           const SizedBox(height: 14),
           Text(
-            'Look for courses in:',
+            'Course topics:',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -504,6 +517,12 @@ class _RecommendedCoursesSection extends StatelessWidget {
             values: keywords,
             background: const Color(0xFFF1F5F9),
             foreground: const Color(0xFF475569),
+            onTap: (keyword) => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => CourseCatalogPage(initialSearch: keyword),
+              ),
+            ),
           ),
         ],
       ],

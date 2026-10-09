@@ -172,6 +172,46 @@ void main() {
       expect(editing?.title, 'Software Engineer');
     });
 
+    testWidgets('reloads the list once the edit form closes', (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: service,
+            onEditCareer: (career) async {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final loadsBefore = service.getCareersCallCount;
+
+      await tester.tap(find.byTooltip('Edit Medical Doctor'));
+      await tester.pumpAndSettle();
+
+      expect(service.getCareersCallCount, loadsBefore + 1);
+    });
+
+    testWidgets('reloads the list once the add form closes', (tester) async {
+      final service = FakeCareerService();
+      await tester.pumpWidget(
+        wrap(
+          AdminManageCareersPage(
+            token: 't',
+            careerService: service,
+            onAddCareer: () async {},
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final loadsBefore = service.getCareersCallCount;
+
+      await tester.tap(find.text('Add career'));
+      await tester.pumpAndSettle();
+
+      expect(service.getCareersCallCount, loadsBefore + 1);
+    });
+
     testWidgets('hides the edit icon when no handler is supplied', (
       tester,
     ) async {

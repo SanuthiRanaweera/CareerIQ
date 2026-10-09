@@ -41,10 +41,14 @@ class AdminManageCareersPage extends StatefulWidget {
   final ValueChanged<int>? onCountChanged;
 
   /// Opens the create form. Null until that screen is wired up.
-  final VoidCallback? onAddCareer;
+  ///
+  /// May return a Future (such as the result of `Navigator.push`); the list
+  /// reloads once it completes, so a saved career appears without a refresh.
+  final FutureOr<void> Function()? onAddCareer;
 
   /// Opens the edit form for one career.
-  final void Function(Career career)? onEditCareer;
+  /// Reloads the list when the returned Future completes, like [onAddCareer].
+  final FutureOr<void> Function(Career career)? onEditCareer;
 
   /// Injectable API client so the screen can be tested without a backend.
   final CareerService? careerService;
@@ -127,6 +131,18 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
         _filtering = false;
       });
     }
+  }
+
+  /// Runs the host's add form, then reloads so the new career is listed.
+  Future<void> _addCareer() async {
+    await widget.onAddCareer?.call();
+    if (mounted) await _loadCareers();
+  }
+
+  /// Runs the host's edit form, then reloads so the changes are shown.
+  Future<void> _editCareer(Career career) async {
+    await widget.onEditCareer?.call(career);
+    if (mounted) await _loadCareers();
   }
 
   void _onSearchChanged(String _) {
@@ -288,7 +304,7 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
               if (widget.onAddCareer != null) ...[
                 const SizedBox(width: 4),
                 FilledButton.icon(
-                  onPressed: widget.onAddCareer,
+                  onPressed: _addCareer,
                   icon: const Icon(Icons.add_rounded, size: 18),
                   label: const Text('Add career'),
                   style: FilledButton.styleFrom(
@@ -376,7 +392,7 @@ class _AdminManageCareersPageState extends State<AdminManageCareersPage> {
             deleting: _deletingId == career.id,
             onEdit: widget.onEditCareer == null
                 ? null
-                : () => widget.onEditCareer!(career),
+                : () => _editCareer(career),
             onDelete: () => _confirmAndDelete(career),
           ),
         ),
